@@ -1,0 +1,14 @@
+# MotionControll.action
+# goal
+jcatty_msgs/bodyCmdMsg body_cmd
+
+---
+
+# result
+jcatty_msgs/bodyMsg body
+
+---
+
+# feedback
+jcatty_msgs/bodyMsg body
+jcatty_msgs/BodyInfoMsg bodyInfo

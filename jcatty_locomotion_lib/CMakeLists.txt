@@ -1,18 +1,15 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(jcatty_body_lib)
+project(jcatty_locomotion_lib)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  std_msgs
   jcatty_msgs
-  jcatty_action
-  jcatty_parts_lib
 )
 
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES jcatty_lib
-  CATKIN_DEPENDS roscpp std_msgs
+  CATKIN_DEPENDS roscpp jcatty_msgs
   #  DEPENDS system_lib
 )
 
@@ -22,14 +19,10 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME}
-  src/${PROJECT_NAME}/Body.cpp
-  src/${PROJECT_NAME}/Part.cpp
-  src/${PROJECT_NAME}/PartNode.cpp
-  src/${PROJECT_NAME}/MotionController.cpp
-  src/${PROJECT_NAME}/McNode.cpp
-  src/${PROJECT_NAME}/FeedbackProcesser.cpp
-  src/${PROJECT_NAME}/FpNode.cpp
+  src/${PROJECT_NAME}/BodyCmd.cpp
+  src/${PROJECT_NAME}/PartCmd.cpp
 )
+
 
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 

@@ -13,12 +13,11 @@
   <depend>catkin</depend>
   <build_depend>roscpp</build_depend>
   <build_depend>std_msgs</build_depend>
-  <build_depend>jcatty_simple_struct_msgs</build_depend>
-  <build_depend>jcatty_actuator_lib</build_depend>
+  <build_depend>jcatty_msgs</build_depend>
+  <build_depend>jcatty_parts_lib</build_depend>
   <build_depend>jcatty_body_lib</build_depend>
   <build_depend>jcatty_motion_lib</build_depend>
   <build_depend>jcatty_support_lib</build_depend>
-  <build_export_depend>jcatty_simple_struct_msgs</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
   <exec_depend>roscpp</exec_depend>

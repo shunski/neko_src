@@ -8,9 +8,9 @@ find_package(catkin REQUIRED COMPONENTS
   jcatty_msgs
   jcatty_action
 
-  jcatty_actuator_lib
+  jcatty_parts_lib
   jcatty_body_lib
-  jcatty_motion_lib
+  jcatty_locomotion_lib
   jcatty_support_lib
 )
 catkin_metapackage()

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>jcatty_lib</name>
+  <name>jcatty_support_lib</name>
   <version>0.0.0</version>
   <description>The jcatty_lib package</description>
 
@@ -12,12 +12,12 @@
   <buildtool_depend>catkin</buildtool_depend>
   <depend>catkin</depend>
   <build_depend>roscpp</build_depend>
-  <build_depend>std_msgs</build_depend>
-  <build_depend>jcatty_simple_struct_msgs</build_depend>
+  <build_depend>jcatty_msgs</build_depend>
+  <build_depend>jcatty_action</build_depend>
   <build_export_depend>roscpp</build_export_depend>
-  <build_export_depend>std_msgs</build_export_depend>
   <exec_depend>roscpp</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
+  <build_depend>jcatty_msgs</build_depend>
+  <build_depend>jcatty_action</build_depend>
 
 
   <export>

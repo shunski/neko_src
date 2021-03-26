@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(jcatty_lib)
+project(jcatty_support_lib)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  std_msgs
-  jcatty_simple_struct_msgs
+  jcatty_msgs
+  jcatty_action
 )
 
 catkin_package(
@@ -20,13 +20,11 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME}
-  src/${PROJECT_NAME}/Part.cpp
-  src/${PROJECT_NAME}/KondoServo.cpp
-  src/${PROJECT_NAME}/DCmotor.cpp
+  src/${PROJECT_NAME}/Calibration.cpp
+  src/${PROJECT_NAME}/Plot.cpp
+  src/${PROJECT_NAME}/Secretary.cpp
 )
 
-
-## Add cmake target dependencies of the library
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(${PROJECT_NAME}

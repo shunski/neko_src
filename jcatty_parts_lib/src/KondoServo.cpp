@@ -1,4 +1,4 @@
-/* 
+/*
  * KondoServo.cpp implements KondoServo.h
  * unsigned char number;           // [0, 31]
  * unsigned char degree;           // [0, 127], 0 = -135, 127 = 135 tranlated into [3500, 11500]
@@ -12,44 +12,49 @@
 
 #include "KondoServo.h"
 
-KondoServo::KondoServo (unsigned char Number) {
+KondoServo::KondoServo ( Uint8 ID, PartID partID) :
+    part_id(partID),
+    id (ID),
+    degree (128/2),                // Neutral
+    temp (1),
+    speed (90),
+    current (1),
+    stretch (60),
+    temp_limit (75),
+    current_limit (40)
+{}
 
-    number = Number;
-    degree = 128/2;                // Neutral
-    temp = 1;
-    speed = 90;
-    current = 1;
-    stretch = 60;
-    temp_limit = 75;
-    current_limit = 40;
-
+KondoServo::KondoServo ( Uint8 ID, PartID partID, ServoCommandMsg &  msg ):
+    id(ID),
+    part_id(partID)
+{
+    this->set(msg);
 }
 
-
-void KondoServo::update (unsigned char Degree, unsigned char Temp, unsigned char Current){
-    set_degree(Degree);
-    set_temp(Temp);
-    set_current(Current);
+KondoServo::KondoServo ( Uint8 ID, PartID partID, typename ServoFeedbackMsg::ConstPtr & msg ) :
+    id(ID),
+    part_id(partID)
+{
+    this->set(msg);
 }
 
-
-void Kondo_Servo::set (unsigned char Speed, unsigned char Stretch, unsigned char Temp_limit, unsigned char Current_limit) {
-    set_speed(Speed);
-    set_stretch(Stretch);
-    set_temp_limit(Temp_limit);
-    set_current_limit(Current_limit);
+KondoServo::KondoServo ( Uint8 ID, PartID partID, ServoFeedbackMsg & msg ):
+    id(ID),
+    part_id(partID)
+{
+    this->set(msg);
 }
 
-
-unsigned char  KondoServo::get_number () const { return number; }
-unsigned char KondoServo::get_degree () const { return degree; }
-unsigned char KondoServo::get_temp () const { return temp; }
-unsigned char KondoServo::get_speed () const { return speed; }
-unsigned char KondoServo::get_current() const { return current; }
-unsigned char KondoServo::get_strech() const { return stretch;  }
-unsigned char KondoServo::get_temp_limit() const { return temp_limit; }
-unsigned char KondoServo::get_current_limit() const { return current_limit; }
-
+PartID  KondoServo::get_part_id () const { return part_id; }
+Uint8  KondoServo::get_id () const { return id; }
+Uin16 KondoServo::get_degree () const { return degree; }
+double KondoServo::get_degree_by_degree () const { return double(degree) * ( (135.0*2)/65535.0 - 135.0); }
+Uint8 KondoServo::get_temp () const { return temp; }
+Uint8 KondoServo::get_speed () const { return speed; }
+Uint8 KondoServo::get_current() const { return current; }
+Uint8 KondoServo::get_strech() const { return stretch;  }
+Uint8 KondoServo::get_temp_limit() const { return temp_limit; }
+Uint8 KondoServo::get_current_limit() const { return current_limit; }
 
 void KondoServo::set_degree(unsigned char Degree) { degree = Degree; }
 void KondoServo::set_temp(unsigned char Temp) { temp = Temp; }
@@ -59,8 +64,8 @@ void KondoServo::set_strech(unsigned char Stretch) { stretch = Stretch; }
 void KondoServo::set_temp_limit(unsigned char Temp_limit) { temp_limit = Temp_limit; }
 void KondoServo::set_current_limit(unsigned char Current_limit) { current_limit = Current_limit; }
 
-void print() {
-    ROS_INFO("Printing Information of Servo: %d", number);
+void KondoServo::print() {
+    ROS_INFO("Printing Information of Servo: %d", id);
     ROS_INFO("\t degree = %d", degree);
     ROS_INFO("\t temp = %d", temp);
     ROS_INFO("\t speed = %d", speed);
@@ -68,4 +73,51 @@ void print() {
     ROS_INFO("\t stretch = %d", stretch);
     ROS_INFO("\t temp_limit = %d", temp_limit);
     ROS_INFO("\t current_limit = %d", current_limit);
+}
+
+CommandMsg KondoServo::get_CommandMsg() const {
+    CommandMsg msg;
+    set_CommandMsg();
+    return msg;
+}
+
+void KondoServo::set_CommandMsg( CommandMsg & msg ) const {
+    msg.id = this.get_id();
+    msg.current_limit = this->get_current_limit();
+    msg.degree = this->get_degree();
+    msg.speed = this->get_speed();
+    msg.stretch = this->get_strech();
+    msg.temp_limit = this->get_temp_limit();
+}
+
+void set( CommandMsg & msg) {
+    if( msg.id != this.get_id() ) {
+        ROS_INFO("Could not set KondoServo from the msg since the ID does not match; object ID:[%d] and msg ID:[%d].", msg.id, this.get_Id());
+        return;
+    }
+    set_current_limit( msg.current_limit );
+    set_degree( msg.degree );
+    set_speed( msg.speed );
+    set_strech( msg.stretch );
+    set_temp_limit( msg.temp_limit );
+}
+
+void KondoServo::set( typename FeedbackMsg::ConstPtr & msg ) {
+    if( msg->id != this.get_id() ) {
+        ROS_INFO("Could not set KondoServo from the msg since the ID does not match; object ID:[%d] and msg ID:[%d].", msg->id, this.get_Id());
+        return;
+    }
+    set_degree( msg->degree );
+    set_current( msg->current );
+    set_temp( msg->temp );
+}
+
+void KondoServo::set( FeedbackMsg & msg ) {
+    if( msg.id != this.get_id() ) {
+        ROS_INFO("Could not set KondoServo from the msg since the ID does not match; object ID:[%d] and msg ID:[%d].", msg.id, this.get_Id());
+        return;
+    }
+    set_degree( msg.degree );
+    set_current( msg.current );
+    set_temp( msg.temp );
 }

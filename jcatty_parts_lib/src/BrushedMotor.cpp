@@ -11,8 +11,8 @@
 #include "BrushedMotor.h"
 
 
-BrushedMotor( unsigned char Number ){
-    number = Number;
+BrushedMotor( Uint8 ID, PartID partID){
+    id = ID;
     rpm = set_rpm(0);
     current = set_current(0);
     set_current_limit_ampair( float( default_current ));
@@ -20,32 +20,30 @@ BrushedMotor( unsigned char Number ){
 }
 
 
-void update( unsigned int Rpm, unsigned char Current );
-void set( unsigned char Current_limit, unsigned char Pwm );
-unsigned char get_number() const { return number; }
-unsigned char get_rpm() const { return rpm; }
-unsigned char get_current() const { return current; }
-unsigned char get_current_limit() const { return current_limit; }
-unsigned char get_pwm() const { return pwm; }
-void set_rpm( unsigned int Rpm ){ rpm = Rpm; }
-void set_current( unsigned char Current ){ current = Current; }
-void set_pwm( unsigned char Pwm ) { pwm = Pwm; }
+void update( Uint8 Rpm, Uint8 Current );
+void set( Uint8 Current_limit, Uint8 Pwm );
+Uint8 get_number() const { return number; }
+Uint8 get_rpm() const { return rpm; }
+Uint8 get_current() const { return current; }
+Uint8 get_current_limit() const { return current_limit; }
+Uint8 get_pwm() const { return pwm; }
+void set_rpm( Uint16 Rpm ) { rpm = Rpm; }
+void set_current( Uint8 Current ){ current = Current; }
+void set_pwm( Uint8 Pwm ) { pwm = Pwm; }
 void maximize_current_limit() { current_limit = max_current; }
 
-
-void set_current_limit( unsigned char Current_limit ){ current_limit = Current_limit; }
-
+void set_current_limit( Uint8 Current_limit ){ current_limit = Current_limit; }
 
 bool set_current_limit_ampair(float Current_limit_ampair) {
     if( Current_value_ampair < 0 ) {
-	ROS_INFO("ERROR: in 'set_current_limit_ampair( float )': Negative number Received!");
+        ROS_INFO("ERROR: in 'set_current_limit_ampair( float )': Negative number Received!");
         return false;
     }
 
     current_limit = set_currentt_limit( unsigned char( current_float_to_char( Current_limit_ampair )));
 
     if( Current_calue > 128.0 ){
-	ROS_INFO("WARNING: in 'set_current_limit_ampair( float )': Too large number Received! Fixed to current_max( %d )", current_max);
+        ROS_INFO("WARNING: in 'set_current_limit_ampair( float )': Too large number Received! Fixed to current_max( %d )", current_max);
         return false;
     }
 
@@ -53,7 +51,7 @@ bool set_current_limit_ampair(float Current_limit_ampair) {
 }
 
 
-unsigned char current_float_to_char( float current_float ){
+Uint8 current_float_to_char( float current_float ){
     int current_int = int( current_float * ( 128.0 / max_current ) + 0.5);
 
     if( current_int < 0 ) { return 0; }
@@ -65,7 +63,7 @@ unsigned char current_float_to_char( float current_float ){
     }
 }
 
-float current_char_to_float( unsigned char current_char ){
+float current_char_to_float( Uint8 current_char ){
     return float( current_char ) / ( 128.0 / max_current );
 }
 

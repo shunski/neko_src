@@ -1,48 +1,57 @@
 // KondoServo.cpp implemented by KondoServo.cpp
-
-
 #ifndef KONDOSERVO_H
 #define KONDOSERVO_H
 
-
 #include <ros/ros.h>
+#include <Utilities.h>
+#include <jcatty_parts_msgs/KondoServoCommandMsg.msg>
+#include <jcatty_parts_msgs/KondoServoFeedbackMsg.msg>
 
+typedef jcatty_parts_msgs::KondoServoCommandMsg ServoCommandMsg;
+typedef jcatty_parts_msgs::KondoServoFeedbackMsg ServoFeedbackMsg;
 
 class KondoServo
 {
-
     private:
-        unsigned char number;           // [0, 31]
-	      unsigned char degree;           // [0, 127], 0 = -135, 127 = 135 tranlated into [3500, 11500]
-	      unsigned char temp;             // [1 ~ 127], 30 = 100
-	      unsigned char speed;            // [1 ~ 127]
-	      unsigned char current;          // [1 ~ 63], I = I[A]
-	      unsigned char stretch;          // [1 ~ 127]
-        unsigned char temp_limit;       // [1 ~ 127], 30 = 100[C], 75 = 70[C];
-        unsigned char current_limit;    // [1 ~ 63], I = I[A]
+        PartID part_id;         // see definition in Utilities.h
+        Uint8 id;               // [0, 31]
+	    Uint16 degree;          // [0, 65535]<=>[-135, 135] at teensy tranlated into [3500, 11500]
+	    Uint8 temp;             // [1 ~ 127], 30 = 100
+	    Uint8 speed;            // [1 ~ 127]
+	    Uint8 current;          // [1 ~ 63], I [A]
+	    Uint8 stretch;          // [1 ~ 127]
+        Uint8 temp_limit;       // [1 ~ 127], 30 = 100[C], 75 = 70[C];
+        Uint8 current_limit;    // [1 ~ 63], I [A]
 
     public:
-        KondoServo (unsigned char Number);
-        void update (unsigned char Degree, unsigned char Temp, unsigned char Current);
-        void set (unsigned char Speed, unsigned char Stretch, unsigned char Temp_limit, unsigned char Current_limit);
-        unsigned char get_number () const;
-        unsigned char get_degree () const;
-        unsigned char get_temp () const;
-        unsigned char get_speed () const;
-        unsigned char get_current() const;
-        unsigned char get_strech() const;
-        unsigned char get_temp_limit() const;
-        unsigned char get_current_limit() const;
+        KondoServo ( Uint8 ID, PartID partID);
+        KondoServo ( Uint8 ID, PartID partID, ServoCommandMsg & );
+        KondoServo ( Uint8 ID, PartID partID, typename ServoFeedbackMsg::ConstPtr & );
+        KondoServo ( Uint8 ID, PartID partID, ServoFeedbackMsg & );
+        PartID  get_part_id () const 
+        unsigned char get_id () const;
+        unsigned short get_degree () const;
+        double get_degree_by_degree () const;
+        Uint8 get_temp () const;
+        Uint8 get_speed () const;
+        Uint8 get_current() const;
+        Uint8 get_strech() const;
+        Uint8 get_temp_limit() const;
+        Uint8 get_current_limit() const;
 
-        void set_degree(unsigned char Degree);
-        void set_temp(unsigned char Temp);
-        void set_speed(unsigned char Speed);
-        void set_current(unsigned char Current);
-        void set_strech(unsigned char Stretch);
-        void set_temp_limit(unsigned char Temp_limit);
-        void set_current_limit(unsigned char Current_limit);
+        void set_degree( Uint16 Degree );
+        void set_temp( Uint8 Temp );
+        void set_speed( Uint8 Speed );
+        void set_current( Uint8 Current );
+        void set_strech( Uint8 Stretch );
+        void set_temp_limit( Uint8 Temp_limit );
+        void set_current_limit( Uint8 Current_limit );
         void print();
-};
 
+        ServoCommandMsg get_CommandMsg() const;
+        void set_CommandMsg( ServoCommandMsg & msg ) const;
+        void set( typename ServoFeedbackMsg::ConstPtr & msg );
+        void set( ServoFeedbackMsg & msg );
+};
 
 #endif

@@ -3,37 +3,32 @@
 #ifndef CATTYLOCOMOTION_H
 #define CATTYLOCOMOTION_H
 
-#include <array>
 #include <vector>
 #include <math.h>
 #include <ros/ros.h>
 
-#define numOfTerms 361
-
-typedef boost::array<unsigned, numOfTerms> Uint8Sequence;
-
 class CattyLocomotion
 {
     protected:
-        // (max_amplitude)*sin(2*pi*phi+initial_phase)
-        Uint8Sequence phi;                        // x is in (0,numOfTerms-1); y is in (0,100);
-        ros::Duration period;                     // domain of t
+        Uint8Sequence sequence;
+        unsigned int numOfSequence;
+        ros::Duration period;
         int max_amplitude;
-        int initial_phase;                        // 0 ~ numOfTerms
-        int max_speed;                            // [Hz]
+        int max_speed;
         bool valid;
 
-        bool check_monotonicity() const ;
         bool check_connectivity() const;
-        bool check_max_speed() const ;
+        bool check_periodicity() const;
 
         // Constructor (Initializer)
-        CattyLocomotion(Uint8Sequence Sequence, double Period) :
-            phi(Sequence),
-            period(Period),
-            valid(true)
+        CattyLocomotion(Uint8Sequence Sequence, ros::Duration Period, int MaxAmplitude, int MaxSpeed ) :
+            phi( Sequence ),
+            period( Period ),
+            max_amplitude( MaxAmplitude ),
+            max_speed( MaxSpeed ),
+            valid(　true　)
         {
-            if(!check()) {
+            if( !check() ) {
                 valid = false;
                 ROS_INFO("Failed to Construct CattyLocomotion.");
             }
@@ -42,15 +37,21 @@ class CattyLocomotion
 
     public:
         bool check() const {
-            if (check_monotonicity()) return false;
-            if (check_connectivity()) return false;
+            if ( get_durationPerPlot < 0.01 ) return false;
+            if ( !isPeriodic()) return false;
+            if ( !isContinuous()) return false;
+            if ( !isDifferentiable()) return false;
             return true;
         }
 
-        array<double, numOfTerms> get_first_derivative() const ;
-        array<double, numOfTerms> get_second_derivative()const ;
+        std::vector<double> get_first_derivative() const;
+        std::vector<double> get_second_derivative() const;
+        void set_first_derivative( std::vector<double> & ) const;
+        void set_second_derivative( std::vector<double> & ) const;
         double get_highest_speed() const ;
         double get_highest_torque() const ;
+        ros::Duration get_durationPerPlot() const { return period / double(numOfSequence) };
+        void set_MotionControllGoal( MotionControllGoal & );
 };
 
 
@@ -59,61 +60,51 @@ namespace CattyLocomotion
     class ServoCmd : public CattyLocomotion
     {
         private:
-            Uint8Sequence limitSpeedSeqence;
-            Uint8Sequence limitStretchSequence;
-            Uint8Sequence limitCurrentSequence;
+            Uint8Sequence speedLimitSeqence;
+            Uint8Sequence stretchLimitSequence;
+            Uint8Sequence currentLimitSequence;
+            Uint8Sequence temperatureLimitSequence;
         public:
-            ServoCmd(Uint8Sequence Sequence, double Period, Uint8Sequence LimitSpeedSeqence,
+            ServoCmd(Uint8Sequence Sequence, ros::Duration Period, Uint8Sequence LimitSpeedSeqence,
                 Uint8Sequence LimitStretchSequence, Uint8Sequence LimitCurrentSequence) :
-            CattyLocomotion(Sequence, Period),
-            limitSpeedSeqence(LimitSpeedSeqence),
-            limitStretchSeqence(LimitStretchSeqence),
-            limitCurrentSeqence(LimitCurrentSeqence)
+                CattyLocomotion(Sequence, Period),
+                speedLimitSeqence(SpeedLimitSeqence),
+                stretchLimitSeqence(StretchLimitSeqence),
+                currentLimitSeqence(CurrentLimitSeqence),
+                temperatureLimitSequence(TemperatureLimitSequence)
             {}
     };
 
-    class DCmotorCmd : public CattyLocomotion
+    class BrushedMotorCmd : public CattyLocomotion
     {
         private:
             Uint8Sequence currentLimitSequence;
-            Uint8Sequence stretchLimitSequence;
         public:
-            DCmotorCMD() :
-            CattyLocomotion(Sequence, Duration):
+            BrushedMotorCmd(Uint8Sequence Sequence, ros::Duration Period, int MaxSpeed, int MaxAmplitude, Uint8Sequence CurrentLimitSeqence) :
+                CattyLocomotion( Sequence, Period, MaxSpeed, MaxAmplitude ),
+                currentLimitSeqence( CurrentLimitSeqence )
             {}
+
+
     };
 
     class PartCmd
     {
         private:
             std::vector<ServoCmd> servoCommands;
-            std::vector<DCmotorCmd> dcmotorCommands;
+            std::vector<BrushedMotorCmd> brushedMotorCommands;
+            std::vector<BrushlessMotorCmd> brushlessMotorCommands;
         public:
-            PartCmd(std::vector<ServoCmd> ServoCommands, std::vector<DCmotorCmd> DCmotorCommands):
-            servoCommands(ServoCommands),
-            dcmotorCommands(DCmotorCommands)
+            PartCmd(std::vector<ServoCmd> ServoCommands, std::vector<DCmotorCmd> BrushedMotorCommands):
+                servoCommands(ServoCommands),
+                brushedMotorCommands(BrushedMotorCommands),
+                brushlessMotorCommands(BrushlessMotorCommands)
             {}
     };
 
-    class BodyCmd
-    {
-        private:
-            PartCmd headCmd;
-            PartCmd chestCmd;
-            PartCmd waistCmd;
-            PartCmd rfCmd;
-            PartCmd lfCmd;
-            PartCmd rhCmd;
-            PartCmd lfCmd;
-        public:
-            BodyCmd(PartCmd HeadCmd, PartCmd ChestCmd, PartCmd WaistCmd, PartCmd RFCmd, PartCmd LFCmd, PartCmd RHCmd, PartCmd LFCmd):
-            headCmd(HeadCmd),
-            chestCmd(ChestCmd),
-            waistCmd(WaistCmd),
-            rfCmd(RFCmd),
-            lfCmd(LFCmd),
-            rhCmd(RHCmd),
-            lfCmd(LFCmd)
-            {}
-    };
+    Uint8Sequence createConstantSequence( unsigned char a, unsigned int size ) {
+        return Uint8Sequence(size, a);
+    }
+
+    void createSampleCmd
 }

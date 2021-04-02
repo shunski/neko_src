@@ -19,6 +19,6 @@ catkin_package(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(rh_mc_node, RHMotionController.cpp)
-target_link_libraries(rh_node, ${catkin_LIBRARIES})
-add_dependencies(rh_node, ${catkin_EXPORTED_TARGES})
+add_executable(rh_motion_controller, main.cpp)
+target_link_libraries(rh_motion_controller, ${catkin_LIBRARIES})
+add_dependencies(rh_motion_controller, ${catkin_EXPORTED_TARGES})

@@ -22,13 +22,8 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME}
-  src/${PROJECT_NAME}/Body.cpp
   src/${PROJECT_NAME}/Part.cpp
-  src/${PROJECT_NAME}/PartNode.cpp
   src/${PROJECT_NAME}/MotionController.cpp
-  src/${PROJECT_NAME}/McNode.cpp
-  src/${PROJECT_NAME}/FeedbackProcesser.cpp
-  src/${PROJECT_NAME}/FpNode.cpp
 )
 
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

@@ -103,8 +103,8 @@ void set( CommandMsg & msg) {
 }
 
 void KondoServo::set( typename FeedbackMsg::ConstPtr & msg ) {
-    if( msg->id != this.get_id() ) {
-        ROS_INFO("Could not set KondoServo from the msg since the ID does not match; object ID:[%d] and msg ID:[%d].", msg->id, this.get_Id());
+    if( msg->id != id ) {
+        ROS_INFO("ERROR: Could not set KondoServo from the msg since the ID does not match; object ID:[%d] and msg ID:[%d].", msg->id, id);
         return;
     }
     set_degree( msg->degree );
@@ -113,8 +113,8 @@ void KondoServo::set( typename FeedbackMsg::ConstPtr & msg ) {
 }
 
 void KondoServo::set( FeedbackMsg & msg ) {
-    if( msg.id != this.get_id() ) {
-        ROS_INFO("Could not set KondoServo from the msg since the ID does not match; object ID:[%d] and msg ID:[%d].", msg.id, this.get_Id());
+    if( msg.id != id ) {
+        ROS_INFO("ERROR: Could not set KondoServo from the msg since the ID does not match; object ID:[%d] and msg ID:[%d].", msg.id, id);
         return;
     }
     set_degree( msg.degree );

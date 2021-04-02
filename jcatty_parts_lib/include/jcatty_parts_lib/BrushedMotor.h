@@ -7,6 +7,7 @@
 
 #include <iostrem>
 #include <ros/ros.h>
+#include <jcatty_support_msgs/Utilities.h>
 #include <jcatty_parts_msgs/BrushedMotorCommandMsg.h>
 #include <jcatty_parts_msgs/BrushedMotorFeedbackMsg.h>
 
@@ -19,7 +20,7 @@ class DCmotor
     private:
         PartID part_id;
         Uint8 id;
-        Uint16 rpm;                      // [0 ~ 255], n = n[rpm] for the sake of storing information. NOT A COMMAND
+        Uint16 rpm;                    // [0 ~ 255], n = n[rpm] for the sake of storing information. NOT A COMMAND
         Uint8 current;                 // [0 ~ 255], 255 = max_current[A]
         Uint8 current_limit;           // [0 ~ 255], 255 = max_current[A]
         Uint8 pwm;                     // [0 ~ 255]
@@ -29,9 +30,11 @@ class DCmotor
         void maximize_current_limit();
 
     public:
-        DCmotor(unsigned char Number);
-        void update( unsigned int Rpm, unsigned char Current );
-        void set( unsigned char Current_limit, unsigned char Pwm );
+        BrushedMotor( Uint8 ID, PartID partID );
+        BrushedMotor( Uint8 ID, PartID partID, BrushedCommandMsg & );
+        BrushedMotor( Uint8 ID, PartID partID, typename BrushedFeedbackMsg::ConstPtr & );
+        BrushedMotor( Uint8 ID, PartID partID, BrushedFeedbackMsg & );
+        PartID BrushedMotor::get_part_id();
         Uint8 get_number() const ;
         Uint8 get_rpm() const ;
         Uint8 get_current() const ;
@@ -48,9 +51,10 @@ class DCmotor
         void set_pwm( Uint8 Pwm );
         void print();
 
-        set(){
-
-        }
+        BrushedCommandMsg get_CommandMsg() const;
+        void set_CommandMsg( BrushedCommandMsg & );
+        void set( typename BrushedFeedbackMsg & );
+        void set( BrushedFeedbackMsg & );
 };
 
 

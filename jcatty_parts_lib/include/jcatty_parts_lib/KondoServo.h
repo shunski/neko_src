@@ -3,7 +3,7 @@
 #define KONDOSERVO_H
 
 #include <ros/ros.h>
-#include <Utilities.h>
+#include <jcatty_support_msgs/Utilities.h>
 #include <jcatty_parts_msgs/KondoServoCommandMsg.msg>
 #include <jcatty_parts_msgs/KondoServoFeedbackMsg.msg>
 
@@ -28,7 +28,7 @@ class KondoServo
         KondoServo ( Uint8 ID, PartID partID, ServoCommandMsg & );
         KondoServo ( Uint8 ID, PartID partID, typename ServoFeedbackMsg::ConstPtr & );
         KondoServo ( Uint8 ID, PartID partID, ServoFeedbackMsg & );
-        PartID  get_part_id () const 
+        PartID  get_part_id () const
         unsigned char get_id () const;
         unsigned short get_degree () const;
         double get_degree_by_degree () const;

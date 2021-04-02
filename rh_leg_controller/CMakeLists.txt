@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(motion_controller_rh)
+project(rh_leg_controller)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp

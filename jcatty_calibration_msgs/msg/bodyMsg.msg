@@ -1,8 +1,0 @@
-# bodyMsgs
-jcatty_simple_struct_msgs/partMsg headInfo
-jcatty_simple_struct_msgs/partMsg chestInfo
-jcatty_simple_struct_msgs/partMsg waistInfo
-jcatty_simple_struct_msgs/partMsg rfInfo
-jcatty_simple_struct_msgs/partMsg lfInfo
-jcatty_simple_struct_msgs/partMsg rhInfo
-jcatty_simple_struct_msgs/partMsg lhInfo

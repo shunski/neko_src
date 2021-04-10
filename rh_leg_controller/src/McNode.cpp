@@ -1,12 +1,13 @@
 // McNode.cpp
 #include <ros/ros.h>
-#include <jcatty_simple_struct/Node.h>
+#include <node_lib/Node.h>
+#include <support_lib/Utilities.h>
 
 class RhMcNode : protected Node::MotionControllerNode
 {
     public:
         McNodeRH()
-            MotionControllerNode("rhLegCommand", "rhCurrentState", "rhProcessedInfo", "rhLocomotionAction")
+            MotionControllerNode(RHLEG, "rhLegCommand", "rhCurrentState", "rhProcessedInfo", "rhLocomotionAction")
         {}
 };
 

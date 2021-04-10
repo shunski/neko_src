@@ -1,0 +1,4 @@
+# FeedbackMsg.msg
+parts_msgs/KondoServoFeedbackMsg[] kondoServoFeedbackSet
+parts_msgs/BrushedMotorFeedbackMsg[] brushedMotorFeedbackSet
+parts_msgs/BrushlessMotorFeedbackMsg[] brushlessMotorFeedbackSet

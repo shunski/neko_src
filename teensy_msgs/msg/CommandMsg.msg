@@ -1,0 +1,4 @@
+# CommandMsg.msg
+parts_msgs/KondoServoCommandMsg[] kondoServoCommandSet
+parts_msgs/BrushedMotorCommandMsg[] brushedMotorCommandSet
+parts_msgs/BrushlessMotorCommandMsg[] brushlessMotorCommandSet

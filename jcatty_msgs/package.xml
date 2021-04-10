@@ -9,11 +9,11 @@
   <license>TODO</license>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>jcatty_parts_msgs</build_depend>
-  <build_depend>jcatty_calibration_msgs</build_depend>
-  <build_depend>jcatty_bodypart_msgs</build_depend>
-  <build_export_depend>std_msgs</build_export_depend>
+  <exec_depend>parts_msgs</exec_depend>
+  <exec_depend>calibration_msgs</exec_depend>
+  <exec_depend>bodypart_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
 
 
-  <export> </export>
+  <export> <metapackage /> </export>
 </package>

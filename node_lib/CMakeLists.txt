@@ -1,0 +1,45 @@
+cmake_minimum_required(VERSION 3.0.2)
+project(node_lib)
+
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  support_lib
+  body_msgs
+  body_lib
+)
+
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES node_lib
+  CATKIN_DEPENDS roscpp std_msgs
+  #  DEPENDS system_lib
+)
+
+include_directories(
+  include
+  ${catkin_INCLUDE_DIRS}
+)
+
+add_library(${PROJECT_NAME}
+  src/${PROJECT_NAME}/HeartrateSubscriber.cpp
+  src/${PROJECT_NAME}/Part.cpp
+  src/${PROJECT_NAME}/MotionController.cpp
+  src/${PROJECT_NAME}/FeedbackProcessor.cpp
+)
+
+add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+target_link_libraries(${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+)
+
+install(
+  TARGETS ${PROJECT_NAME}
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}$
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}$
+  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
+)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+)

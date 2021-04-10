@@ -11,15 +11,19 @@ Part::Part( PartID ID ) :
 {
 	PartProperties pp = get_properties_by_id( id );
 	kondoServoSet     = std::vector<KondoServo>    ( pp.kondoServoNum     );
-	brushedMotorSet   = std::vector<brushedMotor>  ( pp.brushedMotorNum   );
-	brushlessMotorNum = std::vector<brushlessMotor>( pp.brushlessMotorNum );
-	gyroSensorNum     = std::vector<GyroSensor>    ( pp.gyroSensorNum     );
+	brushedMotorSet   = std::vector<BrushedMotor>  ( pp.brushedMotorNum   );
+	brushlessMotorSet = std::vector<BrushlessMotor>( pp.brushlessMotorNum );
+	gyroSensorSet     = std::vector<GyroSensor>    ( pp.gyroSensorNum     );
 
 
-	for ( std::vector<KondoServo>::iterator     it, int i=0; it = kondoServoSet.begin();     ++it, ++i ) it = KondoServo(i);
-	for ( std::vector<BrushedMotor>::iterator   it, int i=0; it = brushedMotorSet.begin();   ++it, ++i ) it = BrushedMotor(i);
-	for ( std::vector<BrushlessMotor>::iterator it, int i=0; it = brushlessMotorSet.begin(); ++it, ++i ) it = BrushlessMotor(i);
-	for ( std::vector<GyroSensor>::iterator     it, int i=0; it = gyroSensorSet.begin();     ++it, ++i ) it = GyroSensor(i);
+	for ( std::vector<KondoServo>::iterator it = kondoServoSet.begin(), int i=0;
+		  it! = kondoServoSet.end(); ++it, ++i ) *it = KondoServo(i)
+	for ( std::vector<BrushedMotor>::iterator it = brushedMotorSet.begin(), int i=0;
+		  it != brushedMotorSet.end(); ++it, ++i ) *it = BrushedMotor(i);
+	for ( std::vector<BrushlessMotor>::iterator it = brushlessMotorSet.begin(), int i=0;
+		  it != brushlessMotorSet.end(); ++it, ++i ) *it = BrushlessMotor(i);
+	for ( std::vector<GyroSensor>::iterator it = gyroSensorSet.begin();
+		  it != gyroSensorSet.end(); ++it, ++i ) *it = GyroSensor(i);
 	return;
 }
 
@@ -80,7 +84,7 @@ void Part::set ( teensy_msgs::FeedbackMsg::ConstPtr & msg ) {
 }
 
 void Part::set ( teensy_msgs::CommandMsg & msg ) {
-    if ( servoSet.size() != msg->servoSet.size() ) {
+    if ( servoSet.size() != msg->kondoServoSet.size() ) {
         ROS_INFO("ERROR: cannot set class Part from the message of type [teensy_msgs::ForelegCommandMsg] because of [servoSet].");
         return;
     }
@@ -97,10 +101,10 @@ void Part::set ( teensy_msgs::CommandMsg & msg ) {
         return;
     }
 
-    for ( int i = 0; i < msg->servoSet.size(); i++ ) servoSet[i].set( msg.servoSet[i] );
-    for ( int i = 0; i < msg->brushedMotorSet.size(); i++ ) brushedMotorSet[i].set( msg.brushedMotorSet[i] );
-    for ( int i = 0; i < msg->brushlessMotorSet.size(); i++ ) brushlessMotorSet[i].set( msg.brushlessMotorSet[i] );
-    for ( int i = 0; i < msg->gyroSensorSet.size(); i++ ) gyroSensorSet[i].set( msg.gyroSensorSet[i] );
+    for ( int i = 0; i < msg.servoSet.size(); i++ ) servoSet[i].set( msg.kondoServoSet[i] );
+    for ( int i = 0; i < msg.brushedMotorSet.size(); i++ ) brushedMotorSet[i].set( msg.brushedMotorSet[i] );
+    for ( int i = 0; i < msg.brushlessMotorSet.size(); i++ ) brushlessMotorSet[i].set( msg.brushlessMotorSet[i] );
+    for ( int i = 0; i < msg.gyroSensorSet.size(); i++ ) gyroSensorSet[i].set( msg.gyroSensorSet[i] );
 }
 
 void Part::set_CommandMsg( teensy_msgs::CommandMsg & msg ) {
@@ -110,9 +114,9 @@ void Part::set_CommandMsg( teensy_msgs::CommandMsg & msg ) {
 
 	for ( std::vector<KondoServo>::iterator it = kondoServoSet.begin(); it != kondoServoSet.end(); ++it )
 		msg.push_back( it->set_CommandMsg());
-	for ( std::vector<brushedMotor>::iterator it = brushedMotorSet.begin(); it != brushedmotorSet.end(); ++it )
+	for ( std::vector<BrushedMotor>::iterator it = brushedMotorSet.begin(); it != brushedmotorSet.end(); ++it )
 		msg.push_back( it->set_CommandMsg());
-	for ( std::vector<brushlessMotor>::iterator it = brushlessMotorSet.begin(); it != brushlessmotorSet.end(); ++it )
+	for ( std::vector<BrushlessMotor>::iterator it = brushlessMotorSet.begin(); it != brushlessmotorSet.end(); ++it )
 		msg.push_back( it->set_CommandMsg());
 }
 
@@ -121,9 +125,9 @@ body_msgs::PartMsg Part::get_PartMsg() const {
 
 	for ( std::vector<KondoServo>::iterator it = kondoServoSet.begin(); it != kondoServoSet.end(); ++it )
 		msg.push_back( it->set_msg());
-	for ( std::vector<brushedMotor>::iterator it = brushedMotorSet.begin(); it != brushedmotorSet.end(); ++it )
+	for ( std::vector<BrushedMotor>::iterator it = brushedMotorSet.begin(); it != brushedMotorSet.end(); ++it )
 		msg.push_back( it->set_msg());
-	for ( std::vector<brushlessMotor>::iterator it = brushlessMotorSet.begin(); it != brushlessmotorSet.end(); ++it )
+	for ( std::vector<BrushlessMotor>::iterator it = brushlessMotorSet.begin(); it != brushlessMotorSet.end(); ++it )
 		msg.push_back( it->set_msg());
 
     return msg;

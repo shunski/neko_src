@@ -4,16 +4,16 @@ parts_msgs/KondoServoCommandMsg[] servoCommand
 parts_msgs/BrushedMotorCommandMsg[] brushedMotorCommand
 parts_msgs/BrushlessMotorCommandMsg[] brushlessMotorCommand
 duration expectedTotalDuration
-Uint16 sequenceSize;
+uint16 sequenceSize
 
 ---
 
 # result
-body_msgs/PartMsg finalState
+body_msgs/PartMsg actualFinalState
 duration totalDuration
 
 ---
 
 # feedback
-body_msgs/PartMsg currentState
+body_msgs/PartMsg actualCurrentState
 duration currentSceneDuration

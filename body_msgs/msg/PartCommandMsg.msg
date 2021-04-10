@@ -1,6 +1,6 @@
 # PartCommandMsg.msg
 Header header
 duration period
-parts_msgs/KondoServoCommandMsg[] servo_command
-parts_msgs/BrushedMotorCommandMsg[] brushed_command
-parts_msgs/BrushlessMotorCommandMsg[] brushless_command
+parts_msgs/KondoServoCommandMsg[] kondoServoCommand
+parts_msgs/BrushedMotorCommandMsg[] brushedMotorCommand
+parts_msgs/BrushlessMotorCommandMsg[] brushlessMotorCommand

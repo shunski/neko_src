@@ -23,11 +23,11 @@ namespace Body{
     {
         private:
             PartID id;
-            std::vector<KondoServo> KondoServoSet;
+            std::vector<KondoServo> kondoServoSet;
             std::vector<BrushedMotor> brushedMotorSet;
             std::vector<BrushlessMotor> brushlessMotorSet;
             std::vector<GyroSensor> gyroSensorSet;
-			bool isValid;
+			bool valid;
 
         public:
             Part();
@@ -66,20 +66,22 @@ namespace Body{
     class MotionController
     {
         protected:
+			PartID id;
             std::vector<Part> expectedStates;
             Part actualCurrentState;
-            std::vector<Part>::iterator expectedCurrentScene;
+            std::vector<Part>::iterator expectedCurrentState;
             const ros::Duration expectedSceneDuration;
-            ros::Duration actualSceneDuration;
+            ros::Duration actualCurrentSceneDuration;
             ros::Time timeOfActionStart;
             ros::Time timeOfLastAction;
+			bool valid;
 
         public:
             MotionController ( PartID );
-            void set_action( body_msgs::PartCommandMsg::ConstPtr & )
+            void set_action( body_msgs::PartCommandMsg::ConstPtr & );
             void procced();
-			void startInitializationAction( initialize_service::PartInitialization::Request &,
-											initialize_servoce::PartInitialization::Response & );
+			// void startInitializationAction( initialize_service::PartInitialization::Request &,
+			//								initialize_servoce::PartInitialization::Response & );
 			void startMotioncontrollAction( motioncontroll_action::MotionControllGoal::ConstPtr & );
             void set_CommandMsg( teensy_msgs::CommandMsg & ) const ;
             bool isEnd() const ;
@@ -87,7 +89,9 @@ namespace Body{
             void set_resultMsg( motioncontroll_action::MotionControllResult & ) const ;
             motioncontroll_action::MotionControllFeedback get_feedbackMsg() const ;
             motioncontroll_action::MotionControllResult get_resultMsg() const ;
-            ros::Duration get_actualSceneDuration() const;
+            ros::Duration get_actualCurrentSceneDuration() const;
+			ros::Duration get_expectedSceneDuration() const;
+			bool isValid();
     };
 
     class FeedbackProcessor
@@ -100,14 +104,6 @@ namespace Body{
             void set( teensy_msgs::FeedbackMsg::ConstPtr & );
             Part processFeedback( teensy_msgs::FeedbackMsg::ConstPtr & );
     };
-
-	class PartInitializer
-	{
-		protected:
-			partID id;
-		public:
-			initializePosition();
-	};
 }
 
 #endif

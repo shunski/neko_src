@@ -23,6 +23,7 @@ add_library(${PROJECT_NAME}
   src/Decoder.cpp
   src/Recoder.cpp
   src/Plot.cpp
+  src/Utilities.cpp
 )
 
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

@@ -6,6 +6,7 @@
 #include <support_lib/Utilities.h>
 #include <parts_msgs/KondoServoCommandMsg.h>
 #include <parts_msgs/KondoServoFeedbackMsg.h>
+#include <parts_msgs/KondoServoMsg.h>
 
 typedef parts_msgs::KondoServoCommandMsg ServoCommandMsg;
 typedef parts_msgs::KondoServoFeedbackMsg ServoFeedbackMsg;
@@ -59,7 +60,7 @@ class KondoServo
         void set( ServoFeedbackMsg & );
 		void set( ServoCommandMsg & );
         void set( ServoMsg & ); // implement!!
-        void set( typename ServoMsg & ); // implement!!
+        void set( typename ServoMsg::ConstPtr & ); // implement!!
 };
 
 #endif

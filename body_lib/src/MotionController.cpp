@@ -8,7 +8,7 @@ MotionController::MotionController( PartID ID ) :
 	valid( true )
 {}
 
-void MotionController::set_action( body_msgs::PartCommandMsg::ConstPtr & msg ) {
+CattyError MotionController::set_action( body_msgs::PartCommandMsg::ConstPtr & msg ) {
 	if ( id != msg->id ){
         ROS_INFO("ERROR: Could not set MotionController object from body_msgs::PartCommandMsg since message id does not match.");
         return LOCOMOTION_ACTION_ERROR;
@@ -27,7 +27,7 @@ void MotionController::set_action( body_msgs::PartCommandMsg::ConstPtr & msg ) {
 			std::vector<Part>::const_iterator kondoservo_iterator = msg->kondoServoCommand.begin(),
 			std::vector<Part>::const_iterator brushed_iterator = msg->brushedMotorCommand.begin(),
 			std::vector<Part>::const_iterator brushless_iterator = msg->brushlessMotorCommand.begin();
-			servo_iterator != msg->kondoServoCommand.end();
+			kondoservo_iterator != msg->kondoServoCommand.end();
 			++kondoservo_iterator,
 			++brushed_iterator,
 			++brushless_iterator
@@ -45,26 +45,26 @@ CattyError MotionController::init_part( init_service::PartInit::Request &,
 
 }
 
-CattyError MotionController::startMotioncontrollAction( motioncontroll_action::MotionControllGoal::ConstPtr & ) {
-	if ( expectedStates.front() == actualCurrentState ) {
-		ROS_INFO("The expected position too far from the current position and thus could not start action.");
-		return LOCOMOTION_ACTION_FAILUE;
-	}
-	timeOfActionStart = ros::Time::now();
-}
+// CattyError MotionController::startMotioncontrollAction( motioncontroll_action::MotionControllGoal::ConstPtr & ) {
+// 	if ( expectedStates.front() == actualCurrentState ) {
+// 		ROS_INFO("The expected position too far from the current position and thus could not start action.");
+// 		return LOCOMOTION_ACTION_FAILUE;
+// 	}
+// 	timeOfActionStart = ros::Time::now();
+// }
 
 void MotionController::procced() {
-    if (expectedCurrentScene == expectedStates.begin()){ //first case
+    if (expectedCurrentState == expectedStates.begin()){ //first case
         ros::Time currentTime = ros::Time::now();
-        actualSceneDuration = currentTime - timeOfActionStart;
+        actualCurrentSceneDuration = currentTime - timeOfActionStart;
         timeOfLastAction = currentTime;
     }
     else{
         ros::Time currentTime = ros::Time::now();
-        actualSceneDuration = currentTime - timeOfLastAction;
+        actualCurrentSceneDuration = currentTime - timeOfLastAction;
         timeOfLastAction = currentTime;
     }
-    ++expectedCurrentScene;
+    ++expectedCurrentState;
 }
 
 void MotionController::set_CommandMsg( teensy_msgs::CommandMsg & msg ) const {
@@ -72,23 +72,23 @@ void MotionController::set_CommandMsg( teensy_msgs::CommandMsg & msg ) const {
 }
 
 bool MotionController::isEnd() const {
-	return expectedCurrentScene == expectedStates.end();
+	return expectedCurrentState == expectedStates.end();
 }
 
 void MotionController::set_feedbackMsg( motioncontroll_action::MotionControllFeedback & feedback ) const {
-	feedback.curretScene = currentScene->get_PartMsg;
-	feedback.curretSceneDuration = actualSceneDuration;
+	feedback.actualCurretState = actualCurrentState->get_PartMsg;
+	feedback.actualCurrentSceneDuration = actualCurrentSceneDuration;
 }
 
-void MotionController::set_resultMsg( motioncontroll_action::MotionControllResult & msg ) const {
+void MotionController::set_resultMsg( motioncontroll_action::MotionControllResult & result ) const {
 	result.totalDuration = ros::Time::now() - timeOfActionStart;
 	result.finalState = * actualCurrentState;
 }
 
 motioncontroll_action::MotionControllFeedback MotionController::get_feedbackMsg() const {
     motioncontroll_action::MotionControllFeedback feedback;
-    feedback.currentScence = currentScence->get_PartMsg();
-    feedback.currentSceneDuration = actualSceneDuration;
+    feedback.actualCurrentState = actualCurrentState->get_PartMsg();
+    feedback.currentSceneDuration = actualCurrentSceneDuration;
     return feedback;
 }
 
@@ -99,8 +99,12 @@ motioncontroll_action::MotionControllResult MotionController::get_resultMsg() co
     return result;
 }
 
-ros::Duration MotionController::get_actualSceneDuration() const {
-	return actualSceneDuration;
+ros::Duration MotionController::get_actualCurrentSceneDuration() const {
+	return actualCurrentSceneDuration;
+}
+
+ros::Duration get_expectedSceneDuration() const {
+	return expectedSceneDuration;
 }
 
 bool MotionController::isValid() {

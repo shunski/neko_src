@@ -6,6 +6,7 @@ MotionControllerNode::MotionControllerNode( PartID ID, std::string publishComman
     mc( ID ),
 	locomotionServer(this, locomotionActionName, boost::bind(& Node::MotionControllerNode::locomotionActionCallback, this), false)
 {
+    valid = mc.isValid();
     locomotionServer.start();
     legCmdPublisher = this->advertise<teensy_msgs::CommandMsg>(publishCmdTopicName, queue_size);
     currentStatePublisher = this->advertise<body_msgs::PartMsg>(publishStateTopicName, queue_size);

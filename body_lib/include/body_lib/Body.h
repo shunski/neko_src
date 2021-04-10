@@ -18,41 +18,6 @@
 #include <teensy_msgs/CommandMsg.h>
 #include <teensy_msgs/FeedbackMsg.h>
 
-#define head_servo_num 1
-#define head_brushedMotor_num 0
-#define head_brushlessMotor_num 0
-#define head_gyroSensor_num 0
-
-#define chest_servo_num 2
-#define chest_brushedMotor_num 0
-#define chest_brushlessMotor_num 0
-#define chest_gyroSensor_num 0
-
-#define waist_servo_num 3
-#define waist_brushedMotor_num 0
-#define waist_brushlessMotor_num 1
-#define waist_gyroSensor_num 0
-
-#define rf_servo_num 1
-#define rf_brushedMotor_num 1
-#define rf_brushlessMotor_num 0
-#define rf_gyroSensor_num 2
-
-#define lf_servo_num 1
-#define lf_brushedMotor_num 1
-#define lf_brushlessMotor_num 0
-#define lf_gyroSensor_num 2
-
-#define rh_servo_num 3
-#define rh_brushedMotor_num 1
-#define rh_brushlessMotor_num 0
-#define rh_gyroSensor_num 2
-
-#define lh_servo_num 3
-#define lh_brushedMotor_num 1
-#define lh_brushlessMotor_num 0
-#define lh_gyroSensor_num 2
-
 namespace Body{
     class Part
     {
@@ -65,10 +30,12 @@ namespace Body{
 			bool isValid;
 
         public:
-			Part ( PartID id );
-            Part ( PartID ID, Uint8 servoNum, Uint8 brushedMotorNum, Uint8 brushlessMotorNum, Uint8 gyroSensorNum );
-            void set ( teensy_msgs::FeedbackMsg::ConstPtr & );
-            void set ( teensy_msgs::CommandMsg & );
+            Part();
+			Part( PartID id );
+            Part( PartID ID, Uint8 servoNum, Uint8 brushedMotorNum, Uint8 brushlessMotorNum, Uint8 gyroSensorNum );
+            Part( PartID ID, Uint8 servoNum, Uint8 brushedMotorNum, Uint8 brushlessMotorNum );
+            void set( teensy_msgs::FeedbackMsg::ConstPtr & );
+            void set( teensy_msgs::CommandMsg & );
             void set_CommandMsg( teensy_msgs::CommandMsg & );
             body_msgs::PartMsg get_PartMsg() const ;
     };
@@ -109,17 +76,18 @@ namespace Body{
 
         public:
             MotionController ( PartID );
+            void set_action( body_msgs::PartCommandMsg::ConstPtr & )
             void procced();
 			void startInitializationAction( initialize_service::PartInitialization::Request &,
 											initialize_servoce::PartInitialization::Response & );
 			void startMotioncontrollAction( motioncontroll_action::MotionControllGoal::ConstPtr & );
-            void set_CommandMsg( teensy_msgs::CommandMsg & msg );
-            bool isEnd() { return expectedCurrentScene == expectedStates.end(); }
-            void set_feedbackMsg ( motioncontroll_action::MotionControllFeedback & feedbackMsg ) {feedbackMsg = this->get_feedbackMsg(); }
-            void set_resultMsg ( motioncontroll_action::MotionControllResult & resultMsg ) { resultMsg = this->get_resultMsg(); }
+            void set_CommandMsg( teensy_msgs::CommandMsg & ) const ;
+            bool isEnd() const ;
+            void set_feedbackMsg( motioncontroll_action::MotionControllFeedback & ) const ;
+            void set_resultMsg( motioncontroll_action::MotionControllResult & ) const ;
             motioncontroll_action::MotionControllFeedback get_feedbackMsg() const ;
             motioncontroll_action::MotionControllResult get_resultMsg() const ;
-            ros::Duration get_actualSceneDuration() { return actualSceneDuration; }
+            ros::Duration get_actualSceneDuration() const;
     };
 
     class FeedbackProcessor
@@ -129,8 +97,8 @@ namespace Body{
 
         public:
             FeedbackProcessor( PartID );
-            void set( teensy_msgs::FeedbackMsg::ConstPtr & msg );
-            Part processFeedback( teensy_msgs::FeedbackMsg::ConstPtr & msg );
+            void set( teensy_msgs::FeedbackMsg::ConstPtr & );
+            Part processFeedback( teensy_msgs::FeedbackMsg::ConstPtr & );
     };
 
 	class PartInitializer

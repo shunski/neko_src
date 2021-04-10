@@ -9,12 +9,13 @@
 
 typedef parts_msgs::KondoServoCommandMsg ServoCommandMsg;
 typedef parts_msgs::KondoServoFeedbackMsg ServoFeedbackMsg;
+typedef parts_msgs::KondoServoMsg ServoMsg;
 
 class KondoServo
 {
     private:
-        const PartID part_id;         // see definition in Utilities.h
-        const Uint8 id;               // [0, 31]
+        const PartID part_id;   // see definition in Utilities.h
+        const Uint8 id;         // [0, 31]
 	    Uint16 degree;          // [0, 65535]<=>[-135, 135] at teensy tranlated into [3500, 11500]
 	    Uint8 temp;             // [1 ~ 127], 30 = 100
 	    Uint8 speed;            // [1 ~ 127]
@@ -52,10 +53,13 @@ class KondoServo
         void print();
 
         ServoCommandMsg get_CommandMsg() const;
-        void set_CommandMsg( ServoCommandMsg & msg ) const;
-        void set( typename ServoFeedbackMsg::ConstPtr & msg );
-        void set( ServoFeedbackMsg & msg );
-		void set( ServoCommandMsg & msg );
+        void set_msg( ServoMsg & ) const; // implement!!
+        void set_CommandMsg( ServoCommandMsg & ) const;
+        void set( typename ServoFeedbackMsg::ConstPtr & );
+        void set( ServoFeedbackMsg & );
+		void set( ServoCommandMsg & );
+        void set( ServoMsg & ); // implement!!
+        void set( typename ServoMsg & ); // implement!!
 };
 
 #endif

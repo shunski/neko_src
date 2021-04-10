@@ -2,66 +2,53 @@
 #include <body_lib/Body.h>
 using namespace Body;
 
-Part::Part( PartID ID ) : 
-	id(ID), isValid(true)
+Part::Part(){
+	valid = false;
+}
+
+Part::Part( PartID ID ) :
+	id( ID ), valid( true )
 {
-	switch (PartID)
-	{
-	case( HEAD ):
-	    for ( Uint8 i = 0; i<head_servo_num; i++ ) servoSet.push_back(KondoServo(i));
-    	for ( Uint8 i = 0; i<head_brushedMotor_num; i++ ) brushedMotorSet.push_back(BrushedMotor(i));
-    	for ( Uint8 i = 0; i<head_brushlessMotor_num; i++ ) brushlessMotorSet.push_back(BrushlessMotor(i));
-    	for ( Uint8 i = 0; i<head_gyroSensorNum; i++ ) gyroSensorSet.push_back(GyroSensor(i));
-		break;
-    case( CHEST ):
-        for ( Uint8 i = 0; i<chest_servo_num; i++ ) servoSet.push_back(KondoServo(i));
-        for ( Uint8 i = 0; i<chest_brushedMotor_num; i++ ) brushedMotorSet.push_back(BrushedMotor(i));
-        for ( Uint8 i = 0; i<chest_brushlessMotor_num; i++ ) brushlessMotorSet.push_back(BrushlessMotor(i));
-        for ( Uint8 i = 0; i<chest_gyroSensorNum; i++ ) gyroSensorSet.push_back(GyroSensor(i));
-        break;
-    case( WAIST ):
-        for ( Uint8 i = 0; i<waist_servo_num; i++ ) servoSet.push_back(KondoServo(i));
-        for ( Uint8 i = 0; i<waist_brushedMotor_num; i++ ) brushedMotorSet.push_back(BrushedMotor(i));
-        for ( Uint8 i = 0; i<waist_brushlessMotor_num; i++ ) brushlessMotorSet.push_back(BrushlessMotor(i));
-        for ( Uint8 i = 0; i<waist_gyroSensorNum; i++ ) gyroSensorSet.push_back(GyroSensor(i));
-        break;
-    case( RFLEG ):
-        for ( Uint8 i = 0; i<rf_servo_num; i++ ) servoSet.push_back(KondoServo(i));
-        for ( Uint8 i = 0; i<rf_brushedMotor_num; i++ ) brushedMotorSet.push_back(BrushedMotor(i));
-        for ( Uint8 i = 0; i<rf_brushlessMotor_num; i++ ) brushlessMotorSet.push_back(BrushlessMotor(i));
-        for ( Uint8 i = 0; i<rf_gyroSensorNum; i++ ) gyroSensorSet.push_back(GyroSensor(i));
-        break;
-    case( LFLEG ):
-        for ( Uint8 i = 0; i<lf_servo_num; i++ ) servoSet.push_back(KondoServo(i));
-        for ( Uint8 i = 0; i<lf_brushedMotor_num; i++ ) brushedMotorSet.push_back(BrushedMotor(i));
-        for ( Uint8 i = 0; i<lf_brushlessMotor_num; i++ ) brushlessMotorSet.push_back(BrushlessMotor(i));
-        for ( Uint8 i = 0; i<lf_gyroSensorNum; i++ ) gyroSensorSet.push_back(GyroSensor(i));
-        break;
-    case( RHLEG ):
-        for ( Uint8 i = 0; i<rh_servo_num; i++ ) servoSet.push_back(KondoServo(i));
-        for ( Uint8 i = 0; i<rh_brushedMotor_num; i++ ) brushedMotorSet.push_back(BrushedMotor(i));
-        for ( Uint8 i = 0; i<rh_brushlessMotor_num; i++ ) brushlessMotorSet.push_back(BrushlessMotor(i));
-        for ( Uint8 i = 0; i<rh_gyroSensorNum; i++ ) gyroSensorSet.push_back(GyroSensor(i));
-        break;
-    case( LHLEG ):
-        for ( Uint8 i = 0; i<lh_servo_num; i++ ) servoSet.push_back(KondoServo(i));
-        for ( Uint8 i = 0; i<lh_brushedMotor_num; i++ ) brushedMotorSet.push_back(BrushedMotor(i));
-        for ( Uint8 i = 0; i<lh_brushlessMotor_num; i++ ) brushlessMotorSet.push_back(BrushlessMotor(i));
-        for ( Uint8 i = 0; i<lh_gyroSensorNum; i++ ) gyroSensorSet.push_back(GyroSensor(i));
-        break;
-	default:
-		isValid = false;
-		ROS_INFO("Invalid construction of Part by ID.")
-		return;
+	PartProperties pp = get_properties_by_id( id );
+	kondoServoSet     = std::vector<KondoServo>    ( pp.kondoServoNum     );
+	brushedMotorSet   = std::vector<brushedMotor>  ( pp.brushedMotorNum   );
+	brushlessMotorNum = std::vector<brushlessMotor>( pp.brushlessMotorNum );
+	gyroSensorNum     = std::vector<GyroSensor>    ( pp.gyroSensorNum     );
+
+
+	for ( std::vector<KondoServo>::iterator     it, int i=0; it = kondoServoSet.begin();     ++it, ++i ) it = KondoServo(i);
+	for ( std::vector<BrushedMotor>::iterator   it, int i=0; it = brushedMotorSet.begin();   ++it, ++i ) it = BrushedMotor(i);
+	for ( std::vector<BrushlessMotor>::iterator it, int i=0; it = brushlessMotorSet.begin(); ++it, ++i ) it = BrushlessMotor(i);
+	for ( std::vector<GyroSensor>::iterator     it, int i=0; it = gyroSensorSet.begin();     ++it, ++i ) it = GyroSensor(i);
+	return;
 }
 
 Part::Part ( PartID ID, Uint8 servoNum, Uint8 brushedMotorNum, Uint8 brushlessMotorNum, Uint8 gyroSensorNum ) :
     id( ID )
 {
-    for (Uint8 i = 0; i<servoNum; i++) servoSet.push_back(KondoServo(i));
-    for (Uint8 i = 0; i<brushedMotorNum; i++) brushedMotorSet.push_back(BrushedMotor(i));
-    for (Uint8 i = 0; i<brushlessMotorNum; i++) brushlessMotorSet.push_back(BrushlessMotor(i));
-    for (Uint8 i = 0; i<gyroSensorNum; i++) gyroSensorSet.push_back(GyroSensor(i));
+    for ( Uint8 i = 0; i<servoNum;          i++) servoSet.push_back( KondoServo(i));
+    for ( Uint8 i = 0; i<brushedMotorNum;   i++) brushedMotorSet.push_back( BrushedMotor(i));
+    for ( Uint8 i = 0; i<brushlessMotorNum; i++) brushlessMotorSet.push_back( BrushlessMotor(i));
+    for ( Uint8 i = 0; i<gyroSensorNum;     i++) gyroSensorSet.push_back( GyroSensor(i));
+}
+
+Part::Part ( PartID ID,
+			std::vector<KondoServo> KondoServoSet,
+			std::vector<BrushedMotor> BrushedMotorSet,
+			std::vector<BrushlessMotor> BrushlessMotorSet ):
+	id( ID )
+{
+	PartProperties pp = get_properties_by_id( id );
+	if ( pp.kondoServoNum != KondoServoSet.size()     ||
+		 pp.brushedMotorNum != BrushedMotorSet.size() ||
+		 pp.brushedMotorNum != BrushlessMotorSet.size() )
+	{
+		valid = false;
+		return;
+	}
+	kondoServoSet     = KondoServoSet;
+	brushedMotorSet   = BrushedMotorSet;
+	brushlessMotorSet = BrushlessMotorSet;
 }
 
 void Part::set ( teensy_msgs::FeedbackMsg::ConstPtr & msg ) {
@@ -117,16 +104,27 @@ void Part::set ( teensy_msgs::CommandMsg & msg ) {
 }
 
 void Part::set_CommandMsg( teensy_msgs::CommandMsg & msg ) {
-    
+	msg.kondoServoCommandSet.clear();
+	msg.brushedMotorCommandSet.clear();
+	msg.brushlessMotorCommandSet.clear();
+
+	for ( std::vector<KondoServo>::iterator it = kondoServoSet.begin(); it != kondoServoSet.end(); ++it )
+		msg.push_back( it->set_CommandMsg());
+	for ( std::vector<brushedMotor>::iterator it = brushedMotorSet.begin(); it != brushedmotorSet.end(); ++it )
+		msg.push_back( it->set_CommandMsg());
+	for ( std::vector<brushlessMotor>::iterator it = brushlessMotorSet.begin(); it != brushlessmotorSet.end(); ++it )
+		msg.push_back( it->set_CommandMsg());
 }
 
 body_msgs::PartMsg Part::get_PartMsg() const {
-    jcatty_body_msgs::PartMsg msg;
+    body_msgs::PartMsg msg;
 
-    for ( int i = 0; i < servoSet.size(); i++ ) msg.servoSet.push_back( servoSet[i].get_KondoServoMsg() );
-    for ( int i = 0; i < brushedMotorSet.size(); i++ ) msg.brushedMotorSet.push_back( brushedMotorSet[i].get_BrushedMotorMsg() );
-    for ( int i = 0; i < brushlessMotorSet.size(); i++ ) msg.brushlessMotorSet.push_back( brushlessMotorMsg[i].get_BrushlessMotorMsg() );
-    for ( int i = 0; i < gyroSensorSet.size(); i++ ) msg.gyroSensorSet[i].push_back( gyroSensorSet[i].get_gyroSensorMsg() );
+	for ( std::vector<KondoServo>::iterator it = kondoServoSet.begin(); it != kondoServoSet.end(); ++it )
+		msg.push_back( it->set_msg());
+	for ( std::vector<brushedMotor>::iterator it = brushedMotorSet.begin(); it != brushedmotorSet.end(); ++it )
+		msg.push_back( it->set_msg());
+	for ( std::vector<brushlessMotor>::iterator it = brushlessMotorSet.begin(); it != brushlessmotorSet.end(); ++it )
+		msg.push_back( it->set_msg());
 
     return msg;
 }

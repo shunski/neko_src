@@ -14,6 +14,7 @@ class RhMcNode : protected Node::MotionControllerNode
 int main(int argc, char **argv) {
     ros::init(argc, argv, "RhMcNode");
     RhMcNode node();
+    if ( !RhNode.isValid()) return false;
     ros::spin();
     return 0;
 }

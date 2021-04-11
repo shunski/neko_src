@@ -9,24 +9,24 @@ MotionController::MotionController( PartID ID ):
 {}
 
 CattyError MotionController::set_action( body_msgs::PartCommandMsg::ConstPtr & msg ) {
-	if ( id != msg->id ){                                                                                                        // body_msgs/PartCommandMsg.msgにidが定義されてない
+	if ( id != msg->id ){
         ROS_INFO("ERROR: Could not set MotionController object from body_msgs::PartCommandMsg since message id does not match.");
         return LOCOMOTION_ACTION_ERROR;
     }
 
-	if ( msg->sequenceSize != msg->kondoServoCommand.sequence.size() ||                                                           // body_msgs/PartCommandMsg.msgにsequenceSizeが定義されてない
-		 msg->sequenceSize != msg->brushedMotorCommand.sequence.size() ||
-		 msg->sequenceSize != msg->brushlessMotorCommand.sequence.size() ){
+	if ( msg->command.sequenceSize != msg->command.kondoServoCommand.sequence.size() ||
+		 msg->command.sequenceSize != msg->command.brushedMotorCommand.sequence.size() ||
+		 msg->command.sequenceSize != msg->command.brushlessMotorCommand.sequence.size() ){
 		ROS_INFO("ERROR: Could not set MotionController object from body_msgs::PartCommandMsg since sequence sizes do not match.");
         return LOCOMOTION_ACTION_ERROR;
 	}
 
-	expectedStates = std::vector( msg->sequenceSize );                                                                             //vectorの型は？
+	expectedStates = std::vector<Part>( msg->command.sequenceSize );
 
     for (
-			std::vector<Part>::const_iterator kondoservo_iterator = msg->kondoServoCommand.begin(),                                //forの区切り方？？
-			std::vector<Part>::const_iterator brushed_iterator = msg->brushedMotorCommand.begin(),
-			std::vector<Part>::const_iterator brushless_iterator = msg->brushlessMotorCommand.begin();
+			std::vector<Part>::const_iterator kondoservo_iterator = msg->command.kondoServoCommand.begin(),                                //forの区切り方？？
+			std::vector<Part>::const_iterator brushed_iterator = msg->command.brushedMotorCommand.begin(),
+			std::vector<Part>::const_iterator brushless_iterator = msg->command.brushlessMotorCommand.begin();
 			kondoservo_iterator != msg->kondoServoCommand.end();
 			++kondoservo_iterator,
 			++brushed_iterator,
@@ -36,7 +36,7 @@ CattyError MotionController::set_action( body_msgs::PartCommandMsg::ConstPtr & m
 		if ( !expectedStates.last().isValid() )
 			break;
     }
-	if( expectedStates.size() != msg->sequenceSize ) return LOCOMOTION_ACTION_ERROR;
+	if( expectedStates.size() != msg->command.sequenceSize ) return LOCOMOTION_ACTION_ERROR;
 	return SUCCESS;
 }
 
@@ -93,9 +93,9 @@ motioncontroll_action::MotionControllFeedback MotionController::get_feedbackMsg(
 }
 
 motioncontroll_action::MotionControllResult MotionController::get_resultMsg() const {
-    motioncontroll_action::MotionControllResult result; 
+    motioncontroll_action::MotionControllResult result;
     result.totalDuration = ros::Time::now() - timeOfActionStart;
-    result.finalState = * actualCurrentState;                                  //finalState is not member   //no match * 
+    result.actualFinalState = actualCurrentState;                                  //finalState is not member   //no match *
     return result;
 }
 

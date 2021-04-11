@@ -1,16 +1,13 @@
 # MotionControll.action
 # goal
-parts_msgs/KondoServoCommandMsg[] servoCommand
-parts_msgs/BrushedMotorCommandMsg[] brushedMotorCommand
-parts_msgs/BrushlessMotorCommandMsg[] brushlessMotorCommand
-duration expectedTotalDuration
-uint16 sequenceSize
+id
+body_msgs/PartCommandMsg commmand
 
 ---
 
 # result
 body_msgs/PartMsg actualFinalState
-duration totalDuration
+duration actualTotalDuration
 
 ---
 

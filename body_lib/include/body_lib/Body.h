@@ -15,10 +15,10 @@
 #include <support_msgs/CalibrationMsg.h>
 #include <parts_lib/Parts.h>
 #include <body_msgs/PartCommandMsg.h>
+#include <body_msgs/PartMsg.h>
 #include <teensy_msgs/CommandMsg.h>
 #include <teensy_msgs/FeedbackMsg.h>
 
-#include <body_msgs/PartMsg.h> //add
 
 namespace Body{
     class Part
@@ -54,15 +54,7 @@ namespace Body{
             Part head;
 
         public:
-            Body() :
-                head( HEAD ),
-                chest( CHEST ),
-				waist( WAIST ),
-                right_fore( RFLEG ),
-                left_fore( LFLEG ),
-                right_hind( RHLEG ),
-                left_hind( LHLEG )
-            {}
+            Body();
     };
 
     class MotionController
@@ -80,7 +72,7 @@ namespace Body{
 
         public:
             MotionController ( PartID );
-            CattyError set_action( body_msgs::PartCommandMsg::ConstPtr & ); // void -> CattyError
+            CattyError set_action( body_msgs::PartCommandMsg::ConstPtr & );
             void procced();
 			// void startInitializationAction( initialize_service::PartInitialization::Request &,
 			//								initialize_servoce::PartInitialization::Response & );
@@ -101,7 +93,7 @@ namespace Body{
     {
         protected:
             Part currentState;
-            Part previousState; // add
+            Part previousState;
 
         public:
             FeedbackProcessor( PartID );

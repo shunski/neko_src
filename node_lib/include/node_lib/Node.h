@@ -34,16 +34,16 @@ namespace Node{
     {
         protected:
             MotionController mc;
-            ros::Publisher commandPublisher;
-            ros::Publisher currentStatePublisher;
-            ros::Subscriber infoProcessorListner;
+            ros::Publisher commandPublisher;          // to teensy
+            ros::Publisher currentStatePublisher;     // to core / other nodes
+            ros::Subscriber feedbackProcessorListner; // listening to FeedbackProcessor Node
             ros::Timer publisherTimer;
-            actionlib::SimpleActionServer<motioncontroll_action::MotionControllAction> locomotionServer;
+            actionlib::SimpleActionServer<motioncontroll_action::MotionControllAction> locomotionServer; // execute action from core
             std::string actionName;
             bool valid;
 
         public:
-            MotionControllerNode(std::string publishCmdTopicName, std::string publishStateTopicName, std::string subscribeInfoTopicName, std::string locomotionActionName);
+            MotionControllerNode( std::string publishCmdTopicName, std::string publishStateTopicName, std::string subscribeInfoTopicName, std::string locomotionActionName );
             void renewAllPublisherTimer () override;
             void processorListnerCallback ( body_msgs::PartMsg::ConstPtr );
             void locomotionActionCallback ( const motioncontroll_action::MotionControllAction::ConstPtr & );

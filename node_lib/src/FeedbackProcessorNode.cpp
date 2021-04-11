@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+#include <node_lib/Node.h>
 
 using namespace Node;
             FeedbackProcessor fp;

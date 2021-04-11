@@ -38,7 +38,7 @@ PartProperties get_properties_by_id( PartID id ){
     PartProperties pp;
     switch ( id )
     {
-        case( HEAD ):    return PartProperties( HEAD,  1, 0, 0 , 0 );
+        case( HEAD  ):   return PartProperties( HEAD,  1, 0, 0 , 0 );
         case( CHEST ):   return PartProperties( CHEST, 2, 0, 0 , 0 );
         case( WAIST ):   return PartProperties( WAIST, 3, 0, 1 , 0 );
         case( RFLEG ):   return PartProperties( RFLEG, 1, 1, 0 , 2 );

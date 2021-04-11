@@ -1,5 +1,5 @@
 // MotionControllerNode.cpp implements MotionControllerNode class in Node.h
-#include <jcatty_support_lib/Node.h>
+#include <node_lib/Node.h>
 using namespace Node;
 
 MotionControllerNode::MotionControllerNode( PartID ID, std::string publishCommandTopicName, std::string publishStateTopicName, std::string subscribeFeedbackTopicName, std::string locomotionActionName):

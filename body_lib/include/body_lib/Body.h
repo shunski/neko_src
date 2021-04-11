@@ -31,7 +31,7 @@ namespace Body{
 
         public:
             Part();
-			Part( PartID id );
+		    Part( PartID ID );
             Part( PartID ID, Uint8 servoNum, Uint8 brushedMotorNum, Uint8 brushlessMotorNum, Uint8 gyroSensorNum );
             Part( PartID ID, Uint8 servoNum, Uint8 brushedMotorNum, Uint8 brushlessMotorNum );
             void set( teensy_msgs::FeedbackMsg::ConstPtr & );
@@ -66,10 +66,10 @@ namespace Body{
     class MotionController
     {
         protected:
-            std::vector<Part> expectedStates;
+            std::vector<Part> expectedStates;                  // Whole animation of states in which part should behave
             Part actualCurrentState;
-            std::vector<Part>::iterator expectedCurrentScene;
-            const ros::Duration expectedSceneDuration;
+            std::vector<Part>::iterator expectedCurrentState;
+            const ros::Duration expectedSceneDuration;         // totalDuration / sizeOfSequence
             ros::Duration actualSceneDuration;
             ros::Time timeOfActionStart;
             ros::Time timeOfLastAction;
@@ -100,14 +100,6 @@ namespace Body{
             void set( teensy_msgs::FeedbackMsg::ConstPtr & );
             Part processFeedback( teensy_msgs::FeedbackMsg::ConstPtr & );
     };
-
-	class PartInitializer
-	{
-		protected:
-			partID id;
-		public:
-			initializePosition();
-	};
 }
 
 #endif

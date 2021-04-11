@@ -1,5 +1,5 @@
 // HeartrateSubscriberNode.cpp implements HeartrateSubscriberNode class in Node.h
-#include <jcatty_support_lib/Node.h>
+#include <node_lib/Node.h>
 using namespace Node;
 
 HeartrateSubscriber::HeartrateSubscriber()

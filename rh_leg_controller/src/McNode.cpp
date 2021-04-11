@@ -6,7 +6,7 @@
 class RhMcNode : protected Node::MotionControllerNode
 {
     public:
-        McNodeRH()
+        RhMcNode()
             MotionControllerNode(RHLEG, "rhLegCommand", "rhCurrentState", "rhProcessedInfo", "rhLocomotionAction")
         {}
 };
@@ -14,7 +14,7 @@ class RhMcNode : protected Node::MotionControllerNode
 int main(int argc, char **argv) {
     ros::init(argc, argv, "RhMcNode");
     RhMcNode node();
-    if ( !RhNode.isValid()) return false;
+    if ( !RhNode.isValid()) return 0;
     ros::spin();
     return 0;
 }

@@ -7,6 +7,8 @@
 #include <math.h>
 #include <ros/ros.h>
 
+#include <support_lib/Utilities.h> // add
+
 class CattyLocomotion
 {
     protected:

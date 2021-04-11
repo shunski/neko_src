@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   parts_lib
   body_msgs
   motioncontroll_action
+  teensy_msgs #add
 )
 
 catkin_package(

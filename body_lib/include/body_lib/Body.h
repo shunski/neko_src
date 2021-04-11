@@ -18,6 +18,8 @@
 #include <teensy_msgs/CommandMsg.h>
 #include <teensy_msgs/FeedbackMsg.h>
 
+#include <body_msgs/PartMsg.h> //add
+
 namespace Body{
     class Part
     {
@@ -70,15 +72,15 @@ namespace Body{
             std::vector<Part> expectedStates;
             Part actualCurrentState;
             std::vector<Part>::iterator expectedCurrentState;
-            const ros::Duration expectedSceneDuration;
-            ros::Duration actualCurrentSceneDuration;
-            ros::Time timeOfActionStart;
-            ros::Time timeOfLastAction;
+            const ros::Duration expectedSceneDuration;                                             // 変数みたいな使い方はできない？
+            ros::Duration actualCurrentSceneDuration;                                              // ..
+            ros::Time timeOfActionStart;                                                           // ..
+            ros::Time timeOfLastAction;                                                            // ..
 			bool valid;
 
         public:
             MotionController ( PartID );
-            void set_action( body_msgs::PartCommandMsg::ConstPtr & );
+            CattyError set_action( body_msgs::PartCommandMsg::ConstPtr & ); // void -> CattyError
             void procced();
 			// void startInitializationAction( initialize_service::PartInitialization::Request &,
 			//								initialize_servoce::PartInitialization::Response & );
@@ -92,12 +94,14 @@ namespace Body{
             ros::Duration get_actualCurrentSceneDuration() const;
 			ros::Duration get_expectedSceneDuration() const;
 			bool isValid();
+
     };
 
     class FeedbackProcessor
     {
         protected:
             Part currentState;
+            Part previousState; // add
 
         public:
             FeedbackProcessor( PartID );

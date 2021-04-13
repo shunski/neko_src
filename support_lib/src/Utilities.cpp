@@ -31,7 +31,7 @@ std::string get_catty_error_description( CattyError error ) {
     {
         case SUCCESS: return "SUCCESS: ";
         case LOCOMOTION_ACTION_ERROR: return "LOCOMOTION_ACTION_ERROR: ";
-        case CONSTRUCTOR_ERROR: return "CONSTRUCTOR_ERROR: ";
+        case CONSTRUCT_ERROR: return "CONSTRUCT_ERROR: ";
         case INIT_ERROR: return "INIT_ERROR: ";
     }
 }

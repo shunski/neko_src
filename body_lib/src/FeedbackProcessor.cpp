@@ -3,10 +3,11 @@
 using namespace Body;
 
 FeedbackProcessor::FeedbackProcessor( PartID ID ):
+	part_id( ID ),
 	previousState( ID ),
 	currentState( ID ) 
 {}
 
-Part FeedbackProcessor::processFeedback( teesny_msgs::FeedbackMsg::ConstPtr & msg ) { //‘Body::Part Body::FeedbackProcessor::processFeedback’ is not a static data member of ‘class Body::FeedbackProcessor’ と // msgがscope外
+Part FeedbackProcessor::processFeedback( teensy_msgs::FeedbackMsg::ConstPtr & msg ) {
     currentState.set( msg );
 }

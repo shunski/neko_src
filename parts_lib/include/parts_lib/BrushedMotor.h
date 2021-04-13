@@ -10,6 +10,7 @@
 #include <support_lib/Utilities.h>
 #include <parts_msgs/BrushedMotorCommandMsg.h>
 #include <parts_msgs/BrushedMotorFeedbackMsg.h>
+#include <parts_msgs/BrushedMotorMsg.h>
 
 typedef parts_msgs::BrushedMotorCommandMsg BrushedCommandMsg;
 typedef parts_msgs::BrushedMotorFeedbackMsg BrushedFeedbackMsg;
@@ -30,10 +31,10 @@ class BrushedMotor
         void maximize_current_limit();
 
     public:
-        BrushedMotor( Uint8 ID, PartID partID );
-        BrushedMotor( Uint8 ID, PartID partID, BrushedCommandMsg & );
-        BrushedMotor( Uint8 ID, PartID partID, typename BrushedFeedbackMsg::ConstPtr & );
-        BrushedMotor( Uint8 ID, PartID partID, BrushedFeedbackMsg & );
+        BrushedMotor( Uint8 ID, PartID );
+        BrushedMotor( Uint8 ID, PartID, BrushedCommandMsg & );
+        BrushedMotor( Uint8 ID, PartID, typename BrushedFeedbackMsg::ConstPtr & );
+        BrushedMotor( Uint8 ID, PartID, BrushedFeedbackMsg & );
 		BrushedMotor( const BrushedMotor & );
 		BrushedMotor operator=( const BrushedMotor & original ){ return BrushedMotor(original); }
             // explicit assignment definition for the sake of treating const members.

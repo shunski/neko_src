@@ -1,7 +1,6 @@
 #include <body_lib/Body.h>
-using namespace Body;
 
-Body::Body() :
+Body::Body::Body() :
     head( HEAD ),
     chest( CHEST ),
     waist( WAIST ),

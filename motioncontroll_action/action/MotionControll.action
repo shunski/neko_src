@@ -1,16 +1,18 @@
 # MotionControll.action
 # goal
-id
-body_msgs/PartCommandMsg commmand
+int8 part_id
+body_msgs/PartCommandMsg command
 
 ---
 
 # result
+int8 part_id
 body_msgs/PartMsg actualFinalState
 duration actualTotalDuration
 
 ---
 
 # feedback
+int8 part_id
 body_msgs/PartMsg actualCurrentState
 duration currentSceneDuration

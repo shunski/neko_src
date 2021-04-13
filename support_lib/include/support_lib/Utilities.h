@@ -1,7 +1,7 @@
 #ifndef UTILITIES_H
 #define UTILITIES_H
 
-#define default_queue_size 100;
+#define default_queue_size 100
 
 #include <vector>
 #include <string>
@@ -10,13 +10,15 @@
 // Useful type definitions
 typedef unsigned char Uint8;
 typedef unsigned short Uint16;
+typedef signed short Int;
 
 typedef std::vector<Uint8> Uint8Sequence;
 typedef std::vector<Uint16> Uint16Sequence;
 
 
 // Part Definitions
-enum PartID { HEAD, CHEST, WAIST, RFLEG, LFLEG, RHLEG, LHLEG };
+enum PartID { NONE=0, HEAD, CHEST, WAIST, RFLEG, LFLEG, RHLEG, LHLEG };
+enum ObjectState { NONE=0; OBJECT, COMMAND, FEEDBACK }
 
 struct PartProperties {
     PartID id;
@@ -36,12 +38,20 @@ enum CattyError
     SUCCESS=0,
     LOCOMOTION_ACTION_ERROR,
     INIT_ERROR,
-    CONSTRUCTOR_ERROR
+    CONSTRUCT_ERROR,
+	PART_ID_NOT_MATCH
 };
-
 bool isSucceeded( CattyError error );
-
 std::string get_catty_error_description( CattyError error );
+
+enum CattyPartsError
+{
+	SUCCESS=0,
+	OBJECT_CONSTRUCTION_FAILUE,
+	MESSAGE_CONSTRUCTION_FAILUE,
+	PART_ID_NOT_MATCH,
+	ID_NOT_MATCH
+}
 
 struct Point
 {

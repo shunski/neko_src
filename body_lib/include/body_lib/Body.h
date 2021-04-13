@@ -6,6 +6,7 @@
 #include <ros/ros.h>
 #include <string>
 #include <vector>
+#include <tuple>
 #include <iostream>
 #include <actionlib/server/simple_action_server.h>
 #include <motioncontroll_action/MotionControllAction.h>
@@ -13,7 +14,7 @@
 #include <motioncontroll_action/MotionControllResult.h>
 #include <motioncontroll_action/MotionControllFeedback.h>
 #include <support_msgs/CalibrationMsg.h>
-#include <parts_lib/Parts.h>
+#include <parts_lib/CattyParts.h>
 #include <body_msgs/PartCommandMsg.h>
 #include <body_msgs/PartMsg.h>
 #include <teensy_msgs/CommandMsg.h>
@@ -24,7 +25,7 @@ namespace Body{
     class Part
     {
         private:
-            PartID id;
+            const PartID part_id;
             std::vector<KondoServo> kondoServoSet;
             std::vector<BrushedMotor> brushedMotorSet;
             std::vector<BrushlessMotor> brushlessMotorSet;
@@ -33,13 +34,17 @@ namespace Body{
 
         public:
             Part();
-		    Part( PartID ID );
-            Part( PartID ID, Uint8 servoNum, Uint8 brushedMotorNum, Uint8 brushlessMotorNum, Uint8 gyroSensorNum );
-            Part( PartID ID, Uint8 servoNum, Uint8 brushedMotorNum, Uint8 brushlessMotorNum );
+		    Part( PartID );
+            Part( PartID, Uint8 servoNum, Uint8 brushedMotorNum, Uint8 brushlessMotorNum, Uint8 gyroSensorNum );
+            Part( PartID, std::vector<KondoServo>     KondoServoSet,
+                          std::vector<BrushedMotor>   BrushedMotorSet, 
+                          std::vector<BrushlessMotor> BrushlessMotorSet );
             void set( teensy_msgs::FeedbackMsg::ConstPtr & );
             void set( teensy_msgs::CommandMsg & );
             void set_CommandMsg( teensy_msgs::CommandMsg & );
             body_msgs::PartMsg get_PartMsg() const ;
+			void set_PartMsg( body_msgs::PartMsg & );
+			bool isValid();
     };
 
     class Body
@@ -60,29 +65,29 @@ namespace Body{
     class MotionController
     {
         protected:
-			PartID id;
+			const PartID part_id;
             std::vector<Part> expectedStates;
             Part actualCurrentState;
             std::vector<Part>::iterator expectedCurrentState;
-            const ros::Duration expectedSceneDuration;                                             // 変数みたいな使い方はできない？
-            ros::Duration actualCurrentSceneDuration;                                              // ..
-            ros::Time timeOfActionStart;                                                           // ..
-            ros::Time timeOfLastAction;                                                            // ..
+            const ros::Duration expectedSceneDuration;
+            ros::Duration actualCurrentSceneDuration;
+            ros::Time timeOfActionStart;
+            ros::Time timeOfLastAction;
 			bool valid;
 
         public:
             MotionController ( PartID );
-            CattyError set_action( body_msgs::PartCommandMsg::ConstPtr & );
+            CattyError set_action( motioncontroll_action::MotionControllGoal::ConstPtr & );
             void procced();
 			// void startInitializationAction( initialize_service::PartInitialization::Request &,
 			//								initialize_servoce::PartInitialization::Response & );
 			void startMotioncontrollAction( motioncontroll_action::MotionControllGoal::ConstPtr & );
-            void set_CommandMsg( teensy_msgs::CommandMsg & ) const ;
+            CattyError set_CommandMsg( teensy_msgs::CommandMsg & ) const ;
             bool isEnd() const ;
-            void set_feedbackMsg( motioncontroll_action::MotionControllFeedback & ) const ;
-            void set_resultMsg( motioncontroll_action::MotionControllResult & ) const ;
-            motioncontroll_action::MotionControllFeedback get_feedbackMsg() const ;
-            motioncontroll_action::MotionControllResult get_resultMsg() const ;
+            CattyError set_feedbackMsg( motioncontroll_action::MotionControllFeedback & ) const ;
+            CattyError set_resultMsg( motioncontroll_action::MotionControllResult & ) const ;
+            motioncontroll_action::MotionControllFeedback generate_feedbackMsg() const ;
+            motioncontroll_action::MotionControllResult generate_resultMsg() const ;
             ros::Duration get_actualCurrentSceneDuration() const;
 			ros::Duration get_expectedSceneDuration() const;
 			bool isValid();
@@ -92,6 +97,7 @@ namespace Body{
     class FeedbackProcessor
     {
         protected:
+			const PartID part_id;
             Part currentState;
             Part previousState;
 

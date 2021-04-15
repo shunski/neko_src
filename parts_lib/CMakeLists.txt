@@ -23,7 +23,7 @@ add_library(${PROJECT_NAME}
   src/BrushedMotor.cpp
   src/BrushlessMotor.cpp
   src/Encoder.cpp
-  src/GyroSensor.cpp
+  src/MotionSensor.cpp
   src/KondoServo.cpp
 )
 

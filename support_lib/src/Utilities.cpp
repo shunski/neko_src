@@ -1,11 +1,11 @@
 #include <support_lib/Utilities.h>
 
-PartProperties::PartProperties( PartID ID, size_t KondoServoNum, size_t BrushedMotorNum, size_t BrushlessMotorNum, size_t GyroSensorNum ):
+PartProperties::PartProperties( PartID ID, size_t KondoServoNum, size_t BrushedMotorNum, size_t BrushlessMotorNum, size_t MotionSensorNum ):
     id( ID ),
     kondoServoNum( KondoServoNum ),
     brushedMotorNum( BrushedMotorNum ),
     brushlessMotorNum( BrushlessMotorNum ),
-    gyroSensorNum( GyroSensorNum )
+    motionSensorNum( MotionSensorNum )
 {}
 
 
@@ -29,9 +29,10 @@ bool isSucceeded( CattyError error ) { return !error; }
 std::string get_catty_error_description( CattyError error ) {
     switch( error )
     {
-        case SUCCESS: return "SUCCESS: ";
-        case LOCOMOTION_ACTION_ERROR: return "LOCOMOTION_ACTION_ERROR: ";
-        case CONSTRUCT_ERROR: return "CONSTRUCT_ERROR: ";
-        case INIT_ERROR: return "INIT_ERROR: ";
+        case SUCCESS: return "SUCCESS";
+        case LOCOMOTION_ACTION_ERROR: return "LOCOMOTION_ACTION_ERROR";
+        case CONSTRUCT_ERROR: return "CONSTRUCT_ERROR";
+        case INIT_ERROR: return "INIT_ERROR";
+        case PART_ID_NOT_MATCH: return "PART_ID_NOT_MATCH"
     }
 }

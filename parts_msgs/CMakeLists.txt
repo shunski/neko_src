@@ -18,7 +18,7 @@ add_message_files(
   BrushlessMotorCommandMsg.msg
   BrushlessMotorFeedbackMsg.msg
   BrushlessMotorMsg.msg
-  GyroSensorMsg.msg
+  MotionSensorMsg.msg
 )
 
 

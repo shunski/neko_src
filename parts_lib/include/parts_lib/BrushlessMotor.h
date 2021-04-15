@@ -3,6 +3,7 @@
 
 #include <ros/ros.h>
 #include <support_lib/Utilities.h>
+#include <parts_lib/GenericParts.h>
 #include <parts_msgs/BrushlessMotorCommandMsg.h>
 #include <parts_msgs/BrushlessMotorFeedbackMsg.h>
 #include <parts_msgs/BrushlessMotorMsg.h>
@@ -11,7 +12,7 @@ typedef parts_msgs::BrushlessMotorCommandMsg BrushlessCommandMsg;
 typedef parts_msgs::BrushlessMotorFeedbackMsg BrushlessFeedbackMsg;
 typedef parts_msgs::BrushlessMotorMsg BrushlessMsg;
 
-class BrushlessMotor : public Parts<BrushlessMsg, BrushlessCommandMsg, BrushlessFeedbackMsg>
+class BrushlessMotor : public GnericParts<BrushlessMsg, BrushlessCommandMsg, BrushlessFeedbackMsg>
 {
 	private:
 		// Command
@@ -23,30 +24,34 @@ class BrushlessMotor : public Parts<BrushlessMsg, BrushlessCommandMsg, Brushless
 		Uint16 current;
 
 	public:
-		BrushlessMotor( Uint8 ID, PartID, ObjectState );
-		BrushlessMotor( BrushlessCommandMsg & );
-		BrushlessMotor( BrushlessFeedbackMsg & );
-		BrushlessMotor( typename BrushlessFeedbackMsg & );
-		Uint16 get_id() const ;
-		Uint16 get_part_id() const ;
+		BrushlessMotor( PartID, Uint8 ID );
+		BrushlessMotor( const BrushlessMotor & );
+
+		BrushlessMotor( const BrushlessMsg & );
+		BrushlessMotor( const typename BrushlessMsg::ConstPtr & );
+		BrushlessMotor( const BrushlessCommandMsg & );
+		BrushlessMotor( const typename BrushlessCommandMsg::ConstPtr & );
+		BrushlessMotor( const BrushlessFeedbackMsg & );
+		BrushlessMotor( const typename BrushlessFeedbackMsg & );
+
 		Int16 get_voltage() const ;
 		Uint16 get_position() const ;
 		Int16 get_speed() const ;
 		Uint16 get_current() const ;
 
-		CattyPartsError set_voltage( Uint16 );
-		CattyPartsError set_position( Uint16 );
-		CattyPartsError set_speed( Uint16 );
-		CattyPartsError set_current( Uint16 );
-		
+		CattyPartsError set_voltage( const Uint16 );
+		CattyPartsError set_position( const Uint16 );
+		CattyPartsError set_speed( const Uint16 );
+		CattyPartsError set_current( const Uint16 );
+
 		void print() const override;
 
-		CattyPartsError set( BrushlessMsg & ) override ;
-		CattyPartsError set( typename BrushlessMsg::ConstPtr & ) override ;
-		CattyPartsError set( BrushlessCommandMsg & ) override ;
-		CattyPartsError set( typename BrushlessCommandMsg::ConstPtr & ) override ;
-		CattyPartsError set( BrushlessFeedbackMsg & ) override ;
-		CattyPartsError set( typename ServoFeedbackMsg::ConstPtr & ) override ;
+		CattyPartsError set( const BrushlessMsg & ) override ;
+		CattyPartsError set( const typename BrushlessMsg::ConstPtr & ) override ;
+		CattyPartsError set( const BrushlessCommandMsg & ) override ;
+		CattyPartsError set( const typename BrushlessCommandMsg::ConstPtr & ) override ;
+		CattyPartsError set( const BrushlessFeedbackMsg & ) override ;
+		CattyPartsError set( const typename ServoFeedbackMsg::ConstPtr & ) override ;
 
 		CattyPartsError set_msg( BrushlessMsg & ) const override ;
 		CattyPartsError set_CommandMsg( BrushlessCommandMsg & ) const override ;

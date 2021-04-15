@@ -18,15 +18,15 @@ typedef std::vector<Uint16> Uint16Sequence;
 
 // Part Definitions
 enum PartID { NONE=0, HEAD, CHEST, WAIST, RFLEG, LFLEG, RHLEG, LHLEG };
-enum ObjectState { NONE=0; OBJECT, COMMAND, FEEDBACK }
+enum ObjectState { NONE=0; GENERAL, COMMAND, FEEDBACK }
 
 struct PartProperties {
     PartID id;
     size_t kondoServoNum;
     size_t brushedMotorNum;
     size_t brushlessMotorNum;
-    size_t gyroSensorNum;
-    PartProperties( PartID ID, size_t KondoServoNum, size_t BrushedMotorNum, size_t BrushlessMotorNum, size_t GyroSensorNum );
+    size_t motionSensorNum;
+    PartProperties( PartID ID, size_t KondoServoNum, size_t BrushedMotorNum, size_t BrushlessMotorNum, size_t MotionSensorNum );
     PartProperties();
 };
 
@@ -39,7 +39,7 @@ enum CattyError
     LOCOMOTION_ACTION_ERROR,
     INIT_ERROR,
     CONSTRUCT_ERROR,
-	PART_ID_NOT_MATCH
+	PART_ID_NOT_MATCH,
 };
 bool isSucceeded( CattyError error );
 std::string get_catty_error_description( CattyError error );
@@ -50,7 +50,8 @@ enum CattyPartsError
 	OBJECT_CONSTRUCTION_FAILUE,
 	MESSAGE_CONSTRUCTION_FAILUE,
 	PART_ID_NOT_MATCH,
-	ID_NOT_MATCH
+	ID_NOT_MATCH,
+    WARNING
 }
 
 struct Point

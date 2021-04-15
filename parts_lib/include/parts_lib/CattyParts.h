@@ -4,6 +4,6 @@
 #include <KondoServo>
 #include <BrushedMotor.h>
 #include <BrushlessMotor.h>
-#include <GyroSensor.h>
+#include <MotionSensor.h>
 
 #endif

@@ -29,15 +29,15 @@ namespace Body{
             std::vector<KondoServo> kondoServoSet;
             std::vector<BrushedMotor> brushedMotorSet;
             std::vector<BrushlessMotor> brushlessMotorSet;
-            std::vector<GyroSensor> gyroSensorSet;
+            std::vector<MotionSensor> motionSensorSet;
 			bool valid;
 
         public:
             Part();
 		    Part( PartID );
-            Part( PartID, Uint8 servoNum, Uint8 brushedMotorNum, Uint8 brushlessMotorNum, Uint8 gyroSensorNum );
+            Part( PartID, Uint8 servoNum, Uint8 brushedMotorNum, Uint8 brushlessMotorNum, Uint8 motionSensorNum );
             Part( PartID, std::vector<KondoServo>     KondoServoSet,
-                          std::vector<BrushedMotor>   BrushedMotorSet, 
+                          std::vector<BrushedMotor>   BrushedMotorSet,
                           std::vector<BrushlessMotor> BrushlessMotorSet );
             void set( teensy_msgs::FeedbackMsg::ConstPtr & );
             void set( teensy_msgs::CommandMsg & );

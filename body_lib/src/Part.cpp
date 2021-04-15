@@ -3,46 +3,48 @@
 using namespace Body;
 
 Part::Part():
-	part_id( NONE ),
-	valid( false )
+	part_id( NONE ), valid( false )
 {}
 
-Part::Part( PartID ID ) :
-	part_id( ID ), valid( true )
+Part::Part( PartID pID ) :
+	part_id( pID ), valid( true )
 {
 	PartProperties pp = get_properties_by_id( part_id );
 	kondoServoSet    .reserve( pp.kondoServoNum     );
 	brushedMotorSet  .reserve( pp.brushedMotorNum   );
 	brushlessMotorSet.reserve( pp.brushlessMotorNum );
-	gyroSensorSet    .reserve( pp.gyroSensorNum     );
+	gyroSensorSet    .reserve( pp.motionSensorNum     );
 
 
 	for ( auto t = std::make_tuple( std::vector<KondoServo>::iterator(kondoServoSet.begin()), 0 );
 		  std::get<std::vector<KondoServo>::iterator>(t) != kondoServoSet.end();
 	      ++std::get<std::vector<KondoServo>::iterator>(t), ++std::get<int>(t) )
-		 *std::get<std::vector<KondoServo>::iterator>(t) = KondoServo( std::get<int>(t), part_id );
+		 *std::get<std::vector<KondoServo>::iterator>(t) = KondoServo( part_id, std::get<int>(t) );
+
     for ( auto t = std::make_tuple( std::vector<BrushedMotor>::iterator(brushedMotorSet.begin()), 0 );
-          std::get<std::vector<BrushedMotor>::iterator>(t) != brushedMotorSet.end(); 
+          std::get<std::vector<BrushedMotor>::iterator>(t) != brushedMotorSet.end();
           ++std::get<std::vector<BrushedMotor>::iterator>(t), ++std::get<int>(t) )
-         *std::get<std::vector<BrushedMotor>::iterator>(t) = BrushedMotor( std::get<int>(t), part_id );
+         *std::get<std::vector<BrushedMotor>::iterator>(t) = BrushedMotor( part_id, std::get<int>(t) );
+
 	for ( auto t = std::make_tuple( std::vector<BrushlessMotor>::iterator(brushlessMotorSet.begin()), 0 );
-          std::get<std::vector<BrushlessMotor>::iterator>(t) != brushlessMotorSet.end(); 
+          std::get<std::vector<BrushlessMotor>::iterator>(t) != brushlessMotorSet.end();
           ++std::get<std::vector<BrushlessMotor>::iterator>(t), ++std::get<int>(t) )
-         *std::get<std::vector<BrushlessMotor>::iterator>(t) = BrushlessMotor( std::get<int>(t), part_id );
-	for ( auto t = std::make_tuple( std::vector<GyroSensor>::iterator(gyroSensorSet.begin()), 0 );
-          std::get<std::vector<GyroSensor>::iterator>(t) != gyroSensorSet.end(); 
-          ++std::get<std::vector<GyroSensor>::iterator>(t), ++std::get<int>(t) )
-         *std::get<std::vector<GyroSensor>::iterator>(t) = GyroSensor( std::get<int>(t), part_id );
+         *std::get<std::vector<BrushlessMotor>::iterator>(t) = BrushlessMotor( part_id, std::get<int>(t) );
+
+	for ( auto t = std::make_tuple( std::vector<MotionSensor>::iterator(motionSensorSet.begin()), 0 );
+          std::get<std::vector<MotionSensor>::iterator>(t) != MotionSensorSet.end();
+          ++std::get<std::vector<MotionSensor>::iterator>(t), ++std::get<int>(t) )
+         *std::get<std::vector<MotionSensor>::iterator>(t) = MotionSensor( part_id, std::get<int>(t) );
 	return;
 }
 
-Part::Part ( PartID ID, Uint8 servoNum, Uint8 brushedMotorNum, Uint8 brushlessMotorNum, Uint8 gyroSensorNum ) :
+Part::Part ( PartID ID, Uint8 servoNum, Uint8 brushedMotorNum, Uint8 brushlessMotorNum, Uint8 motionSensorNum ) :
     part_id( ID )
 {
-    for ( Uint8 i = 0; i<servoNum;          i++) kondoServoSet.push_back( KondoServo( i, part_id ));
-    for ( Uint8 i = 0; i<brushedMotorNum;   i++) brushedMotorSet.push_back( BrushedMotor( i, part_id ));
-    for ( Uint8 i = 0; i<brushlessMotorNum; i++) brushlessMotorSet.push_back( BrushlessMotor( i, part_id ));
-    for ( Uint8 i = 0; i<gyroSensorNum;     i++) gyroSensorSet.push_back( GyroSensor( i, part_id ));
+    for ( Uint8 i = 0; i<servoNum;          i++) kondoServoSet.push_back( KondoServo( part_id, i ));
+    for ( Uint8 i = 0; i<brushedMotorNum;   i++) brushedMotorSet.push_back( BrushedMotor( part_id, i ));
+    for ( Uint8 i = 0; i<brushlessMotorNum; i++) brushlessMotorSet.push_back( BrushlessMotor( part_id, i ));
+    for ( Uint8 i = 0; i<motionSensorNum;   i++) motionSensorSet.push_back( MotionSensor( part_id, i ));
 }
 
 Part::Part ( PartID ID,
@@ -81,8 +83,8 @@ void Part::set ( teensy_msgs::FeedbackMsg::ConstPtr & msg ) {
         valid = false;
 		return;
     }
-    if ( gyroSensorSet.size() != msg->gyroSensorSet.size() ) {
-        ROS_INFO("ERROR: cannot set class Part from the message of type [teensy_msgs::ForelegInfoMsg] because of [gyroSensorSet].");
+    if ( motionSensorSet.size() != msg->motionSensorSet.size() ) {
+        ROS_INFO("ERROR: cannot set class Part from the message of type [teensy_msgs::FeedbackMsg] because of [motionSensorSet].");
         valid = false;
 		return;
     }
@@ -90,7 +92,7 @@ void Part::set ( teensy_msgs::FeedbackMsg::ConstPtr & msg ) {
     for ( auto t = std::make_tuple( std::vector<KondoServo>::iterator( kondoServoSet.begin()),
 	      std::vector<parts_msgs::KondoServoFeedbackMsg>::const_iterator( msg->kondoServoFeedbackSet.begin()));
 	      std::get<std::vector<KondoServo>::iterator>(t) != kondoServoSet.end();
-	      ++std::get<std::vector<KondoServo>::iterator>(t), 
+	      ++std::get<std::vector<KondoServo>::iterator>(t),
 	      ++std::get<std::vector<parts_msgs::KondoServoFeedbackMsg>::const_iterator>(t) )
 		std::get<std::vector<KondoServo>::iterator>(t) -> set( *std::get<std::vector<parts_msgs::KondoServoFeedbackMsg>::const_iterator>(t) );
 
@@ -108,33 +110,33 @@ void Part::set ( teensy_msgs::FeedbackMsg::ConstPtr & msg ) {
           ++std::get<std::vector<parts_msgs::BrushlessMotorFeedbackMsg>::const_iterator>(t) )
         std::get<std::vector<BrushlessMotor>::iterator>(t) -> set( *std::get<std::vector<parts_msgs::BrushlessMotorFeedbackMsg>::const_iterator>(t) );
 
-    for ( auto t = std::make_tuple( std::vector<GyroSensor>::iterator( gyroSensorSet.begin()),
-          std::vector<parts_msgs::GyroSensorMsg>::const_iterator( msg->gyroSensorSet.begin()));
-          std::get<std::vector<GyroSensor>::iterator>(t) != gyroSensorSet.end();
-          ++std::get<std::vector<GyroSensor>::iterator>(t),
-          ++std::get<std::vector<parts_msgs::GyroSensorMsg>::const_iterator>(t) )
-        std::get<std::vector<GyroSensor>::iterator>(t) -> set( *std::get<std::vector<parts_msgs::GyroSensorMsg>::const_iterator>(t) );
+    for ( auto t = std::make_tuple( std::vector<MotionSensor>::iterator( motionSensorSet.begin()),
+          std::vector<parts_msgs::MotionSensorMsg>::const_iterator( msg->motionSensorSet.begin()));
+          std::get<std::vector<MotionSensor>::iterator>(t) != motionSensorSet.end();
+          ++std::get<std::vector<MotionSensor>::iterator>(t),
+          ++std::get<std::vector<parts_msgs::MotionSensorMsg>::const_iterator>(t) )
+        std::get<std::vector<MotionSensor>::iterator>(t) -> set( *std::get<std::vector<parts_msgs::MotionSensorMsg>::const_iterator>(t) );
 
 }
 
 CattyError Part::set ( teensy_msgs::CommandMsg & msg ) {
     if ( kondoServoSet.size() != msg->kondoServoCommandSet.size() ) {
-        ROS_INFO("ERROR: cannot set class Part from the message of type [teensy_msgs::ForelegCommandMsg] because of [servoSet].");
+        ROS_INFO("ERROR: cannot set class Part from the message of type [teensy_msgs::CommandMsg] because of [servoSet].");
 		valid = false;
         return CONSTRUCT_ERROR;
     }
-    if ( brushedMotorSet.size() != msg->brushedMotorCommandSet.size() ) { 
-        ROS_INFO("ERROR: cannot set class Part from the message of type [teensy_msgs::ForelegCommandMsg] because of [brushedMotorSet].");
+    if ( brushedMotorSet.size() != msg->brushedMotorCommandSet.size() ) {
+        ROS_INFO("ERROR: cannot set class Part from the message of type [teensy_msgs::CommandMsg] because of [brushedMotorSet].");
 		valid = false;
         return CONSTRUCT_ERROR;
     }
-    if ( brushlessMotorSet.size() != msg->brushlessMotorCommandSet.size() ) { 
-        ROS_INFO("ERROR: cannot set class Part from the message of type [teensy_msgs::ForelegCommandMsg] because of [brushlessMotorSet].");
+    if ( brushlessMotorSet.size() != msg->brushlessMotorCommandSet.size() ) {
+        ROS_INFO("ERROR: cannot set class Part from the message of type [teensy_msgs::CommandMsg] because of [brushlessMotorSet].");
 		valid = false;
         return CONSTRUCT_ERROR;
     }
-    if ( gyroSensorSet.size() != msg->gyroSensorSet.size() ) {
-        ROS_INFO("ERROR: cannot set class Part from the message of type [teensy_msgs::ForelegCommandMsg] because of [gyroSensorSet].");
+    if ( gyroSensorSet.size() != msg->motionSensorSet.size() ) {
+        ROS_INFO("ERROR: cannot set class Part from the message of type [teensy_msgs::CommandMsg] because of [motionSensorSet].");
 		valid = false;
         return CONSTRUCT_ERROR;
     }
@@ -182,7 +184,7 @@ CattyError set_PartMsg( body_msgs::PartMsg & msg ){
 	if ( part_id != msg->part_id ) {
 		return ID_NOT_MATCH;
 	}
-	
+
 }
 
 bool isValid(){

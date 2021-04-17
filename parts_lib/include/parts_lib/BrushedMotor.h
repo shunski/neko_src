@@ -31,7 +31,7 @@ class BrushedMotor : public GenericParts<BrushedMsg, BrushedCommandMsg, BrushedF
         void maximize_current_limit();
 
     public:
-        BrushedMotor( Uint8 ID, PartID );
+        BrushedMotor( PartID, Uint8 ID );
         BrushedMotor( const BrushedMotor & );
 
         BrushedMotor( const BrushedMsg & );
@@ -57,16 +57,16 @@ class BrushedMotor : public GenericParts<BrushedMsg, BrushedCommandMsg, BrushedF
 
         void print() const override;
 
-        CattyPartsError set_msg() const override;
-        CattyPartsError set_CommandMsg( BrushedCommandMsg & ) const override;
-        CattyPartsError set_FeedbackMsg( BrushedFeedbackMsg & ) const override;
+        CattyError set_msg( BrushedMsg & ) const override;
+        CattyError set_CommandMsg( BrushedCommandMsg & ) const override;
+        CattyError set_FeedbackMsg( BrushedFeedbackMsg & ) const override;
 
-        CattyPartsError set( const BrushedMsg & );
-        CattyPartsError set( const typename BrushedMsg::ConstPtr & );
-        CattyPartsError set( const BrushedVCommandMsg & );
-        CattyPartsError set( const typename BrushedCommandMsg::ConstPtr & );
-        CattyPartsError set( const BrushedFeedbackMsg & );
-        CattyPartsError set( const typename BrushedFeedbackMsg::ConstPtr & );
+        CattyError set( const BrushedMsg & );
+        CattyError set( const typename BrushedMsg::ConstPtr & );
+        CattyError set( const BrushedCommandMsg & );
+        CattyError set( const typename BrushedCommandMsg::ConstPtr & );
+        CattyError set( const BrushedFeedbackMsg & );
+        CattyError set( const typename BrushedFeedbackMsg::ConstPtr & );
 };
 
 

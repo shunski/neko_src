@@ -1,9 +1,9 @@
 #ifndef CATTYPARTS_H
 #define CATTYPARTS_H
 
-#include <KondoServo>
-#include <BrushedMotor.h>
-#include <BrushlessMotor.h>
-#include <MotionSensor.h>
+#include <parts_lib/KondoServo.h>
+#include <parts_lib/BrushedMotor.h>
+#include <parts_lib/BrushlessMotor.h>
+#include <parts_lib/MotionSensor.h>
 
 #endif

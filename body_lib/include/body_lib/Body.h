@@ -39,8 +39,8 @@ namespace Body{
             Part( PartID, std::vector<KondoServo>     KondoServoSet,
                           std::vector<BrushedMotor>   BrushedMotorSet,
                           std::vector<BrushlessMotor> BrushlessMotorSet );
-            void set( teensy_msgs::FeedbackMsg::ConstPtr & );
-            void set( teensy_msgs::CommandMsg & );
+            CattyError set( const teensy_msgs::FeedbackMsg::ConstPtr & );
+            CattyError set( const teensy_msgs::CommandMsg::ConstPtr & );
             void set_CommandMsg( teensy_msgs::CommandMsg & );
             body_msgs::PartMsg get_PartMsg() const ;
 			void set_PartMsg( body_msgs::PartMsg & );

@@ -3,7 +3,7 @@ int8 part_id
 int8 id
 uint16 accel_x
 uint16 accel_y
-uint16 accel_x
+uint16 accel_z
 uint16 gyro_x
 uint16 gyro_y
 uint16 gyro_z

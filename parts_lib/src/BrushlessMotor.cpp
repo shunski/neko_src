@@ -1,12 +1,12 @@
 #include <parts_lib/BrushlessMotor.h>
 
 BrushlessMotor::BrushlessMotor( PartID pID, Uint8 ID ):
-	GenrericParts( "BrushlessMotor", pID, ID )
+	GenericParts( "BrushlessMotor", pID, ID )
 {}
 
 
 BrushlessMotor::BrushlessMotor( const BrushlessMotor & original ):
-	GenrericParts( "BrushlessMotor", original.part_id, original.id ),
+	GenericParts( "BrushlessMotor", PartID(original.part_id), original.id ),
 	voltage( original.voltage ),
 	position( original.position ),
 	speed( original.speed ),
@@ -14,48 +14,46 @@ BrushlessMotor::BrushlessMotor( const BrushlessMotor & original ):
 {
 	state = original.state;
 	valid = original.valid;
-	well_defined = riiginal.well_defined;
+	well_defined = original.well_defined;
 }
 
 
 BrushlessMotor::BrushlessMotor( const BrushlessMsg & msg ):
-	GenrericParts( "BrushlessMotor", msg.part_id, msg.id )
+	GenericParts( "BrushlessMotor", PartID(msg.part_id), msg.id )
 { this->set( msg ); }
 
 
 BrushlessMotor::BrushlessMotor( const typename BrushlessMsg::ConstPtr & msg ):
-	GenrericParts( "BrushlessMotor", msg->part_id, msg->id )
+	GenericParts( "BrushlessMotor", PartID(msg->part_id), msg->id )
 { this->set( msg ); }
 
 
 BrushlessMotor::BrushlessMotor( const BrushlessCommandMsg & msg ):
-	GenrericParts( "BrushlessMotor", msg.part_id, msg.id )
+	GenericParts( "BrushlessMotor", PartID(msg.part_id), msg.id )
 { this->set( msg ); }
 
 
 BrushlessMotor::BrushlessMotor( const typename BrushlessCommandMsg::ConstPtr & msg ):
-	GenrericParts( "BrushlessMotor", msg->part_id, msg->id )
+	GenericParts( "BrushlessMotor", PartID(msg->part_id), msg->id )
 { this->set( msg ); }
 
 
 BrushlessMotor::BrushlessMotor( const BrushlessFeedbackMsg & msg ):
-	GenrericParts( "BrushlessMotor", msg.part_id, msg.id )
+	GenericParts( "BrushlessMotor", PartID(msg.part_id), msg.id )
 { this->set( msg ); }
 
 
-BrushlessMotor::BrushlessMotor( typename BrushlessFeedbackMsg::ConstPtr & msg ):
-	GenrericParts( "BrushlessMotor", msg->part_id, msg->id )
+BrushlessMotor::BrushlessMotor( const typename BrushlessFeedbackMsg::ConstPtr & msg ):
+	GenericParts( "BrushlessMotor", PartID(msg->part_id), msg->id )
 { this->set( msg ); }
 
 
-PartID BrushlessMotor::get_part_id() const { return part_id; }
-Uint8 BrushlessMotor::get_id() const { return id }
 Int16 BrushlessMotor::get_voltage() const { return voltage; }
 Uint16 BrushlessMotor::get_position() const { return position; }
 Int16 BrushlessMotor::get_speed() const { return speed; }
 Uint16 BrushlessMotor::get_current() const { return current; }
 
-CattyPartsError BrushlessMotor::set_voltage( Int16 Voltage) {
+CattyError BrushlessMotor::set_voltage( const Int16 Voltage ) {
 	if ( Voltage > 30000 ) {
 		voltage =  30000;
 		ROS_INFO("set_voltage(Int16):Could not set the value of argument. Value was too big.");
@@ -71,7 +69,7 @@ CattyPartsError BrushlessMotor::set_voltage( Int16 Voltage) {
 }
 
 
-CattyPartsError BrushlessMotor::set_position( Uint16 Position ) {
+CattyError BrushlessMotor::set_position( const Uint16 Position ) {
 	if ( Position > 8191 ) {
 		position =  8191;
 		ROS_INFO("set_position(Uint16):Could not set the value of argument. Value was too big.");
@@ -87,26 +85,21 @@ CattyPartsError BrushlessMotor::set_position( Uint16 Position ) {
 }
 
 
-CattyPartsError BrushlessMotor::set_speed( Int16 Speed) {
+CattyError BrushlessMotor::set_speed( const Int16 Speed ) {
 	speed = Speed;
 	return SUCCESS;
 }
 
 
-CattyPartsError BrushlessMotor::set_current( Uint16 Current ) {
+CattyError BrushlessMotor::set_current( const Uint16 Current ) {
 	current = Current;
 	return SUCCESS;
 }
 
 
-void BrushlessMotor::print() const override {
+void BrushlessMotor::print() const {
 	if( valid ){
-		ROS_INFO("Printing Information of <%s>: part_id = [%d], id = [%d], \n
-		voltage \t= [%d], \n
-		position \t= [%d], \n
-		speed \t= [%d], \n
-		current \t= [%d] \n\n",
-		child_name.c_str(), part_id, id, voltage, position, speed, current );
+		ROS_INFO("Printing Information of <%s>: part_id = [%d], id = [%d], \nvoltage \t= [%d], \nposition \t= [%d], \nspeed \t= [%d], \ncurrent \t= [%d] \n", child_name.c_str(), part_id, id, voltage, position, speed, current );
 	}
 	else {
 		ROS_INFO("This <%s> is not valid. Please exit the program.", child_name.c_str());
@@ -114,19 +107,17 @@ void BrushlessMotor::print() const override {
 }
 
 
-CattyPartsError BrushlessMotor::set_msg( BrushlessMsg & msg ) const override {
+CattyError BrushlessMotor::set_msg( BrushlessMsg & msg ) const {
 	if ( msg.part_id == 0 && msg.id == 0 ) {
-		msg->part_id = part_id;
-		msg->id = id;
+		msg.part_id = part_id;
+		msg.id = id;
 	} else {
-		CattyPartsError error = check_id( msg );
+		CattyError error = check_msg_id( msg );
 		if ( error == PART_ID_NOT_MATCH ) {
-			print_msg_part_id_error();
-			valid = false;
+			print_msg_part_id_error( msg );
 			return error;
 		} else if ( error == ID_NOT_MATCH ) {
-			print_msg_id_error();
-			valid = false;
+			print_msg_id_error( msg );
 			return error;
 		}
 	}
@@ -148,19 +139,17 @@ CattyPartsError BrushlessMotor::set_msg( BrushlessMsg & msg ) const override {
 }
 
 
-CattyPartsError BrushlessMottor::set_CommandMsg( BrushlessCommadMsg & msg ) const override {
+CattyError BrushlessMotor::set_CommandMsg( BrushlessCommandMsg & msg ) const {
 	if ( msg.part_id == 0 && msg.id == 0 ) {
-		msg->part_id = part_id;
-		msg->id = id;
+		msg.part_id = part_id;
+		msg.id = id;
 	} else {
-		CattyPartsError error = check_id( msg );
+		CattyError error = check_msg_id( msg );
 		if ( error == PART_ID_NOT_MATCH ) {
-			print_msg_part_id_error();
-			valid = false;
+			print_msg_part_id_error( msg );
 			return error;
 		} else if ( error == ID_NOT_MATCH ) {
-			print_msg_id_error();
-			valid = false;
+			print_msg_id_error( msg );
 			return error;
 		}
 	}
@@ -179,19 +168,17 @@ CattyPartsError BrushlessMottor::set_CommandMsg( BrushlessCommadMsg & msg ) cons
 }
 
 
-CattyPartsError BrushlessMotor::set_FeedbackMsg( BrushlessFeedbackMsg & msg ) const override {
+CattyError BrushlessMotor::set_FeedbackMsg( BrushlessFeedbackMsg & msg ) const {
 	if ( msg.part_id == 0 && msg.id == 0 ) {
-		msg->part_id = part_id;
-		msg->id = id;
+		msg.part_id = part_id;
+		msg.id = id;
 	} else {
-		CattyPartsError error = check_id( msg );
+		CattyError error = check_msg_id( msg );
 		if ( error == PART_ID_NOT_MATCH ) {
-			print_msg_part_id_error();
-			valid = false;
+			print_msg_part_id_error( msg );
 			return error;
 		} else if ( error == ID_NOT_MATCH ) {
-			print_msg_id_error();
-			valid = false;
+			print_msg_id_error( msg );
 			return error;
 		}
 	}
@@ -213,15 +200,15 @@ CattyPartsError BrushlessMotor::set_FeedbackMsg( BrushlessFeedbackMsg & msg ) co
 
 
 
-CattyPartsError BrushlessMotor::set( const BrushlessMsg & msg ) override
+CattyError BrushlessMotor::set( const BrushlessMsg & msg ) 
 {
-	CattyPartsError = check_id( msg );
+	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
-		print_msg_part_id_error();
+		print_msg_part_id_error( msg );
 		valid = false;
 		return error;
 	} else if ( error == ID_NOT_MATCH ) {
-		print_msg_id_error();
+		print_msg_id_error( msg );
 		valid = false;
 		return error;
 	}
@@ -239,15 +226,15 @@ CattyPartsError BrushlessMotor::set( const BrushlessMsg & msg ) override
 }
 
 
-CattyPartsError BrushlessMotor::set( const typename BrushlessMsg::ConstPtr & msg ) override
+CattyError BrushlessMotor::set( const typename BrushlessMsg::ConstPtr & msg )
 {
-	CattyPartsError = check_id( msg );
+	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
-		print_msg_part_id_error();
+		print_msg_part_id_error( msg );
 		valid = false;
 		return error;
 	} else if ( error == ID_NOT_MATCH ) {
-		print_msg_id_error();
+		print_msg_id_error( msg );
 		valid = false;
 		return error;
 	}
@@ -265,20 +252,20 @@ CattyPartsError BrushlessMotor::set( const typename BrushlessMsg::ConstPtr & msg
 }
 
 
-CattyPartsError BrushlessMotor::set( const BrushlessCommandMsg & msg ) override
+CattyError BrushlessMotor::set( const BrushlessCommandMsg & msg )
 {
-	CattyPartsError = check_id( msg );
+	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
-		print_msg_part_id_error();
+		print_msg_part_id_error( msg );
 		valid = false;
 		return error;
 	} else if ( error == ID_NOT_MATCH ) {
-		print_msg_id_error();
+		print_msg_id_error( msg );
 		valid = false;
 		return error;
 	}
 
-	if ( state == NONE ) state = COMMAND;
+	if ( state == INVALID ) state = COMMAND;
 	else if ( state == FEEDBACK ) state = GENERAL;
 
 	voltage = msg.voltage;
@@ -289,20 +276,20 @@ CattyPartsError BrushlessMotor::set( const BrushlessCommandMsg & msg ) override
 }
 
 
-CattyPartsError BrushlessMotor::set( const typename BrushlessCommandMsg::ConstPtr & msg ) override
+CattyError BrushlessMotor::set( const typename BrushlessCommandMsg::ConstPtr & msg )
 {
-	CattyPartsError = check_id( msg );
+	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
-		print_msg_part_id_error();
+		print_msg_part_id_error( msg );
 		valid = false;
 		return error;
 	} else if ( error == ID_NOT_MATCH ) {
-		print_msg_id_error();
+		print_msg_id_error( msg );
 		valid = false;
 		return error;
 	}
 
-	if ( state == NONE ) state = COMMAND;
+	if ( state == INVALID ) state = COMMAND;
 	else if ( state == FEEDBACK ) state = GENERAL;
 
 	voltage = msg->voltage;
@@ -313,20 +300,20 @@ CattyPartsError BrushlessMotor::set( const typename BrushlessCommandMsg::ConstPt
 }
 
 
-CattyPartsError BrushlessMotor::set( const BrushlessFeedbackMsg & msg ) override
+CattyError BrushlessMotor::set( const BrushlessFeedbackMsg & msg )
 {
-	CattyPartsError = check_id( msg );
+	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
-		print_msg_part_id_error();
+		print_msg_part_id_error( msg );
 		valid = false;
 		return error;
 	} else if ( error == ID_NOT_MATCH ) {
-		print_msg_id_error();
+		print_msg_id_error( msg );
 		valid = false;
 		return error;
 	}
 
-	if ( state == NONE ) state = FEEDBACK;
+	if ( state == INVALID ) state = FEEDBACK;
 	else if ( state == COMMAND ) state = GENERAL;
 
 	position = msg.position;
@@ -339,20 +326,20 @@ CattyPartsError BrushlessMotor::set( const BrushlessFeedbackMsg & msg ) override
 }
 
 
-CattyPartsError BrushlessMotor::set( const typename ServoFeedbackMsg::ConstPtr & msg ) override
+CattyError BrushlessMotor::set( const typename BrushlessFeedbackMsg::ConstPtr & msg )
 {
-	CattyPartsError = check_id( msg );
+	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
-		print_msg_part_id_error();
+		print_msg_part_id_error( msg );
 		valid = false;
 		return error;
 	} else if ( error == ID_NOT_MATCH ) {
-		print_msg_id_error();
+		print_msg_id_error( msg );
 		valid = false;
 		return error;
 	}
 
-	if ( state == NONE ) state = FEEDBACK;
+	if ( state == INVALID ) state = FEEDBACK;
 	else if ( state == COMMAND ) state = GENERAL;
 
 	position = msg->position;

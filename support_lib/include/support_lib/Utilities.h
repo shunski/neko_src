@@ -10,7 +10,7 @@
 // Useful type definitions
 typedef unsigned char Uint8;
 typedef unsigned short Uint16;
-typedef signed short Int;
+typedef signed short Int16;
 
 typedef std::vector<Uint8> Uint8Sequence;
 typedef std::vector<Uint16> Uint16Sequence;
@@ -18,7 +18,7 @@ typedef std::vector<Uint16> Uint16Sequence;
 
 // Part Definitions
 enum PartID { NONE=0, HEAD, CHEST, WAIST, RFLEG, LFLEG, RHLEG, LHLEG };
-enum ObjectState { NONE=0; GENERAL, COMMAND, FEEDBACK }
+enum ObjectState { INVALID=0, GENERAL, COMMAND, FEEDBACK };
 
 struct PartProperties {
     PartID id;
@@ -36,23 +36,17 @@ PartProperties get_properties_by_id( PartID id );
 enum CattyError
 {
     SUCCESS=0,
-    LOCOMOTION_ACTION_ERROR,
-    INIT_ERROR,
-    CONSTRUCT_ERROR,
-	PART_ID_NOT_MATCH,
-};
-bool isSucceeded( CattyError error );
-std::string get_catty_error_description( CattyError error );
-
-enum CattyPartsError
-{
-	SUCCESS=0,
+	WARNING,
+    LOCOMOTION_ACTION_FAILUE,
+    MOTION_INIT_FAILUE,
 	OBJECT_CONSTRUCTION_FAILUE,
 	MESSAGE_CONSTRUCTION_FAILUE,
 	PART_ID_NOT_MATCH,
-	ID_NOT_MATCH,
-    WARNING
-}
+	ID_NOT_MATCH
+};
+
+bool isSucceeded( CattyError error );
+std::string get_catty_error_description( CattyError error );
 
 struct Point
 {

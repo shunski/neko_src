@@ -11,14 +11,14 @@ MotionController::MotionController( PartID ID ):
 CattyError MotionController::set_action( motioncontroll_action::MotionControllGoal::ConstPtr & msg ) {
 	if ( part_id != msg->part_id ){
         ROS_INFO("ERROR: Could not set MotionController object from body_msgs::PartCommandMsg since message id does not match.");
-        return LOCOMOTION_ACTION_ERROR;
+        return LOCOMOTION_ACTION_FAILUE;
     }
 
 	if ( msg->command.sequenceSize != msg->command.kondoServoCommandSequence.size() ||
 		 msg->command.sequenceSize != msg->command.brushedMotorCommandSequence.size() ||
 		 msg->command.sequenceSize != msg->command.brushlessMotorCommandSequence.size() ){
 		ROS_INFO("ERROR: Could not set MotionController object from body_msgs::PartCommandMsg since the message is not well defined; sizes do not match.");
-        return LOCOMOTION_ACTION_ERROR;
+        return LOCOMOTION_ACTION_FAILUE;
 	}
 
 	expectedStates = std::vector<Part>( msg->command.sequenceSize );
@@ -27,7 +27,8 @@ CattyError MotionController::set_action( motioncontroll_action::MotionControllGo
 			auto t = std::make_tuple( 
 			std::vector<parts_msgs::KondoServoCommandMsg>::const_iterator( msg->command.kondoServoCommandSequence.begin() ),
 			std::vector<parts_msgs::BrushedMotorCommandMsg>::const_iterator( msg->command.brushedMotorCommandSequence.begin()),
-			std::vector<parts_msgs::BrushlessMotorCommandMsg>::const_iterator( msg->command.brushlessMotorCommandSequence.begin());
+			std::vector<parts_msgs::BrushlessMotorCommandMsg>::const_iterator( msg->command.brushlessMotorCommandSequence.begin())
+			);
 			std::get<std::vector<parts_msgs::KondoServoCommandMsg>::const_iterator>(t) = msg->command.kondoServoCommandSequence.end();
 			++std::get<std::vector<parts_msgs::KondoServoCommandMsg>::const_iterator>(t),
 			++std::get<std::vector<parts_msgs::BrushedMotorCommandMsg>::const_iterator>(t),
@@ -44,7 +45,7 @@ CattyError MotionController::set_action( motioncontroll_action::MotionControllGo
 		if ( !expectedStates.back().isValid() )
 			break;
     }
-	if( expectedStates.size() != msg->command.sequenceSize ) return LOCOMOTION_ACTION_ERROR;
+	if( expectedStates.size() != msg->command.sequenceSize ) return LOCOMOTION_ACTION_FAILUE;
 	return SUCCESS;
 }
 

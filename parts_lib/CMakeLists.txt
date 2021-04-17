@@ -20,9 +20,9 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME}
+  src/GenericParts.cpp
   src/BrushedMotor.cpp
   src/BrushlessMotor.cpp
-  src/Encoder.cpp
   src/MotionSensor.cpp
   src/KondoServo.cpp
 )

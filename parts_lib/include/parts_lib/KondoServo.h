@@ -36,6 +36,8 @@ class KondoServo : GenericParts< ServoMsg, ServoCommandMsg, ServoFeedbackMsg >
         KondoServo ( const ServoFeedbackMsg & );
         KondoServo ( const typename ServoFeedbackMsg::ConstPtr & );
 
+		void operator=( const KondoServo & );
+
         Uint16 get_degree () const;
         double get_degree_by_degree () const;
         Uint8 get_temp () const;
@@ -55,16 +57,16 @@ class KondoServo : GenericParts< ServoMsg, ServoCommandMsg, ServoFeedbackMsg >
 
         void print() const override ;
 
-        CattyPartsError set_msg( ServoMsg & ) const override ;
-        CattyPartsError set_CommandMsg( ServoCommandMsg & ) const override ;
-        CattyPartsError set_FeedbackMsg( ServoFeedbackMsg & ) const override ;
+        CattyError set_msg( ServoMsg & ) const override ;
+        CattyError set_CommandMsg( ServoCommandMsg & ) const override ;
+        CattyError set_FeedbackMsg( ServoFeedbackMsg & ) const override ;
 
-        CattyPartsError set( const ServoMsg & ) override ;
-        CattyPartsError set( const typename ServoMsg::ConstPtr & ) override  ;
-        CattyPartsError set( const ServoCommandMsg & ) override ;
-        CattyPartsError set( const typename ServoCommandMsg::ConstPtr & ) override ;
-        CattyPartsError set( const ServoFeedbackMsg & ) override ;
-        CattyPartsError set( const typename ServoFeedbackMsg::ConstPtr & ) override ;
+        CattyError set( const ServoMsg & ) override ;
+        CattyError set( const typename ServoMsg::ConstPtr & ) override  ;
+        CattyError set( const ServoCommandMsg & ) override ;
+        CattyError set( const typename ServoCommandMsg::ConstPtr & ) override ;
+        CattyError set( const ServoFeedbackMsg & ) override ;
+        CattyError set( const typename ServoFeedbackMsg::ConstPtr & ) override ;
 };
 
 #endif

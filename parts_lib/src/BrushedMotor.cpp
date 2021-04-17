@@ -5,7 +5,7 @@ BrushedMotor::BrushedMotor( PartID pID, Uint8 ID):
 {}
 
 BrushedMotor::BrushedMotor( const BrushedMotor & original ) :
-    GenericParts( "BrushedMotor", pID, ID ),
+    GenericParts( "BrushedMotor", PartID(original.part_id), original.id ),
     current_limit( original.current_limit ),
     pwm( original.pwm ),
     rpm( original.rpm ),
@@ -14,37 +14,35 @@ BrushedMotor::BrushedMotor( const BrushedMotor & original ) :
 
 
 BrushedMotor::BrushedMotor( const BrushedMsg & msg ):
-    GenericParts( "BrushedMotor", msg.part_id, msg.id ),
+    GenericParts( "BrushedMotor", PartID(msg.part_id), msg.id )
 { this->set( msg ); }
 
 
 BrushedMotor::BrushedMotor( const typename BrushedMsg::ConstPtr & msg ):
-    GenericParts( "BrushedMotor", msg->part_id, msg->id ),
+    GenericParts( "BrushedMotor", PartID(msg->part_id), msg->id )
 { this->set( msg ); }
 
 
 BrushedMotor::BrushedMotor( const BrushedCommandMsg & msg ):
-    GenericParts( "BrushedMotor", msg.part_id, msg.id ),
+    GenericParts( "BrushedMotor", PartID(msg.part_id), msg.id )
 { this->set( msg ); }
 
 
 BrushedMotor::BrushedMotor( const typename BrushedCommandMsg::ConstPtr & msg ):
-    GenericParts( "BrushedMotor", msg->part_id, msg->id ),
+    GenericParts( "BrushedMotor", PartID(msg->part_id), msg->id )
 { this->set( msg ); }
 
 
 BrushedMotor::BrushedMotor( const BrushedFeedbackMsg & msg ):
-    GenericParts( "BrushedMotor", msg.part_id, msg.id ),
+    GenericParts( "BrushedMotor", PartID(msg.part_id), msg.id )
 { this->set( msg ); }
 
 
 BrushedMotor::BrushedMotor( const typename BrushedFeedbackMsg::ConstPtr & msg ):
-    GenericParts( "BrushedMotor", msg->part_id, msg->id ),
+    GenericParts( "BrushedMotor", PartID(msg->part_id), msg->id )
 { this->set( msg ); }
 
 
-PartID BrushedMotor::get_part_id() { return part_id; }
-Uint8 BrushedMotor::get_id() const { return id; }
 Uint8 BrushedMotor::get_rpm() const { return rpm; }
 Uint8 BrushedMotor::get_current() const { return current; }
 Uint8 BrushedMotor::get_current_limit() const { return current_limit; }
@@ -94,15 +92,10 @@ Uint16 rpm;
 Uint8 current;
 
 
-void BrushedMotor::print() const override
+void BrushedMotor::print() const
 {
     if( valid ){
-        ROS_INFO("Printing Information of <%s>: part_id = [%d], id = [%d], \n
-        current_limit\t= [%d], \n
-        pwm \t= [%d], \n
-        rpm \t= [%d], \n
-        current \t= [%d], \n\n",
-        child_name.c_str(), part_id, id, current_limit, pwm, rpm, current );
+        ROS_INFO("Printing Information of <%s>: part_id = [%d], id = [%d], \ncurrent_limit\t= [%d], \npwm \t= [%d], \nrpm \t= [%d], \ncurrent \t= [%d], \n", child_name.c_str(), part_id, id, current_limit, pwm, rpm, current );
     }
     else {
         ROS_INFO("This <%s> is not valid. Please exit the program.", child_name.c_str());
@@ -110,20 +103,18 @@ void BrushedMotor::print() const override
 }
 
 
-CattyPartsError BrushedMotor::set_msg( BrushedMsg & msg ) const override
+CattyError BrushedMotor::set_msg( BrushedMsg & msg ) const
 {
 	if ( msg.part_id == 0 && msg.id == 0 ) {
-		msg->part_id = part_id;
-		msg->id = id;
+		msg.part_id = part_id;
+		msg.id = id;
 	} else {
-		CattyPartsError error = check_id( msg );
+		CattyError error = check_msg_id( msg );
 		if ( error == PART_ID_NOT_MATCH ) {
-			print_msg_part_id_error();
-			valid = false;
+			print_msg_part_id_error( msg );
 			return error;
 		} else if ( error == ID_NOT_MATCH ) {
-			print_msg_id_error();
-			valid = false;
+			print_msg_id_error( msg );
 			return error;
 		}
 	}
@@ -146,19 +137,17 @@ CattyPartsError BrushedMotor::set_msg( BrushedMsg & msg ) const override
 }
 
 
-CattyPartsError BrushedMotor::set_CommandMsg( BrushedCommandMsg & msg ) const override {
+CattyError BrushedMotor::set_CommandMsg( BrushedCommandMsg & msg ) const {
 	if ( msg.part_id == 0 && msg.id == 0 ) {
-		msg->part_id = part_id;
-		msg->id = id;
+		msg.part_id = part_id;
+		msg.id = id;
 	} else {
-		CattyPartsError error = check_id( msg );
+		CattyError error = check_msg_id( msg );
 		if ( error == PART_ID_NOT_MATCH ) {
-			print_msg_part_id_error();
-			valid = false;
+			print_msg_part_id_error( msg );
 			return error;
 		} else if ( error == ID_NOT_MATCH ) {
-			print_msg_id_error();
-			valid = false;
+			print_msg_id_error( msg );
 			return error;
 		}
 	}
@@ -178,19 +167,17 @@ CattyPartsError BrushedMotor::set_CommandMsg( BrushedCommandMsg & msg ) const ov
 }
 
 
-CattyPartsError BrushedMotor::set_FeedbackMsg( BrushedFeedbackMsg & msg ) const override {
+CattyError BrushedMotor::set_FeedbackMsg( BrushedFeedbackMsg & msg ) const {
 	if ( msg.part_id == 0 && msg.id == 0 ) {
-		msg->part_id = part_id;
-		msg->id = id;
+		msg.part_id = part_id;
+		msg.id = id;
 	} else {
-		CattyPartsError error = check_id( msg );
+		CattyError error = check_msg_id( msg );
 		if ( error == PART_ID_NOT_MATCH ) {
-			print_msg_part_id_error();
-			valid = false;
+			print_msg_part_id_error( msg );
 			return error;
 		} else if ( error == ID_NOT_MATCH ) {
-			print_msg_id_error();
-			valid = false;
+			print_msg_id_error( msg );
 			return error;
 		}
 	}
@@ -210,15 +197,15 @@ CattyPartsError BrushedMotor::set_FeedbackMsg( BrushedFeedbackMsg & msg ) const 
 }
 
 
-CattyPartsError BrushedMotor::set( const BrushedMsg & msg ) override
+CattyError BrushedMotor::set( const BrushedMsg & msg )
 {
-	CattyPartsError = check_id( msg );
+	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
-		print_msg_part_id_error();
+		print_msg_part_id_error( msg );
 		valid = false;
 		return error;
 	} else if ( error == ID_NOT_MATCH ) {
-		print_msg_id_error();
+		print_msg_id_error( msg );
 		valid = false;
 		return error;
 	}
@@ -237,15 +224,15 @@ CattyPartsError BrushedMotor::set( const BrushedMsg & msg ) override
 }
 
 
-CattyPartsError BrushedMotor::set( const typename BrushedMsg::ConstPtr & msg ) override
+CattyError BrushedMotor::set( const typename BrushedMsg::ConstPtr & msg )
 {
-	CattyPartsError = check_id( msg );
+	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
-		print_msg_part_id_error();
+		print_msg_part_id_error( msg );
 		valid = false;
 		return error;
 	} else if ( error == ID_NOT_MATCH ) {
-		print_msg_id_error();
+		print_msg_id_error( msg );
 		valid = false;
 		return error;
 	}
@@ -264,20 +251,20 @@ CattyPartsError BrushedMotor::set( const typename BrushedMsg::ConstPtr & msg ) o
 }
 
 
-CattyPartsError BrushedMotor::set( const BrushedCommandMsg & msg ) override
+CattyError BrushedMotor::set( const BrushedCommandMsg & msg )
 {
-	CattyPartsError = check_id( msg );
+	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
-		print_msg_part_id_error();
+		print_msg_part_id_error( msg );
 		valid = false;
 		return error;
 	} else if ( error == ID_NOT_MATCH ) {
-		print_msg_id_error();
+		print_msg_id_error( msg );
 		valid = false;
 		return error;
 	}
 
-    if ( state == NONE ) state = COMMAND;
+    if ( state == INVALID ) state = COMMAND;
     else if ( state == FEEDBACK ) state = GENERAL;
 
     current_limit = msg.current_limit;
@@ -289,20 +276,20 @@ CattyPartsError BrushedMotor::set( const BrushedCommandMsg & msg ) override
 }
 
 
-CattyPartsError BrushedMotor::set( const BrushedCommandMsg::ConstPtr & msg ) override
+CattyError BrushedMotor::set( const BrushedCommandMsg::ConstPtr & msg )
 {
-	CattyPartsError = check_id( msg );
+	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
-		print_msg_part_id_error();
+		print_msg_part_id_error( msg );
 		valid = false;
 		return error;
 	} else if ( error == ID_NOT_MATCH ) {
-		print_msg_id_error();
+		print_msg_id_error( msg );
 		valid = false;
 		return error;
 	}
 
-    if ( state == NONE ) state = COMMAND;
+    if ( state == INVALID ) state = COMMAND;
     else if ( state == FEEDBACK ) state = GENERAL;
 
     current_limit = msg->current_limit;
@@ -314,20 +301,20 @@ CattyPartsError BrushedMotor::set( const BrushedCommandMsg::ConstPtr & msg ) ove
 }
 
 
-CattyPartsError BrushedMotor::set( const BrushedFeedbackMsg & msg ) override
+CattyError BrushedMotor::set( const BrushedFeedbackMsg & msg )
 {
-	CattyPartsError = check_id( msg );
+	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
-		print_msg_part_id_error();
+		print_msg_part_id_error( msg );
 		valid = false;
 		return error;
 	} else if ( error == ID_NOT_MATCH ) {
-		print_msg_id_error();
+		print_msg_id_error( msg );
 		valid = false;
 		return error;
 	}
 
-    if ( state == NONE ) state = FEEDBACK;
+    if ( state == INVALID ) state = FEEDBACK;
     else if ( state == COMMAND ) state = GENERAL;
 
     rpm = msg.rpm;
@@ -339,20 +326,20 @@ CattyPartsError BrushedMotor::set( const BrushedFeedbackMsg & msg ) override
 }
 
 
-CattyPartsError BrushedMotor::set( const typename BrushedFeedbackMsg::ConstPtr & msg ) override
+CattyError BrushedMotor::set( const typename BrushedFeedbackMsg::ConstPtr & msg )
 {
-	CattyPartsError = check_id( msg );
+	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
-		print_msg_part_id_error();
+		print_msg_part_id_error( msg );
 		valid = false;
 		return error;
 	} else if ( error == ID_NOT_MATCH ) {
-		print_msg_id_error();
+		print_msg_id_error( msg );
 		valid = false;
 		return error;
 	}
 
-    if ( state == NONE ) state = FEEDBACK;
+    if ( state == INVALID ) state = FEEDBACK;
     else if ( state == COMMAND ) state = GENERAL;
 
     rpm = msg->rpm;

@@ -7,7 +7,7 @@ KondoServo::KondoServo ( PartID pID, Uint8 ID ) :
 
 
 KondoServo::KondoServo( const KondoServo & original ):
-	GenrericParts( "KondoServo", original.part_id, original.id ),
+	GenericParts( "KondoServo", PartID(original.part_id), original.id ),
 	degree( original.degree ),
 	temp_limit( original.temp_limit ),
 	current_limit( original.current_limit ),
@@ -16,43 +16,41 @@ KondoServo::KondoServo( const KondoServo & original ):
 {
 	state = original.state;
 	valid = original.valid;
-	well_defined = riiginal.well_defined;
+	well_defined = original.well_defined;
 }
 
 
-KondoServo::KondoServo ( ServoMsg &  msg ):
-    GenericParts( "KondoServo", msg.part_id, msg.id )
+KondoServo::KondoServo ( const ServoMsg &  msg ):
+    GenericParts( "KondoServo", PartID(msg.part_id), msg.id )
 { this->set( msg ); }
 
 
-KondoServo::KondoServo ( typename ServoMsg::ConstPtr &  msg ):
-    GenericParts( "KondoServo", msg->part_id, msg->id )
+KondoServo::KondoServo ( const typename ServoMsg::ConstPtr &  msg ):
+    GenericParts( "KondoServo", PartID(msg->part_id), msg->id )
 { this->set( msg ); }
 
 
-KondoServo::KondoServo ( ServoCommandMsg &  msg ):
-    GenericParts( "KondoServo", msg.part_id, msg.id )
+KondoServo::KondoServo ( const ServoCommandMsg &  msg ):
+    GenericParts( "KondoServo", PartID(msg.part_id), msg.id )
 { this->set( msg ); }
 
 
-KondoServo::KondoServo ( typename ServoCommandMsg::ConstPtr &  msg ):
-    GenericParts( "KondoServo", msg->part_id, msg->id )
+KondoServo::KondoServo ( const typename ServoCommandMsg::ConstPtr &  msg ):
+    GenericParts( "KondoServo", PartID(msg->part_id), msg->id )
 { this->set( msg ); }
 
 
-KondoServo::KondoServo ( ServoFeedbackMsg &  msg ):
-    GenericParts( "KondoServo", msg.part_id, msg.id )
+KondoServo::KondoServo ( const ServoFeedbackMsg &  msg ):
+    GenericParts( "KondoServo", PartID(msg.part_id), msg.id )
 { this->set( msg ); }
 
 
-KondoServo::KondoServo ( typename ServoFeedbackMsg::ConstPtr &  msg ):
-    GenericParts( "KondoServo", msg->part_id, msg->id )
+KondoServo::KondoServo ( const typename ServoFeedbackMsg::ConstPtr &  msg ):
+    GenericParts( "KondoServo", PartID(msg->part_id), msg->id )
 { this->set( msg ); }
 
 
 
-PartID  KondoServo::get_part_id () const { return part_id; }
-Uint8  KondoServo::get_id () const { return id; }
 Uint16 KondoServo::get_degree () const { return degree; }
 double KondoServo::get_degree_by_degree () const { return double(degree) * ( (135.0*2)/65535.0 - 135.0); }
 Uint8 KondoServo::get_temp () const { return temp; }
@@ -70,18 +68,10 @@ void KondoServo::set_strech(Uint8 Stretch) { stretch = Stretch; }
 void KondoServo::set_temp_limit(Uint8 Temp_limit) { temp_limit = Temp_limit; }
 void KondoServo::set_current_limit(Uint8 Current_limit) { current_limit = Current_limit; }
 
-void KondoServo::print() const override
+void KondoServo::print() const
 {
     if( valid ){
-        ROS_INFO("Printing Information of <%s>: part_id = [%d], id = [%d], \n
-        degree\t= [%d], \n
-        temp_limit \t= [%d], \n
-        current_limit \t= [%d], \n
-        speed \t= [%d], \n
-        stretch \t= [%d], \n
-        temp \t= [%d], \n
-        current \t= [%d] \n\n",
-        child_name.c_str(), part_id, id, degree, temp_limit, current_limit, speed, stretch, temp, current );
+        ROS_INFO("Printing Information of <%s>: part_id = [%d], id = [%d], \ndegree\t= [%d], \ntemp_limit \t= [%d], \ncurrent_limit \t= [%d], \nspeed \t= [%d], \nstretch \t= [%d], \ntemp \t= [%d], \ncurrent \t= [%d] \n", child_name.c_str(), part_id, id, degree, temp_limit, current_limit, speed, stretch, temp, current );
     }
     else {
         ROS_INFO("This <%s> is not valid. Please exit the program.", child_name.c_str());
@@ -89,19 +79,17 @@ void KondoServo::print() const override
 }
 
 
-CattyPartsError KondoServo::set_msg( ServoMsg & msg ) const override {
+CattyError KondoServo::set_msg( ServoMsg & msg ) const {
 	if ( msg.part_id == 0 && msg.id == 0 ) {
-		msg->part_id = part_id;
-		msg->id = id;
+		msg.part_id = part_id;
+		msg.id = id;
 	} else {
-		CattyPartsError error = check_id( msg );
+		CattyError error = check_msg_id( msg );
 		if ( error == PART_ID_NOT_MATCH ) {
-			print_msg_part_id_error();
-			valid = false;
+			print_msg_part_id_error( msg );
 			return error;
 		} else if ( error == ID_NOT_MATCH ) {
-			print_msg_id_error();
-			valid = false;
+			print_msg_id_error( msg );
 			return error;
 		}
 	}
@@ -127,19 +115,17 @@ CattyPartsError KondoServo::set_msg( ServoMsg & msg ) const override {
 }
 
 
-CattyPartsError KondoServo::set_CommandMsg( ServoCommandMsg & msg ) const override {
+CattyError KondoServo::set_CommandMsg( ServoCommandMsg & msg ) const {
 	if ( msg.part_id == 0 && msg.id == 0 ) {
-		msg->part_id = part_id;
-		msg->id = id;
+		msg.part_id = part_id;
+		msg.id = id;
 	} else {
-		CattyPartsError error = check_id( msg );
+		CattyError error = check_msg_id( msg );
 		if ( error == PART_ID_NOT_MATCH ) {
-			print_msg_part_id_error();
-			valid = false;
+			print_msg_part_id_error( msg );
 			return error;
 		} else if ( error == ID_NOT_MATCH ) {
-			print_msg_id_error();
-			valid = false;
+			print_msg_id_error( msg );
 			return error;
 		}
 	}
@@ -162,19 +148,17 @@ CattyPartsError KondoServo::set_CommandMsg( ServoCommandMsg & msg ) const overri
 }
 
 
-CattyPartsError KondoServo::set_FeedbackMsg( ServoFeedbackMsg & msg ) const override {
+CattyError KondoServo::set_FeedbackMsg( ServoFeedbackMsg & msg ) const {
 	if ( msg.part_id == 0 && msg.id == 0 ) {
-		msg->part_id = part_id;
-		msg->id = id;
+		msg.part_id = part_id;
+		msg.id = id;
 	} else {
-		CattyPartsError error = check_id( msg );
+		CattyError error = check_msg_id( msg );
 		if ( error == PART_ID_NOT_MATCH ) {
-			print_msg_part_id_error();
-			valid = false;
+			print_msg_part_id_error( msg );
 			return error;
 		} else if ( error == ID_NOT_MATCH ) {
-			print_msg_id_error();
-			valid = false;
+			print_msg_id_error( msg );
 			return error;
 		}
 	}
@@ -194,15 +178,15 @@ CattyPartsError KondoServo::set_FeedbackMsg( ServoFeedbackMsg & msg ) const over
 }
 
 
-CattyPartsError KondoServo::set( const ServoMsg & msg ) override
+CattyError KondoServo::set( const ServoMsg & msg )
 {
-	CattyPartsError = check_id( msg );
+	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
-		print_msg_part_id_error();
+		print_msg_part_id_error( msg );
 		valid = false;
 		return error;
 	} else if ( error == ID_NOT_MATCH ) {
-		print_msg_id_error();
+		print_msg_id_error( msg );
 		valid = false;
 		return error;
 	}
@@ -224,20 +208,20 @@ CattyPartsError KondoServo::set( const ServoMsg & msg ) override
 }
 
 
-CattyPartsError KondoServo::set( const typename ServoMsg::ConstPtr & msg ) override
+CattyError KondoServo::set( const typename ServoMsg::ConstPtr & msg )
 {
-	CattyPartsError = check_id( msg );
+	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
-		print_msg_part_id_error();
+		print_msg_part_id_error( msg );
 		valid = false;
 		return error;
 	} else if ( error == ID_NOT_MATCH ) {
-		print_msg_id_error();
+		print_msg_id_error( msg );
 		valid = false;
 		return error;
 	}
 
-    state = GENRAL;
+    state = GENERAL;
 
     degree = msg->degree;
 	temp_limit = msg->temp_limit;
@@ -254,20 +238,20 @@ CattyPartsError KondoServo::set( const typename ServoMsg::ConstPtr & msg ) overr
 }
 
 
-CattyPartsError KondoServo::set( const ServoCommandMsg & msg ) override
+CattyError KondoServo::set( const ServoCommandMsg & msg )
 {
-	CattyPartsError = check_id( msg );
+	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
-		print_msg_part_id_error();
+		print_msg_part_id_error( msg );
 		valid = false;
 		return error;
 	} else if ( error == ID_NOT_MATCH ) {
-		print_msg_id_error();
+		print_msg_id_error( msg );
 		valid = false;
 		return error;
 	}
 
-    if ( state == NONE ) state = COMMAND;
+    if ( state == INVALID ) state = COMMAND;
     else if ( state == FEEDBACK ) state = GENERAL;
 
     degree = msg.degree;
@@ -282,20 +266,20 @@ CattyPartsError KondoServo::set( const ServoCommandMsg & msg ) override
 }
 
 
-CattyPartsError KondoServo::set( const ServoCommandMsg::ConstPtr & msg ) override
+CattyError KondoServo::set( const ServoCommandMsg::ConstPtr & msg )
 {
-	CattyPartsError = check_id( msg );
+	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
-		print_msg_part_id_error();
+		print_msg_part_id_error( msg );
 		valid = false;
 		return error;
 	} else if ( error == ID_NOT_MATCH ) {
-		print_msg_id_error();
+		print_msg_id_error( msg );
 		valid = false;
 		return error;
 	}
 
-    if ( state == NONE ) state = COMMAND;
+    if ( state == INVALID ) state = COMMAND;
     else if ( state == FEEDBACK ) state = GENERAL;
 
     degree = msg->degree;
@@ -310,20 +294,20 @@ CattyPartsError KondoServo::set( const ServoCommandMsg::ConstPtr & msg ) overrid
 }
 
 
-CattyPartsError KondoServo::set( const ServoFeedbackMsg & msg ) override
+CattyError KondoServo::set( const ServoFeedbackMsg & msg )
 {
-	CattyPartsError = check_id( msg );
+	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
-		print_msg_part_id_error();
+		print_msg_part_id_error( msg );
 		valid = false;
 		return error;
 	} else if ( error == ID_NOT_MATCH ) {
-		print_msg_id_error();
+		print_msg_id_error( msg );
 		valid = false;
 		return error;
 	}
 
-    if ( state == NONE ) state = FEEDBACK;
+    if ( state == INVALID ) state = FEEDBACK;
     else if ( state == COMMAND ) state = GENERAL;
 
 	temp = msg.temp;
@@ -335,20 +319,20 @@ CattyPartsError KondoServo::set( const ServoFeedbackMsg & msg ) override
 }
 
 
-CattyPartsError KondoServo::set( const typename ServoFeedbackMsg::ConstPtr & msg ) override
+CattyError KondoServo::set( const typename ServoFeedbackMsg::ConstPtr & msg )
 {
-	CattyPartsError = check_id( msg );
+	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
-		print_msg_part_id_error();
+		print_msg_part_id_error( msg );
 		valid = false;
 		return error;
 	} else if ( error == ID_NOT_MATCH ) {
-		print_msg_id_error();
+		print_msg_id_error( msg );
 		valid = false;
 		return error;
 	}
 
-    if ( state == NONE ) state = FEEDBACK;
+    if ( state == INVALID ) state = FEEDBACK;
     else if ( state == COMMAND ) state = GENERAL;
 
 	temp = msg->temp;

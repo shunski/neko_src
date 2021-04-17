@@ -30,9 +30,13 @@ std::string get_catty_error_description( CattyError error ) {
     switch( error )
     {
         case SUCCESS: return "SUCCESS";
-        case LOCOMOTION_ACTION_ERROR: return "LOCOMOTION_ACTION_ERROR";
-        case CONSTRUCT_ERROR: return "CONSTRUCT_ERROR";
-        case INIT_ERROR: return "INIT_ERROR";
-        case PART_ID_NOT_MATCH: return "PART_ID_NOT_MATCH"
+		case WARNING: return "WARNING";
+        case LOCOMOTION_ACTION_FAILUE: return "LOCOMOTION_ACTION_FAILUE";
+		case MOTION_INIT_FAILUE: return "MOTION_INIT_FAILUE";
+        case OBJECT_CONSTRUCTION_FAILUE: return "OBJECT_CONSTRUCTION_FAILUE";
+        case MESSAGE_CONSTRUCTION_FAILUE: return "MESSAGE_CONSTRUCTION_FAILUE";
+        case PART_ID_NOT_MATCH: return "PART_ID_NOT_MATCH";
+		case ID_NOT_MATCH: return "ID_NOT_MATCH";
     }
 }
+

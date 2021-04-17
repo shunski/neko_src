@@ -11,7 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES node_lib
-  CATKIN_DEPENDS roscpp std_msgs
+  CATKIN_DEPENDS roscpp 
   #  DEPENDS system_lib
 )
 
@@ -21,10 +21,9 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME}
-  src/${PROJECT_NAME}/HeartrateSubscriber.cpp
-  src/${PROJECT_NAME}/Part.cpp
-  src/${PROJECT_NAME}/MotionController.cpp
-  src/${PROJECT_NAME}/FeedbackProcessor.cpp
+  src/HeartrateSubscriberNode.cpp
+  src/MotionControllerNode.cpp
+  src/FeedbackProcessorNode.cpp
 )
 
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

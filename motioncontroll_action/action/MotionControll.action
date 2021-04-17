@@ -1,7 +1,9 @@
 # MotionControll.action
 # goal
 int8 part_id
-body_msgs/PartCommandMsg command
+duration expectedTotalDuration
+int16 sequenceSize
+body_msgs/PartCommandMsg[] partCommandSequence
 
 ---
 

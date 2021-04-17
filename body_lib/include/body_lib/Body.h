@@ -31,20 +31,27 @@ namespace Body{
             std::vector<BrushlessMotor> brushlessMotorSet;
             std::vector<MotionSensor> motionSensorSet;
 			bool valid;
+			bool well_defined;
+			ObjectState state;
 
         public:
             Part();
 		    Part( PartID );
             Part( PartID, Uint8 servoNum, Uint8 brushedMotorNum, Uint8 brushlessMotorNum, Uint8 motionSensorNum );
-            Part( PartID, std::vector<KondoServo>     KondoServoSet,
-                          std::vector<BrushedMotor>   BrushedMotorSet,
-                          std::vector<BrushlessMotor> BrushlessMotorSet );
+            Part( PartID, const std::vector<KondoServo>&,
+                          const std::vector<BrushedMotor>&,
+                          const std::vector<BrushlessMotor>& );
+			Part( PartID, const std::vector<parts_msgs::KondoServoCommandMsg> &,
+                          const std::vector<parts_msgs::BrushedMotorCommandMsg> &,
+                          const std::vector<parts_msgs::BrushlessMotorCommandMsg> & );
             CattyError set( const teensy_msgs::FeedbackMsg::ConstPtr & );
             CattyError set( const teensy_msgs::CommandMsg::ConstPtr & );
-            void set_CommandMsg( teensy_msgs::CommandMsg & );
-            body_msgs::PartMsg get_PartMsg() const ;
-			void set_PartMsg( body_msgs::PartMsg & );
-			bool isValid();
+
+            CattyError set_PartMsg( body_msgs::PartMsg & );
+			CattyError set_CommandMsg( teensy_msgs::CommandMsg & );
+
+			bool isValid() const ;
+			bool isWellDefined() const ;
     };
 
     class Body
@@ -84,13 +91,11 @@ namespace Body{
 			void startMotioncontrollAction( motioncontroll_action::MotionControllGoal::ConstPtr & );
             CattyError set_CommandMsg( teensy_msgs::CommandMsg & ) const ;
             bool isEnd() const ;
-            CattyError set_feedbackMsg( motioncontroll_action::MotionControllFeedback & ) const ;
-            CattyError set_resultMsg( motioncontroll_action::MotionControllResult & ) const ;
-            motioncontroll_action::MotionControllFeedback generate_feedbackMsg() const ;
-            motioncontroll_action::MotionControllResult generate_resultMsg() const ;
+            CattyError set_feedbackMsg( motioncontroll_action::MotionControllFeedback & );
+            CattyError set_resultMsg( motioncontroll_action::MotionControllResult & );
             ros::Duration get_actualCurrentSceneDuration() const;
 			ros::Duration get_expectedSceneDuration() const;
-			bool isValid();
+			bool isValid() const;
 
     };
 

@@ -2,13 +2,8 @@
 #include <node_lib/Node.h>
 
 using namespace Node;
-            FeedbackProcessor fp;
-            ros::Publisher processedFeedbackPublisher;
-            ros::Subscriber teencyListner;
-            ros::Publisher currentStatePublisher;
-            std::string nodeName;
-            std::string publishTopicName;
-            std::string subscribeTopicName;
+
+
 FeedbackProcessorNode(PartID ID, std::string NodeName, std::string PublishTopicName, std::string SubscribeTopicName, std::string HeartrateFeedbackName)
 	fp(ID),
 	nodeName( NodeName ),
@@ -22,16 +17,16 @@ FeedbackProcessorNode(PartID ID, std::string NodeName, std::string PublishTopicN
                                                                 boost::bind( &Node::FeedbackProcessorNode::teensyListerCallback, this ));
 }
 
-void teencyListnerCallback ( jcatty_teensy_msgs::InfoMsg::ConstPtr msg ){
+void FeedbackProcessorNode::teencyListnerCallback ( teensy_msgs::FeedbackMsg::ConstPtr msg ){
 	fp.processFeedback( msg );
 	publish_processedFeedback( msg );
 }
 
-inline void publish_processedFeedback( jcatty_body_msgs::PartMsg ) const {
+inline void FeedbackProcessorNode::publish_processedFeedback( body_msgs::PartMsg ) const {
 	processedFeedbackPublisher.publish( msg );
 }
 
-void publish_currentState() {
+void FeedbackProcessorNode::publish_currentState() {
 	body_msgs::PartMsg msg;
 	fp.set_PartMsg( msg );
 	currentStatePublisher.publish( msg );

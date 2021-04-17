@@ -17,8 +17,8 @@ MotionControllerNode::MotionControllerNode( PartID ID, std::string publishComman
     actionName = locomotionActionName;
 }
 
-void MotionControllerNode::renewAllPublisherTimer () override {
-    publisherTimer = this->createTimer(heartrate, boost::bind(& Node::McNode::publish_currentState()), this);
+void MotionControllerNode::renewAllPublisherTimer () {
+    publisherTimer = this->createTimer(heartrate, boost::bind(& Node::MotionContollerNode::publish_currentState()), this);
 }
 
 void MotionControllerNode::processorListnerCallback ( body_msgs::PartMsg::ConstPtr msg ){

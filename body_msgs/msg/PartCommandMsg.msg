@@ -1,8 +1,6 @@
 # PartCommandMsg.msg
 Header header
 uint8 part_id
-duration expectedTotalDuration
-int16 sequenceSize
-parts_msgs/KondoServoCommandMsg[] kondoServoCommandSequence
-parts_msgs/BrushedMotorCommandMsg[] brushedMotorCommandSequence
-parts_msgs/BrushlessMotorCommandMsg[] brushlessMotorCommandSequence
+parts_msgs/KondoServoCommandMsg[] kondoServoCommandSet
+parts_msgs/BrushedMotorCommandMsg[] brushedMotorCommandSet
+parts_msgs/BrushlessMotorCommandMsg[] brushlessMotorCommandSet

@@ -10,7 +10,7 @@
 #include <support_msgs/CalibrationMsg.h>
 #include <support_lib/Utilities.h>
 #include <teensy_msgs/CommandMsg.h>
-#include <teensy_msgs/InfoMsg.h>
+#include <teensy_msgs/FeedbackMsg.h>
 #include <actionlib/server/simple_action_server.h>
 #include <motioncontroll_action/MotionControllAction.h>
 #include <motioncontroll_action/MotionControllGoal.h>
@@ -27,20 +27,20 @@ namespace Node{
             ros::Duration heartrate;
         public:
             HeartrateSubscriber();
-            HeartrateSubscriberCallback( support_msgs::HeartrateMsg::ConstPtr );
+            void HeartrateSubscriberCallback( support_msgs::HeartrateMsg::ConstPtr );
+			virtual void renewAllPublisherTimer();
     };
 
     class MotionControllerNode : virtual protected ros::NodeHandle, virtual protected HeartrateSubscriber
     {
         protected:
-            MotionController mc;
+            Body::MotionController mc;
             ros::Publisher commandPublisher;          // to teensy
             ros::Publisher currentStatePublisher;     // to core / other nodes
             ros::Subscriber feedbackProcessorListner; // listening to FeedbackProcessor Node
             ros::Timer publisherTimer;
             actionlib::SimpleActionServer<motioncontroll_action::MotionControllAction> locomotionServer; // execute action from core
             std::string actionName;
-            bool valid;
 
         public:
             MotionControllerNode( std::string publishCmdTopicName, std::string publishStateTopicName, std::string subscribeInfoTopicName, std::string locomotionActionName );
@@ -50,13 +50,12 @@ namespace Node{
             inline void publish_cmdMsg() const;
             inline void publish_feedback() const;
             inline void publish_currentState() const;
-            bool valid();
     };
 
     class FeedbackProcessorNode : virtual protected ros::NodeHandle, virtual protected HeartrateSubscriber
     {
         protected:
-            FeedbackProcessor fp;
+            Body::FeedbackProcessor fp;
             ros::Publisher ProcessedFeedbackPublisher;
             ros::Subscriber teencyListner;
 			ros::Publisher currentStatePublisher;

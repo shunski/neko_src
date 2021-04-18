@@ -7,7 +7,7 @@ class RhFpNode : protected Node::FeedbackProcessorNode
 {
     public:
         FeedbackProcessorNode()
-            MotionControllerNode( RHLEG, "rhLegCommand", "rhProcessedFeedback", "rhTeensyFeedback", "rhHeartrateSubscriber" )
+            MotionControllerNode( RHLEG, "rhLeg")
         {}
 };
 

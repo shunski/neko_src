@@ -2,9 +2,15 @@
 #include <node_lib/Node.h>
 using namespace Node;
 
-MotionControllerNode::MotionControllerNode( PartID ID, std::string publishCommandTopicName, std::string publishStateTopicName, std::string subscribeFeedbackTopicName, std::string locomotionActionName):
-    mc( ID ),
-	locomotionServer(this, locomotionActionName, boost::bind(& Node::MotionControllerNode::locomotionActionCallback, this), false)
+MotionControllerNode::MotionControllerNode( PartID pID, std::string PartName ):
+    mc( pID ),
+    nodeName( PartName+"MotionController"),
+    fromFeedbackProcessorSubscribeTopicName(partName+"controlledMotion"),
+    toTeensyPublishTopicName( nodeName+"TeensyCommand"),
+    toFeedbackProcessorTopicName( nodename+"ActionState"),
+    heartrateFeedbackName( nodeName+"HeartrateFeedback"),
+	locomotionServer(this, locomotionActionName, boost::bind(& Node::MotionControllerNode::locomotionActionCallback, this), false),
+    valid( ture )
 {
     valid = mc.isValid();
     locomotionServer.start();
@@ -13,8 +19,8 @@ MotionControllerNode::MotionControllerNode( PartID ID, std::string publishComman
     legInfoProcessorListner = this->subscribe<body_msgs::PartMsg>(subscribeInfoTopicName,
                                                                   queue_size,
                                                                   boost::bind(& Node::MotionControllerNode::processorListnerCallback, this));
-    publisherTimer = this->createTimer( heartrate, boost::bind(& Node::MotionControllerNode::publish_CommandMsg()), this );
-    actionName = locomotionActionName;
+    currentStatePublisherTimer = this->createTimer( heartrate, boost::bind(& Node::MotionControllerNode::publish_CommandMsg()), this );
+    mcValidnessSensor = this->createTimer( ros::Duration(0.1), boost::bind(& Node::MotionControllerNode::checkMcValidness()), this );
 }
 
 void MotionControllerNode::renewAllPublisherTimer () {
@@ -51,17 +57,25 @@ void MotionControllerNode::locomotionActionCallback ( const motioncontroll_actio
     }
 }
 
+
 inline void MotionControllerNode::publish_CommandMsg() const {
     teensy_msgs::CommandMsg msg = mc.get_CommandMsg();
     currentStatePublisher.publish( msg );
 }
+
 
 inline void MotionControllerNode::publish_feedback() const {
     motioncontroll_action::MotionControllFeedback feedback = mc.get_feedbackMsg();
     locomotionServer.currentStatePublisher.publish( msg );
 }
 
+
 void MotionControllerNode::publish_currentState() const {
     body_msgs::PartMsg msg = mc.get_currentState().set_PartMsg();
     currentStatePublisher.publish( msg );
+}
+
+
+void MotionControllerNode::checkMcValidness(){
+    valid = mc.isValid();
 }

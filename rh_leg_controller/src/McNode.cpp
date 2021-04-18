@@ -7,7 +7,7 @@ class RhMcNode : protected Node::MotionControllerNode
 {
     public:
         RhMcNode()
-            MotionControllerNode(RHLEG, "rhLegCommand", "rhCurrentState", "rhProcessedInfo", "rhLocomotionAction")
+            MotionControllerNode( RHLEG, "rhLeg" )
         {}
 };
 

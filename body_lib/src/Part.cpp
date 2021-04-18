@@ -3,11 +3,13 @@
 using namespace Body;
 
 Part::Part():
-	part_id( NONE ), valid( true ), well_defined( false )
+	part_id( NONE ), scene_id( USHRT_MAX ), valid( true ), well_defined( false ), state( INVALID )
 {}
 
+
+
 Part::Part( PartID pID ) :
-	part_id( pID ), valid( true ), well_defined( false )
+	part_id( pID ), scene_id( USHRT_MAX ), valid( true ), well_defined( false ), state( INVALID )
 {
 	PartProperties pp = get_properties_by_id( part_id );
 
@@ -29,8 +31,47 @@ Part::Part( PartID pID ) :
 }
 
 
+Part::Part( PartID pID, Uint16 SceneID ) :
+	part_id( pID ), scene_id( SceneID ), valid( true ), well_defined( false ), state( INVALID )
+{
+	PartProperties pp = get_properties_by_id( part_id );
+
+	kondoServoSet    .reserve( pp.kondoServoNum     );
+	brushedMotorSet  .reserve( pp.brushedMotorNum   );
+	brushlessMotorSet.reserve( pp.brushlessMotorNum );
+	motionSensorSet  .reserve( pp.motionSensorNum   );
+
+	for ( int i=0; i<pp.kondoServoNum; i++ )
+		kondoServoSet.push_back( KondoServo( part_id, i ));
+	for ( int i=0; i<pp.brushedMotorNum; i++ )
+		brushedMotorSet.push_back( BrushedMotor( part_id, i ));
+	for ( int i=0; i<pp.brushlessMotorNum; i++ )
+		brushlessMotorSet.push_back( BrushlessMotor( part_id, i ));
+	for ( int i=0; i<pp.motionSensorNum; i++ )
+		motionSensorSet.push_back( MotionSensor( part_id, i ));
+
+	return;
+}
+
+
+Part::Part( const teensy_msgs::CommandMsg::ConstPtr & msg ) :
+	part_id( PartID(msg->part_id)), scene_id( msg->scene_id ), valid( true ), well_defined( true ), state( INVALID )
+{
+	CattyError error = set( msg );
+	return;
+}
+
+
+Part::Part( const teensy_msgs::FeedbackMsg::ConstPtr & msg ) :
+	part_id( PartID(msg->part_id)), scene_id( msg->scene_id ), valid( true ), well_defined( true ), state( INVALID )
+{
+	CattyError error = set( msg );
+	return;
+}
+
+
 Part::Part ( PartID ID, Uint8 servoNum, Uint8 brushedMotorNum, Uint8 brushlessMotorNum, Uint8 motionSensorNum ) :
-    part_id( ID ), valid( false ), well_defined( false )
+    part_id( ID ), valid( false ), well_defined( false ), state( INVALID )
 {
     for ( Uint8 i = 0; i<servoNum;          i++) kondoServoSet.push_back( KondoServo( part_id, i ));
     for ( Uint8 i = 0; i<brushedMotorNum;   i++) brushedMotorSet.push_back( BrushedMotor( part_id, i ));
@@ -275,7 +316,7 @@ CattyError Part::set_PartMsg( body_msgs::PartMsg & msg ){
 		it->set_msg( generalMsg );
 		msg.brushlessMotorSet.push_back( generalMsg );
 	}
-	
+
 	return SUCCESS;
 
 }
@@ -285,3 +326,6 @@ bool Part::isValid() const { return valid; }
 
 
 bool Part::isWellDefined() const { return well_defined; }
+
+
+Uint16 Part::get_scene_id() const { return scene_id; };

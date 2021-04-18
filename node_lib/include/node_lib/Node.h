@@ -8,6 +8,7 @@
 #include <body_lib/Body.h>
 #include <support_msgs/HeartrateMsg.h>
 #include <support_msgs/CalibrationMsg.h>
+#include <support_srv/LocomotionActionStateSrv.h>
 #include <support_lib/Utilities.h>
 #include <teensy_msgs/CommandMsg.h>
 #include <teensy_msgs/FeedbackMsg.h>
@@ -38,18 +39,26 @@ namespace Node{
             ros::Publisher commandPublisher;          // to teensy
             ros::Publisher currentStatePublisher;     // to core / other nodes
             ros::Subscriber feedbackProcessorListner; // listening to FeedbackProcessor Node
-            ros::Timer publisherTimer;
+            ros::Timer currentStatePublisherTimer;
             actionlib::SimpleActionServer<motioncontroll_action::MotionControllAction> locomotionServer; // execute action from core
-            std::string actionName;
+            std::string nodeName;
+            std::string locomotionActionName;
+            std::string fromFeedbackProcessorSubscribeTopicName;
+            std::string toTeensyPublishTopicName;
+            std::string toFeedbackProcessorTopicName;
+            std::string heartrateFeedbackName;
+            bool valid;
+            ros::Timer mcValidnessSensor;
 
         public:
-            MotionControllerNode( std::string publishCmdTopicName, std::string publishStateTopicName, std::string subscribeInfoTopicName, std::string locomotionActionName );
+            MotionControllerNode( PartID pID, std::string PartName );
             void renewAllPublisherTimer () override;
-            void processorListnerCallback ( body_msgs::PartMsg::ConstPtr );
+            void processorListnerCallback ( const body_msgs::PartMsg::ConstPtr );
             void locomotionActionCallback ( const motioncontroll_action::MotionControllAction::ConstPtr & );
             inline void publish_cmdMsg() const;
             inline void publish_feedback() const;
             inline void publish_currentState() const;
+            void checkMcValidness();
     };
 
     class FeedbackProcessorNode : virtual protected ros::NodeHandle, virtual protected HeartrateSubscriber
@@ -59,16 +68,22 @@ namespace Node{
             ros::Publisher ProcessedFeedbackPublisher;
             ros::Subscriber teencyListner;
 			ros::Publisher currentStatePublisher;
+            ros::Timer currentStatePublisherTimer;
+            ros::ServiceServer actionStateServer;
             std::string nodeName;
-            std::string publishTopicName;
-            std::string subscribeTopicName;
+            std::string toMotionControllerPublishTopicName;
+            std::string fromTeensySubscribeTopicName;
+            std::string fromMotionControllerServiceTopicName;
 			std::string heartrateFeedbackName;
+            bool valid;
+            ros::Timer fpValidnessSensor;
 
         public:
-            FeedbackProcessorNode( PartID ID, std::string NodeName, std::string PublishTopicName, std::string SubscribeTopicName, std::string HeartrateFeedbackName );
+            FeedbackProcessorNode( PartID pID, std::string PartName );
             void teencyListnerCallback( teensy_msgs::InfoMsg::ConstPtr );
             inline void publish_processedFeedback( body_msgs::PartMsg ) const ;
 			void publish_CurrentState();
+            void checkFpValidness();
     };
 }
 

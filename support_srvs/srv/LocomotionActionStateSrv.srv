@@ -1,0 +1,5 @@
+uint16 sequenceSize
+
+---
+
+uint8[] stateOfScenes

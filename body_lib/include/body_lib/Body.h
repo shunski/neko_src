@@ -1,13 +1,13 @@
 // Body.h
-
 #ifndef BODY_H
 #define BODY_H
 
 #include <ros/ros.h>
 #include <string>
 #include <vector>
+#include <queue>
 #include <tuple>
-#include <iostream>
+#include <limits.h>
 #include <actionlib/server/simple_action_server.h>
 #include <motioncontroll_action/MotionControllAction.h>
 #include <motioncontroll_action/MotionControllGoal.h>
@@ -22,14 +22,19 @@
 
 
 namespace Body{
+
+
     class Part
     {
         private:
             const PartID part_id;
+            const Uint16 scene_id;
+
             std::vector<KondoServo> kondoServoSet;
             std::vector<BrushedMotor> brushedMotorSet;
             std::vector<BrushlessMotor> brushlessMotorSet;
             std::vector<MotionSensor> motionSensorSet;
+
 			bool valid;
 			bool well_defined;
 			ObjectState state;
@@ -37,6 +42,9 @@ namespace Body{
         public:
             Part();
 		    Part( PartID );
+            Part( PartID, Uint16 SceneID );
+            Part( const teensy_msgs::CommandMsg::ConstPtr & );
+            Part( const teensy_msgs::FeedbackMsg::ConstPtr & );
             Part( PartID, Uint8 servoNum, Uint8 brushedMotorNum, Uint8 brushlessMotorNum, Uint8 motionSensorNum );
             Part( PartID, const std::vector<KondoServo>&,
                           const std::vector<BrushedMotor>&,
@@ -52,7 +60,10 @@ namespace Body{
 
 			bool isValid() const ;
 			bool isWellDefined() const ;
+            Uint16 get_scene_id() const ;
     };
+
+
 
     class Body
     {
@@ -68,6 +79,8 @@ namespace Body{
         public:
             Body();
     };
+
+
 
     class MotionController
     {
@@ -99,17 +112,33 @@ namespace Body{
 
     };
 
+
+
     class FeedbackProcessor
     {
         protected:
 			const PartID part_id;
-            Part currentState;
-            Part previousState;
+            std::queue<Part> pendingScenes;
+            Uint16 sequenceSize;
+            Uint16 currentSceneIdReceived;
+            Uint16 currentSceneIdProcessed;
+            Uint16 numMissingExpectedScenes;              // # of scenes heard from teensy but not from MotionController
+            Uint16 numMissingActualScenes;                // # of scenes heard from MotionController but not from teensy
+            Uint16 numTotallyMissingScenes;               // # of scenes not processed at all which were supposed to be there (guessed by scene_id of messages)
+            std::vector<ObjectState> stateOfScenes;
+            bool inAction;
+            bool valid;
 
         public:
             FeedbackProcessor( PartID );
-            void set( teensy_msgs::FeedbackMsg::ConstPtr & );
-            Part processFeedback( teensy_msgs::FeedbackMsg::ConstPtr & );
+            start_action( Uint16 SequenceSize );
+            void add_pendingScenes( const teensy_msgs::CommandMsg::ConstPtr & ); // When command is received from MotionController
+            Part process_Feedback( const teensy_msgs::FeedbackMsg::ConstPtr & ); // When feedback is received from teensy
+            void reset_processing();
+            CattyError set_stateOfScene( support_srvs::LocmotionActionStateSrv::Response & );
+            void fillTheRest();
+            bool isInAction() const ;
+            bool isValid() const ;
     };
 }
 

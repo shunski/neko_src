@@ -11,6 +11,8 @@ add_message_files(
   FILES
   CalibrationMsg.msg
   HeartrateMsg.msg
+  ActionStartNotifierMsg.msg
+  ActionEndReporterMsg.msg
 )
 
 
@@ -21,7 +23,7 @@ generate_messages(
 
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES 
+#  LIBRARIES
  CATKIN_DEPENDS std_msgs message_runtime
 #  DEPENDS system_lib
 )

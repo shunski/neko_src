@@ -14,6 +14,8 @@
 #include <motioncontroll_action/MotionControllResult.h>
 #include <motioncontroll_action/MotionControllFeedback.h>
 #include <support_msgs/CalibrationMsg.h>
+#include <support_msgs/ActionStartNotifierMsg.h>
+#include <support_msgs/ActionEndReporterMsg.h>
 #include <parts_lib/CattyParts.h>
 #include <body_msgs/PartCommandMsg.h>
 #include <body_msgs/PartMsg.h>
@@ -89,14 +91,20 @@ namespace Body{
             std::vector<Part> expectedStates;
             Part actualCurrentState;
             std::vector<Part>::iterator expectedCurrentState;
+            std::queue<PartMsg> processedFeedbackPending;
             const ros::Duration expectedSceneDuration;
             ros::Duration actualCurrentSceneDuration;
             ros::Time timeOfActionStart;
             ros::Time timeOfLastAction;
+            bool inAction;
 			bool valid;
 
         public:
             MotionController ( PartID );
+
+            motioncontroll_action::MotionControllFeedback locomotionActionFeedback;
+            motioncontroll_action::MotionControllResult locomotionActionResult;
+
             CattyError set_action( motioncontroll_action::MotionControllGoal::ConstPtr & );
             void procced();
 			// void startInitializationAction( initialize_service::PartInitialization::Request &,
@@ -104,10 +112,16 @@ namespace Body{
 			void startMotioncontrollAction( motioncontroll_action::MotionControllGoal::ConstPtr & );
             CattyError set_CommandMsg( teensy_msgs::CommandMsg & ) const ;
             bool isEnd() const ;
-            CattyError set_feedbackMsg( motioncontroll_action::MotionControllFeedback & );
-            CattyError set_resultMsg( motioncontroll_action::MotionControllResult & );
+            CattyError initialize_feedbackMsg();
+            CattyError initialize_resultMsg();
+            CattyError set_feedbackMsg( const body_msgs::PartMsg::ConstPtr & );
+            CattyError set_resultMsg( const support_msgs::ActionEndReporterMsg::ConstPtr & );
             ros::Duration get_actualCurrentSceneDuration() const;
 			ros::Duration get_expectedSceneDuration() const;
+            CattyError set_actionStartNotifier( support_msgs::actionStartNotifierMsg & );
+            void add_processedFeedbackPending( const body_msgs::PartMsg::ConstPtr & );
+            void end_action();
+            bool isInAction() const ;
 			bool isValid() const;
 
     };
@@ -131,11 +145,11 @@ namespace Body{
 
         public:
             FeedbackProcessor( PartID );
-            void start_action( Uint16 SequenceSize, std::string & );
-            void add_pendingScenes( const teensy_msgs::CommandMsg::ConstPtr & ); // When command is received from MotionController
+            void start_action( const support_msgs::ActionStartNotifierMsg::ConstPtr &, std::string & NodeName );
+            bool add_pendingScenes( const teensy_msgs::CommandMsg::ConstPtr & ); // When command is received from MotionController. return true if the action ends.
             Part process_Feedback( const teensy_msgs::FeedbackMsg::ConstPtr & ); // When feedback is received from teensy
-            void reset_processing();
-            //CattyError set_stateOfScene( support_srvs::LocmotionActionStateSrv::Response & );   //support_srvsがincludeできてないっぽい
+            void reset();
+            CattyError set_endReporterMsg();
             void fillTheRest();
             bool isInAction() const ;
             bool isValid() const ;

@@ -7,20 +7,35 @@ using namespace Node;
 FeedbackProcessorNode(PartID ID, std::string PartName )
 	fp( ID ),
 	nodeName( PartName+"FeedbackProcessor" ),
-	toMotionControllerPublishTopicName( nodeName+"processedFeedback" ),
-	fromTeensySubscribeTopicName( nodeName+"TeensyFeedback" ),
-	fromMotionControllerServiceTopicName( nodeName+"ActionState" ),
-	heartrateFeedbackName( nodeName+"HeartrateFeedback" ),
+	toMotionControllerFeedbackTopicName( PartName+"ProcessedFeedback" ),
+	toMotionControllerFinishActionTopicName( PartName+"FinishAction" ),
+	fromMotionControllerTeensyCommandTopicName( PartName+"TeensyCommand" ),
+	fromTeensySubscribeTopicName( PartName+"TeensyFeedback" ),
+	fromMotionControllerActionStartNotifierTopicName( PartName+"ActionState" ),
+	heartrateFeedbackName( PartName+"HeartrateFeedback" ),
 	valid( true )
 {
-	processedFeedbackPublisher = this->advertise<body_msgs::PartMsg>(ToMotionControllerPublishTopicName, queue_size );
+	processedFeedbackPublisher = this->advertise<body_msgs::PartMsg>( toMotionControllerPublishTopicName, queue_size );
+	actionEndReporter = this->advertise<support_msgs::ActionEndReporterMsg>( toMotionControllerFinishActionTopicName, queue_size );
+	teensyCommandSubscriber = this->subscribe<teensy_msgs::FeedbackMsg>( fromMotionControllerTeensyCommandTopicName,
+	                                                                boost::bind(& Node::FeedbackProcessorNode::commandsListnerCallback, this ));
 	currentStatePublisher = this->advertise<std_msgs::bool>( heartrateFeedbackName, queue_size );
 	teensyListner = this->advertise<teensy_msgs::FeedbackMsg>( FromTeensySubscribeTopicName, queue_size,
-                                                                boost::bind( &Node::FeedbackProcessorNode::teensyListerCallback, this ));
-	actionStateServer = this->advertiseService<support_srv::LocomotionActionStateSrv>( FromTeensySubscribeTopicName,
-                                                boost::bind( &Node::FeedbackProcessorNode::locomotionActionStateServerCallback, this ));
+                                                                boost::bind(& Node::FeedbackProcessorNode::teensyListerCallback, this ));
+	actionStartListner = this->advertiseService<support_msgs::actionStartNotifierMsg>( FromTeensySubscribeTopicName,
+                                                boost::bind( &Node::FeedbackProcessorNode::actionStartListnerCallback, this ));
 	currentStatePublisherTimer = this->createTimer( heartrate, boost::bind(& Node::FeedbackProcessorNode::publish_currentState(), this ));
 	fpValidnessSensor = this->createTimer( ros::Duration(0.1), boost::bind(& Node::FeedbackProcessorNode::checkFpValidness(), this ))
+}
+
+
+void FeedbackProcessorNode::teensyCommandSubscriber ( teensy_msgs::CommandMsg::ConstPtr msg ){
+	bool isActionFinished = pf.add_pendingScenes( msg );
+	if ( isActionFinished ){
+		support_msgs::ActionEndReporterMsg endReporter;
+		fp.set_endReporterMsg( endReporter );
+		actionEndReporter
+	}
 }
 
 
@@ -28,12 +43,7 @@ void FeedbackProcessorNode::teensyListnerCallback ( teensy_msgs::FeedbackMsg::Co
 	Part processedFeedback = fp.processFeedback( msg );
 	PartMsg publishingMsg;
 	processFeedback.set_PartMsg( publishingMsg );
-	publish_processedFeedback( msg );
-}
-
-
-inline void FeedbackProcessorNode::publish_processedFeedback( const body_msgs::PartMsg & ) const {
-	processedFeedbackPublisher.publish( msg );
+	processedFeedbackPublisher.publish( publishMsg );
 }
 
 
@@ -43,26 +53,11 @@ void FeedbackProcessorNode::publish_currentState() {
 }
 
 
-bool FeedbackProcessorNode::locomotionActionStateServerCallback( support_srvs::LocmotionActionStateSrv::Request & req
-	                                                             support_srvs::LocmotionActionStateSrv::Response & res ){
-	fp.start_action( rep.sequenceSize, nodeName );
-
-	ros::Rate rate(10);
-	while( fp.isInAction() ){
-		rate.sleep();
-	}
-
-	if ( fp.isValid() ){
-		fp.set_stateOfScenes( res );
-		ROS_INFO("%s: Action Done. Returning the response.");
-		return true;
-	} else {
-		ROS_INFO("Error on %s: Action Not Complete.");
-		return true;
-	}
+bool FeedbackProcessorNode::actionStartListnerCallback( support_msgs::ActionStartNotifierMsg & msg ) {
+	fp.start_action( msg, nodeName );
 }
 
 
-void FeedbackProcessorNode::checkFpValidness(){
+void FeedbackProcessorNode::checkFpValidness() {
 	valid = fp.isValid();
 }

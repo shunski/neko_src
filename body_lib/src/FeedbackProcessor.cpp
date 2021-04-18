@@ -7,19 +7,24 @@ FeedbackProcessor::FeedbackProcessor( PartID ID ):
 {}
 
 
-void FeedbackProcessor::start_action( Uint16 SequenceSize, std::string & NodeName ){
+CattyError FeedbackProcessor::start_action( const support_msgs::ActionStartNotifierMsg::ConstPtr & msg, std::string & NodeName ){
 	if ( inAction ){
-		ROS_INFO("LOCOMOTION_ACTION_ERROR: %s could not start action since another action is in already happning", NodeName.c_str());
+		ROS_INFO("LOCOMOTION_ACTION_ERROR: %s could not start action since another action is in already happning. ", NodeName.c_str());
 		valid = false;
-		return;
+		return LOCOMOTION_ACTION_ERROR;
+	}
+	if ( msg->part_id != part_id ){
+		valid = false;
+		ROS_INFO("PART_ID_NOT_MATCH: %s could not start action since StartActionNotifierMsg id does not match. ", NodeName.c_str());
+		return PART_ID_NOT_MATCH;
 	}
 	inAction = true;
-	sequenceSize = SequenceSize;
-	reset_processing();
+	sequenceSize = msg->sequenceSize;
+	reset();
 }
 
 
-void FeedbackProcessor::add_pendingScenes( const teensy_msgs::CommandMsg::ConstPtr & msg )
+bool FeedbackProcessor::add_pendingScenes( const teensy_msgs::CommandMsg::ConstPtr & msg )
 {
 	if ( msg->scene_id <= currentSceneIdReceived ){
 
@@ -45,13 +50,13 @@ void FeedbackProcessor::add_pendingScenes( const teensy_msgs::CommandMsg::ConstP
 
 	if ( currentSceneIdReceived == sequenceSize ) {
 		ros::Duration(0.5).sleep();
-		if ( currentSceneIdProcessed == currentSceneIdReceived ) {
-			inAction = false;
-		} else {
+		if ( currentSceneIdProcessed != currentSceneIdReceived )
 			fillTheRest();
-			inAction = false;
-		}
+		inAction = false;
+		return true;
 	}
+
+	return false;
 }
 
 
@@ -65,7 +70,12 @@ Part FeedbackProcessor::process_Feedback( const teensy_msgs::FeedbackMsg::ConstP
 {
 	if( pendingScenes.front().get_scene_id() == msg->scene_id )
 	{
-		Part processedPart = pendingScenes.front().set( msg ); //.set()のreturn型はCattyError
+		Part processedPart = pendingScenes.front();
+		CatttyError error = processedPart.set( msg );
+		if ( error!=SUCCESS )
+		{
+			valid = false;
+		}
 		pendingScenes.pop();
 		currentSceneIdProcessed++;
 		return processedPart;
@@ -79,6 +89,7 @@ Part FeedbackProcessor::process_Feedback( const teensy_msgs::FeedbackMsg::ConstP
 		return Part( msg );
 	}
 
+
 	else // pendingScenes.front().scene_id() < msg->scene_id
 	{
 		currentSceneIdProcessed = msg->scene_id;
@@ -86,29 +97,27 @@ Part FeedbackProcessor::process_Feedback( const teensy_msgs::FeedbackMsg::ConstP
 			pendingScenes.pop();
 			numMissingActualScenes++;
 		}
-		Part processedPart = pendingScenes.front().set(msg); //.set()のreturn型はCattyError
+		Part processedPart = pendingScenes.front();
+		CattyError error = processedPart.set(msg);
+		if ( error!=SUCCESS )
+		{
+			valid = false;
+		}
 		pendingScenes.pop();
 		return processedPart;
 	}
 }
 
 
-void FeedbackProcessor::reset_processing()
+void FeedbackProcessor::reset()
 {
-	pendingScenes = vector( sequenceSize, INVALID ); // エラー：‘vector’ was not declared in this scope
-	//missingExpectedScenes.clear();  // これらはなに？いらない？
-	//missingActualScenes.clear();    //　同上
+	pendingScenes = queue<Part>( sequenceSize, INVALID );
 	numMissingActualScenes = 0;
 	numMissingExpectedScenes = 0;
 	numTotallyMissingScenes = 0;
 }
 
 
-bool FeedbackProcessor::isInAction() const {
-	return inAction;
-}
+bool FeedbackProcessor::isInAction() const { return inAction; }
 
-
-bool FeedbackProcessor::isValid() const {
-	return valid;
-}
+bool FeedbackProcessor::isValid() const { return valid; }

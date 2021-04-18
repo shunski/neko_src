@@ -3,7 +3,10 @@ project(node_lib)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  std_msgs
   support_lib
+  support_msgs
+  support_srvs
   body_msgs
   body_lib
 )
@@ -11,7 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES node_lib
-  CATKIN_DEPENDS roscpp 
+  CATKIN_DEPENDS roscpp
   #  DEPENDS system_lib
 )
 

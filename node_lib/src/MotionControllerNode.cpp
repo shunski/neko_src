@@ -5,77 +5,107 @@ using namespace Node;
 MotionControllerNode::MotionControllerNode( PartID pID, std::string PartName ):
     mc( pID ),
     nodeName( PartName+"MotionController"),
-    fromFeedbackProcessorSubscribeTopicName(partName+"controlledMotion"),
-    toTeensyPublishTopicName( nodeName+"TeensyCommand"),
-    toFeedbackProcessorTopicName( nodename+"ActionState"),
-    heartrateFeedbackName( nodeName+"HeartrateFeedback"),
+    fromFeedbackProcessorFeedbackTopicName( PartName+"controlledMotion" ),
+    fromFeedbackProcessorFinishActionTopicName( PartName+"FinishAction" ),
+    toTeensyPublishTopicName( PartName+"TeensyCommand" ),
+    toFeedbackProcessorActionStartNotifierName( PartName+"ActionStartNotifier" ),
+    heartrateFeedbackName( PartName+"HeartrateFeedback" ),
 	locomotionServer(this, locomotionActionName, boost::bind(& Node::MotionControllerNode::locomotionActionCallback, this), false),
     valid( ture )
 {
     valid = mc.isValid();
     locomotionServer.start();
-    legCmdPublisher = this->advertise<teensy_msgs::CommandMsg>(publishCmdTopicName, queue_size);
-    currentStatePublisher = this->advertise<body_msgs::PartMsg>(publishStateTopicName, queue_size);
-    legInfoProcessorListner = this->subscribe<body_msgs::PartMsg>(subscribeInfoTopicName,
-                                                                  queue_size,
-                                                                  boost::bind(& Node::MotionControllerNode::processorListnerCallback, this));
+    commandPublisher = this->advertise<teensy_msgs::CommandMsg>( toTeensyPublishTopicName, queue_size);
+    actionStartNotifier = this->advertise<support_msgs::actionStartNotifierMsg>( toFeedbackProcessorActionStartNotifierName, 10 );
+    actionEndListner = this->subscribe<support_msgs::ActionEndReporterMsg>( fromFeedbackProcessorFinishActionTopicName,
+                                                                            boost::bind(& Node::MotionContollerNode::end_action, this));
+    currentStatePublisher = this->advertise<std_msgs::bool>( heartrateFeedbackName, queue_size);
+    feedbackProcessorListner = this->subscribe<body_msgs::PartMsg>( fromFeedbackProcessorSubscribeTopicName,
+                                                                   queue_size,
+                                                                   boost::bind(& Node::MotionControllerNode::processorListnerCallback, this));
     currentStatePublisherTimer = this->createTimer( heartrate, boost::bind(& Node::MotionControllerNode::publish_CommandMsg()), this );
     mcValidnessSensor = this->createTimer( ros::Duration(0.1), boost::bind(& Node::MotionControllerNode::checkMcValidness()), this );
 }
 
+
 void MotionControllerNode::renewAllPublisherTimer () {
-    publisherTimer = this->createTimer(heartrate, boost::bind(& Node::MotionContollerNode::publish_currentState()), this);
+    publisherTimer = this->createTimer(heartrate, boost::bind( & Node::MotionContollerNode::publish_currentState()), this );
 }
 
-void MotionControllerNode::processorListnerCallback ( body_msgs::PartMsg::ConstPtr msg ){
-    mc.reflectFeedback(msg);
+
+void end_action( const support_msgs::ActionEndReporterMsg::ConstPtr & msg ){
+    mc.set_resultMsg( msg );
 }
 
-void MotionControllerNode::locomotionActionCallback ( const motioncontroll_action::MotionControllAction::ConstPtr & goal) {
+
+void MotionControllerNode::processorListnerCallback ( const body_msgs::PartMsg::ConstPtr & msg ){
+    mc.add_processedFeedbackPending( msg );
+}
+
+
+void MotionControllerNode::locomotionActionCallback ( const motioncontroll_action::MotionControllAction::ConstPtr & goal )
+{
     bool success;
-    ros::Duration sleepPeriod = mc.get_sceneDuration() / 2.0;
-    CommandMsg cmdMsg;
+    CattyError error = mc.set_action( goal );
+    if ( error != SUCCESS )
+    {
+        actionServer.setPreempted();
+        return;
+    }
+
+    ros::Duration commandDuration = mc.get_sceneDuration();
+
+    support_msgs::actionStartNotifierMsg notifierMsg;
+    mc.set_actionStartNotifier( notifierMsg );
+    actionStartNotifier.publish( notifierMsg );
+
     mc.startAction();
 
     while( !mc.isEnd() ){
         if ( actionServer.isPreemptRequested() || !ros::ok() ){
-            ROS_INFO("%s: Preempted Requested", actionName.c_str());
+            ROS_INFO("%s: Preempted Requested", locomotionActionName.c_str());
             success = false;
-            actionName.setPreempted();
+            actionServer.setPreempted();
             break;
         }
-        publish_cmdMsg();
+
+        publish_CommandMsg();
         sleepPeriod.sleep();
         publish_feedback();
         mc.proceed();
     }
 
+    ros::Rate rate( 10 );
+    while( mc.isInAction() ){
+        rate.sleep();
+    }
+
     if ( success ) {
         motioncontroll_action::MotionControllResult result = mc.get_resultMsg();
         ROS_INFO("%s Succeeded", actionName.c_str());
-        setSucceed(result);
+        setSucceed( result );
     }
 }
 
 
-inline void MotionControllerNode::publish_CommandMsg() const {
-    teensy_msgs::CommandMsg msg = mc.get_CommandMsg();
-    currentStatePublisher.publish( msg );
+inline void MotionControllerNode::publish_CommandMsg() const
+{
+    currentStatePublisher.publish( mc.get_CommandMsg() );
 }
 
 
-inline void MotionControllerNode::publish_feedback() const {
+inline void MotionControllerNode::publish_feedback() const
+{
     motioncontroll_action::MotionControllFeedback feedback = mc.get_feedbackMsg();
     locomotionServer.currentStatePublisher.publish( msg );
 }
 
 
-void MotionControllerNode::publish_currentState() const {
+void MotionControllerNode::publish_currentState() const
+{
     body_msgs::PartMsg msg = mc.get_currentState().set_PartMsg();
     currentStatePublisher.publish( msg );
 }
 
 
-void MotionControllerNode::checkMcValidness(){
-    valid = mc.isValid();
-}
+void MotionControllerNode::checkMcValidness() { valid = mc.isValid(); }

@@ -23,14 +23,21 @@ CattyError MotionController::set_action( motioncontroll_action::MotionControllGo
         return LOCOMOTION_ACTION_FAILUE;
 	}
 
+	if ( inAction == true ) {
+		ROS_INFO("ERROR: Could not set MotionController object to start since another action is in progress.");
+		valid = false;
+        return LOCOMOTION_ACTION_FAILUE;
+	}
+	inAction = true;
+
 	expectedStates = std::vector<Part>( msg->sequenceSize );
 
     for ( std::vector<body_msgs::PartCommandMsg>::const_iterator it = msg->partCommandSequence.begin();
 			it != msg->partCommandSequence.end();
 			++it ) {
-        expectedStates.push_back( 
-			Part( 
-				part_id, 
+        expectedStates.push_back(
+			Part(
+				part_id,
 				it->kondoServoCommandSet,
 				it->brushedMotorCommandSet,
 				it->brushlessMotorCommandSet
@@ -46,7 +53,7 @@ CattyError MotionController::set_action( motioncontroll_action::MotionControllGo
 
 // CattyError MotionController::init_part( init_service::PartInit::Request &,
 // 										init_service::PartInit::Response & ){
-// 
+//
 // };
 
 // CattyError MotionController::startMotioncontrollAction( motioncontroll_action::MotionControllGoal::ConstPtr & ) {
@@ -88,42 +95,21 @@ bool MotionController::isEnd() const {
 }
 
 
-CattyError MotionController::set_feedbackMsg( motioncontroll_action::MotionControllFeedback & feedback ) {
-    if ( part_id != feedback.part_id && feedback.part_id != 0 ){
-        ROS_INFO("ERROR: Could not set [motioncontroll_action::MotionControllFeedback] message because id does not match.");
-        return PART_ID_NOT_MATCH;
-    }
-	body_msgs::PartMsg actualCurrentStateMsg;
-	CattyError error = actualCurrentState.set_PartMsg( actualCurrentStateMsg );
-	if ( error != SUCCESS ) {
-		ROS_INFO("Terminating program since seirous error occured: %s", get_catty_error_description( error ).c_str());
-		valid = false;
-		return error;
+CattyError set_feedbackMsg( const body_msgs::PartMsg::ConstPtr & msg, std::string & nodeName ){
+	if ( part_id != msg->part_id ){
+		ROS_INFO("PART_ID_NOT_MATCH(%s): Could not set the feedbackMsg of Action by body_msgs::PartMsg since PartID not match", nodeName);
+		return PART_ID_NOT_MATCH;
 	}
-	feedback.actualCurrentState = actualCurrentStateMsg;
-	feedback.currentSceneDuration = actualCurrentSceneDuration;
-	return SUCCESS;
+
+	msg->;
 }
 
 
-CattyError MotionController::set_resultMsg( motioncontroll_action::MotionControllResult & result ) {
-    if ( part_id != result.part_id && result.part_id != 0 ){
-        ROS_INFO("ERROR: Could not set [motioncontroll_action::MotionControllResult] message because part_id does not match.");
-        return PART_ID_NOT_MATCH;
-    }
-
-	body_msgs::PartMsg actualFinalStateMsg;
-	CattyError error = actualCurrentState.set_PartMsg( actualFinalStateMsg );
-
-	if ( error != SUCCESS ){
-		ROS_INFO("Terminating MotionController since seirous error occured: %s", get_catty_error_description( error ).c_str());
-		valid = false;
-		return error;
+CattyError set_resultMsg( const support_msgs::ActionEndReporterMsg::ConstPtr & msg, std::string & nodeName  ){
+	if ( part_id != msg->part_id ){
+		ROS_INFO("PART_ID_NOT_MATCH(%s): Could not set the resultMsg of Action by support_msgs::ActionEndReporterMsg since PartID not match", nodeName);
+		return PART_ID_NOT_MATCH;
 	}
-
-	result.actualFinalState = actualFinalStateMsg;
-	result.actualTotalDuration = ros::Time::now() - timeOfActionStart;
-	return SUCCESS;
 }
 
 
@@ -136,6 +122,25 @@ ros::Duration MotionController::get_expectedSceneDuration() const {
 	return expectedSceneDuration;
 }
 
+
+CattyError MotionController::set_actionStartNotifier( support_msgs::actionStartNotifierMsg & msg ) {
+	if( msg.part_id == 0 ){
+		msg.part_id = part_id;
+		msg.sequenceSize = sequenceSize;
+		return SUCCESS;
+	} else if ( part_id == msg.part_id ) {
+		msg.sequenceSize = sequenceSize;
+		return SUCCESS;
+	} else {
+		return MESSAGE_CONSTRUCTION_FAILUE;
+	}
+}
+
+void MotionController::end_action(){
+	inAction = false;
+}
+
+bool MotionController::isInAction() const { return inAction; }
 
 bool MotionController::isValid() const { return valid; }
 

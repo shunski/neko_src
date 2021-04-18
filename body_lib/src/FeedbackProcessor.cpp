@@ -65,7 +65,7 @@ Part FeedbackProcessor::process_Feedback( const teensy_msgs::FeedbackMsg::ConstP
 {
 	if( pendingScenes.front().get_scene_id() == msg->scene_id )
 	{
-		Part processedPart = pendingScenes.front().set( msg );
+		Part processedPart = pendingScenes.front().set( msg ); //.set()のreturn型はCattyError
 		pendingScenes.pop();
 		currentSceneIdProcessed++;
 		return processedPart;
@@ -81,12 +81,12 @@ Part FeedbackProcessor::process_Feedback( const teensy_msgs::FeedbackMsg::ConstP
 
 	else // pendingScenes.front().scene_id() < msg->scene_id
 	{
-		currentSceneIdProcessd = msg->scene_id;
-		while ( pendingScenes.front().scene_id().get_scene_id() != msg->scene_id ){
+		currentSceneIdProcessed = msg->scene_id;
+		while ( pendingScenes.front().get_scene_id() != msg->scene_id ){
 			pendingScenes.pop();
 			numMissingActualScenes++;
 		}
-		Part processedPart = pendingScenes.front().set(msg);
+		Part processedPart = pendingScenes.front().set(msg); //.set()のreturn型はCattyError
 		pendingScenes.pop();
 		return processedPart;
 	}
@@ -95,9 +95,9 @@ Part FeedbackProcessor::process_Feedback( const teensy_msgs::FeedbackMsg::ConstP
 
 void FeedbackProcessor::reset_processing()
 {
-	pendingScenes = vector( sequenceSize, INIVALID );
-	missingExpectedScenes.clear();
-	missingActualScenes.clear();
+	pendingScenes = vector( sequenceSize, INVALID ); // エラー：‘vector’ was not declared in this scope
+	//missingExpectedScenes.clear();  // これらはなに？いらない？
+	//missingActualScenes.clear();    //　同上
 	numMissingActualScenes = 0;
 	numMissingExpectedScenes = 0;
 	numTotallyMissingScenes = 0;

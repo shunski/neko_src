@@ -24,7 +24,7 @@ FeedbackProcessorNode(PartID ID, std::string PartName )
 }
 
 
-void FeedbackProcessorNode::teencyListnerCallback ( teensy_msgs::FeedbackMsg::ConstPtr msg ){
+void FeedbackProcessorNode::teensyListnerCallback ( teensy_msgs::FeedbackMsg::ConstPtr msg ){
 	Part processedFeedback = fp.processFeedback( msg );
 	PartMsg publishingMsg;
 	processFeedback.set_PartMsg( publishingMsg );

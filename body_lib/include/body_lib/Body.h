@@ -19,7 +19,7 @@
 #include <body_msgs/PartMsg.h>
 #include <teensy_msgs/CommandMsg.h>
 #include <teensy_msgs/FeedbackMsg.h>
-
+//#include <support_srvs/LocomotionActionStateSrv.h> //これやってもsupport_srvsインクルードできてなさそうだった->138行目
 
 namespace Body{
 
@@ -131,11 +131,11 @@ namespace Body{
 
         public:
             FeedbackProcessor( PartID );
-            start_action( Uint16 SequenceSize );
+            void start_action( Uint16 SequenceSize, std::string & );
             void add_pendingScenes( const teensy_msgs::CommandMsg::ConstPtr & ); // When command is received from MotionController
             Part process_Feedback( const teensy_msgs::FeedbackMsg::ConstPtr & ); // When feedback is received from teensy
             void reset_processing();
-            CattyError set_stateOfScene( support_srvs::LocmotionActionStateSrv::Response & );
+            //CattyError set_stateOfScene( support_srvs::LocmotionActionStateSrv::Response & );   //support_srvsがincludeできてないっぽい
             void fillTheRest();
             bool isInAction() const ;
             bool isValid() const ;

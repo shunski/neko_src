@@ -71,7 +71,7 @@ Part::Part( const teensy_msgs::FeedbackMsg::ConstPtr & msg ) :
 
 
 Part::Part ( PartID ID, Uint8 servoNum, Uint8 brushedMotorNum, Uint8 brushlessMotorNum, Uint8 motionSensorNum ) :
-    part_id( ID ), valid( false ), well_defined( false ), state( INVALID )
+    part_id( ID ), scene_id( USHRT_MAX ), valid( false ), well_defined( false ), state( INVALID )
 {
     for ( Uint8 i = 0; i<servoNum;          i++) kondoServoSet.push_back( KondoServo( part_id, i ));
     for ( Uint8 i = 0; i<brushedMotorNum;   i++) brushedMotorSet.push_back( BrushedMotor( part_id, i ));
@@ -84,7 +84,7 @@ Part::Part ( PartID ID,
 			const std::vector<KondoServo> & KondoServoSet,
 			const std::vector<BrushedMotor> & BrushedMotorSet,
 			const std::vector<BrushlessMotor> & BrushlessMotorSet ):
-	part_id( ID ), valid( true ), well_defined( true ), state( COMMAND )
+	part_id( ID ), scene_id( USHRT_MAX ), valid( true ), well_defined( true ), state( COMMAND )
 {
 	PartProperties pp = get_properties_by_id( part_id );
 	if ( pp.kondoServoNum     != KondoServoSet.size()   ||
@@ -116,7 +116,7 @@ Part::Part ( PartID ID,
 Part::Part( PartID pID , const std::vector<parts_msgs::KondoServoCommandMsg> & KondoServoCommandSet,
                    const std::vector<parts_msgs::BrushedMotorCommandMsg> & BrushedMotorCommandSet,
                    const std::vector<parts_msgs::BrushlessMotorCommandMsg> & BrushlessMotorCommandSet ):
-	part_id( pID ), valid( true ), well_defined( true ), state( COMMAND )
+	part_id( pID ), scene_id( USHRT_MAX ), valid( true ), well_defined( true ), state( COMMAND )
 {
 	PartProperties pp = get_properties_by_id( part_id );
 	if ( pp.kondoServoNum     != KondoServoCommandSet.size()   ||

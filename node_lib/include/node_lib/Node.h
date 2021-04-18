@@ -66,7 +66,7 @@ namespace Node{
         protected:
             Body::FeedbackProcessor fp;
             ros::Publisher ProcessedFeedbackPublisher;
-            ros::Subscriber teencyListner;
+            ros::Subscriber teensyListner;
 			ros::Publisher currentStatePublisher;
             ros::Timer currentStatePublisherTimer;
             ros::ServiceServer actionStateServer;
@@ -80,7 +80,7 @@ namespace Node{
 
         public:
             FeedbackProcessorNode( PartID pID, std::string PartName );
-            void teencyListnerCallback( teensy_msgs::InfoMsg::ConstPtr );
+            void teensyListnerCallback( teensy_msgs::InfoMsg::ConstPtr );
             inline void publish_processedFeedback( body_msgs::PartMsg ) const ;
 			void publish_CurrentState();
             void checkFpValidness();

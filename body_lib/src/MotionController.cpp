@@ -5,9 +5,10 @@ namespace Body{
 
 MotionController::MotionController( PartID ID ):
 	part_id( ID ),
-	actualCurrentState( ID ),
 	valid( true )
-{}
+{
+	ROS_INFO("Initializing MotionController Done.");
+}
 
 
 CattyError MotionController::set_action( const motioncontroll_action::MotionControllGoal::ConstPtr & msg ) {

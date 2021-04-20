@@ -46,7 +46,6 @@ namespace Node{
 			ros::Subscriber actionEndListner;
             ros::Subscriber feedbackProcessorListner;    // listening to FeedbackProcessor Node
             ros::Timer currentStatePublisherTimer;
-            actionlib::SimpleActionServer<motioncontroll_action::MotionControllAction> locomotionServer; // execute action from core
 
             std::string nodeName;
             std::string locomotionActionName;
@@ -55,6 +54,9 @@ namespace Node{
             std::string toTeensyPublishTopicName;
             std::string toFeedbackProcessorActionStartNotifierName;
             std::string heartrateFeedbackName;
+
+			actionlib::SimpleActionServer<motioncontroll_action::MotionControllAction> locomotionServer; // execute action from core
+
             bool valid;
             ros::Timer mcValidnessSensor;
 

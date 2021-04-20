@@ -23,7 +23,7 @@ FeedbackProcessorNode::FeedbackProcessorNode( PartID pID, std::string PartName )
 	teensyListner = this->subscribe( fromTeensySubscribeTopicName,
 			default_queue_size,
 			&Node::FeedbackProcessorNode::teensyListnerCallback, this );
-	actionStartListner = this->subscribe( fromTeensySubscribeTopicName,
+	actionStartListner = this->subscribe( fromMotionControllerActionStartNotifierTopicName,
 			default_queue_size,
 			&Node::FeedbackProcessorNode::actionStartListnerCallback, this );
 	currentStatePublisherTimer = this->createTimer( heartrate, boost::bind(& Node::FeedbackProcessorNode::publish_currentState, this ));

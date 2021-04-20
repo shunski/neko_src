@@ -1,7 +1,7 @@
 #ifndef UTILITIES_H
 #define UTILITIES_H
 
-#define default_queue_size 100
+#define default_queue_size 10
 
 #include <vector>
 #include <string>

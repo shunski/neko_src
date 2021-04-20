@@ -3,15 +3,17 @@
 using namespace Node;
 
 MotionControllerNode::MotionControllerNode( PartID pID, std::string PartName ):
-    mc( pID ),
-    nodeName( PartName+"MotionController"),
-    fromFeedbackProcessorFeedbackTopicName( PartName+"controlledMotion" ),
-    fromFeedbackProcessorFinishActionTopicName( PartName+"FinishAction" ),
-    toTeensyPublishTopicName( PartName+"TeensyCommand" ),
-    toFeedbackProcessorActionStartNotifierName( PartName+"ActionStartNotifier" ),
-    heartrateFeedbackName( PartName+"HeartrateFeedback" ),
-	locomotionServer( *(ros::NodeHandle*)(this), locomotionActionName, boost::bind( &Node::MotionControllerNode::locomotionActionCallback, this, _1 ), false )
+	mc( pID ),
+	nodeName( PartName+"MotionController"),
+	fromFeedbackProcessorFeedbackTopicName( PartName+"controlledMotion" ),
+	fromFeedbackProcessorFinishActionTopicName( PartName+"FinishAction" ),
+	toTeensyPublishTopicName( PartName+"TeensyCommand" ),
+	toFeedbackProcessorActionStartNotifierName( PartName+"ActionStartNotifier" ),
+	heartrateFeedbackName( PartName+"HeartrateFeedback" ),
+	locomotionActionName(PartName+"locomotionAction"),
+	locomotionServer( *((ros::NodeHandle*)this), locomotionActionName, boost::bind( &Node::MotionControllerNode::locomotionActionCallback, this, _1 ), false )
 {
+	ROS_INFO("Initializing MotionControllerNode...");
     locomotionServer.start();
 	valid = mc.isValid();
     commandPublisher = this->advertise<teensy_msgs::CommandMsg>( toTeensyPublishTopicName, default_queue_size );
@@ -24,7 +26,8 @@ MotionControllerNode::MotionControllerNode( PartID pID, std::string PartName ):
 			default_queue_size,
 			& Node::MotionControllerNode::processorListnerCallback, this );
     currentStatePublisherTimer = this->createTimer( heartrate, boost::bind( &Node::MotionControllerNode::publish_CommandMsg, this ));
-    mcValidnessSensor = this->createTimer( ros::Duration(0.1), boost::bind( &Node::MotionControllerNode::checkMcValidness, this ));
+    mcValidnessSensor = this->createTimer( ros::Duration(0.5), boost::bind( &Node::MotionControllerNode::checkMcValidness, this ));
+	ROS_INFO("Done..");
 }
 
 
@@ -35,6 +38,7 @@ void MotionControllerNode::renewAllPublisherTimer () {
 
 void MotionControllerNode::end_action( const support_msgs::ActionEndReporterMsg::ConstPtr & msg ){
     mc.update_locomotionActionResultMsg( msg, nodeName );
+	ROS_INFO("End of action Reported by the subscriber.");
 }
 
 

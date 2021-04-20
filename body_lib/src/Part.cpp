@@ -58,6 +58,7 @@ Part::Part( const teensy_msgs::CommandMsg::ConstPtr & msg ) :
 	part_id( PartID(msg->part_id)), scene_id( msg->scene_id ), valid( true ), well_defined( true ), state( INVALID )
 {
 	CattyError error = set( msg );
+	if ( error!=SUCCESS ) valid = false;
 	return;
 }
 
@@ -66,6 +67,16 @@ Part::Part( const teensy_msgs::FeedbackMsg::ConstPtr & msg ) :
 	part_id( PartID(msg->part_id)), scene_id( msg->scene_id ), valid( true ), well_defined( true ), state( INVALID )
 {
 	CattyError error = set( msg );
+	if ( error!=SUCCESS ) valid = false;
+	return;
+}
+
+
+Part::Part( const body_msgs::PartMsg::ConstPtr & msg ):
+	part_id( PartID(msg->part_id)), scene_id( msg->scene_id ), valid( true ), well_defined( true ), state( INVALID )
+{
+	CattyError error = set( msg );
+	if ( error!=SUCCESS ) valid = false;
 	return;
 }
 
@@ -149,9 +160,9 @@ Part::Part( PartID pID , const std::vector<parts_msgs::KondoServoCommandMsg> & K
 
 CattyError Part::set ( const teensy_msgs::FeedbackMsg::ConstPtr & msg ) {
 	if ( part_id != msg->part_id ) {
-		ROS_INFO("OBJECT_CONSTRUCTION_FAILUE: Could not set the Part object by FeedbackMsg since part_id does not match.");
+		ROS_INFO("OBJECT_CONSTRUCTION_FAILURE: Could not set the Part object by FeedbackMsg since part_id does not match.");
 		valid = false;
-		return OBJECT_CONSTRUCTION_FAILUE;
+		return OBJECT_CONSTRUCTION_FAILURE;
 	}
 
 	if ( state==INVALID ) state == FEEDBACK;
@@ -174,9 +185,9 @@ CattyError Part::set ( const teensy_msgs::FeedbackMsg::ConstPtr & msg ) {
 
 CattyError Part::set ( const typename teensy_msgs::CommandMsg::ConstPtr & msg ) {
 	if ( part_id != msg->part_id ) {
-		ROS_INFO("OBJECT_CONSTRUCTION_FAILUE: Could not set the Part object by FeedbackMsg since part_id does not match.");
+		ROS_INFO("OBJECT_CONSTRUCTION_FAILURE: Could not set the Part object by FeedbackMsg since part_id does not match.");
 		valid = false;
-		return OBJECT_CONSTRUCTION_FAILUE;
+		return OBJECT_CONSTRUCTION_FAILURE;
 	}
 
 	if ( state==INVALID ) state == COMMAND;
@@ -195,20 +206,42 @@ CattyError Part::set ( const typename teensy_msgs::CommandMsg::ConstPtr & msg ) 
 }
 
 
+CattyError Part::set ( const typename body_msgs::PartMsg::ConstPtr & msg ) {
+    if ( part_id != msg->part_id ) {
+        ROS_INFO("OBJECT_CONSTRUCTION_FAILURE: Could not set the Part object by body_msgs::PartMsg since part_id does not match.");
+        valid = false;
+        return OBJECT_CONSTRUCTION_FAILURE;
+    }
+
+	state == GENERAL;
+
+	for ( std::vector<parts_msgs::KondoServoMsg>::const_iterator it=msg->kondoServoSet.begin(); it!=msg->kondoServoSet.end(); ++it )
+		kondoServoSet.push_back(*it);
+	for ( std::vector<parts_msgs::BrushedMotorMsg>::const_iterator it=msg->brushedMotorSet.begin(); it!=msg->brushedMotorSet.end(); ++it )
+		brushedMotorSet.push_back(*it);
+    for ( std::vector<parts_msgs::BrushlessMotorMsg>::const_iterator it=msg->brushlessMotorSet.begin(); it!=msg->brushlessMotorSet.end(); ++it )
+		brushlessMotorSet.push_back(*it);
+
+	well_defined = true;
+
+	return SUCCESS;
+}
+
+
 CattyError Part::set_CommandMsg( teensy_msgs::CommandMsg & msg ) {
 	if ( !valid ) {
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILUER: Invalid Part Object is trying to set the PartMsg. Please exit the program.");
-		return MESSAGE_CONSTRUCTION_FAILUE;
+		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURER: Invalid Part Object is trying to set the PartMsg. Please exit the program.");
+		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 
 	if ( !( state == GENERAL || state == COMMAND )){
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILUE:This Part object is not suitable for setting the CommandMsg.");
-		return MESSAGE_CONSTRUCTION_FAILUE;
+		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE:This Part object is not suitable for setting the CommandMsg.");
+		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 
 	if ( !well_defined ) {
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILUE: This Part Object is ill-defined and thus could not set the teensy_msgs::CommandMsg.");
-		return MESSAGE_CONSTRUCTION_FAILUE;
+		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This Part Object is ill-defined and thus could not set the teensy_msgs::CommandMsg.");
+		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 
 	if( msg.part_id == 0 ){
@@ -261,17 +294,17 @@ CattyError Part::set_CommandMsg( teensy_msgs::CommandMsg & msg ) {
 CattyError Part::set_PartMsg( body_msgs::PartMsg & msg ){
 	if ( !valid ) {
 		ROS_INFO("ERROR: Invalid Part Object is trying to set the PartMsg. Please exit the program.");
-		return MESSAGE_CONSTRUCTION_FAILUE;
+		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 
 	if ( state != GENERAL ){
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILUE: This Part object is not suitable for setting the CommandMsg.");
-		return MESSAGE_CONSTRUCTION_FAILUE;
+		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This Part object is not suitable for setting the CommandMsg.");
+		return MESSAGE_CONSTRUCTION_FAILURE;
     }
 
 	if ( !well_defined ) {
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILUE: This Part Object is ill-defined and thus could not set the PartMsg.");
-		return MESSAGE_CONSTRUCTION_FAILUE;
+		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This Part Object is ill-defined and thus could not set the PartMsg.");
+		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 
 	if( msg.part_id == 0 ){

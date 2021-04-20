@@ -10,7 +10,6 @@ PartProperties::PartProperties( PartID ID, size_t KondoServoNum, size_t BrushedM
 
 
 PartProperties get_properties_by_id( PartID id ){
-    PartProperties pp;
     switch ( id )
     {
         case( HEAD ):    return PartProperties( HEAD,  1, 0, 0 , 0 );
@@ -21,7 +20,7 @@ PartProperties get_properties_by_id( PartID id ){
         case( RHLEG ):   return PartProperties( RHLEG, 3, 1, 0 , 2 );
         case( LHLEG ):   return PartProperties( LHLEG, 3, 1, 0 , 2 );
     }
-    return PartProperties();
+    return PartProperties( NONE, 0, 0, 0, 0);
 }
 
 bool isSucceeded( CattyError error ) { return !error; }
@@ -31,10 +30,10 @@ std::string get_catty_error_description( CattyError error ) {
     {
         case SUCCESS: return "SUCCESS";
 		case WARNING: return "WARNING";
-        case LOCOMOTION_ACTION_FAILUE: return "LOCOMOTION_ACTION_FAILUE";
-		case MOTION_INIT_FAILUE: return "MOTION_INIT_FAILUE";
-        case OBJECT_CONSTRUCTION_FAILUE: return "OBJECT_CONSTRUCTION_FAILUE";
-        case MESSAGE_CONSTRUCTION_FAILUE: return "MESSAGE_CONSTRUCTION_FAILUE";
+        case LOCOMOTION_ACTION_FAILURE: return "LOCOMOTION_ACTION_FAILURE";
+		case MOTION_INIT_FAILURE: return "MOTION_INIT_FAILURE";
+        case OBJECT_CONSTRUCTION_FAILURE: return "OBJECT_CONSTRUCTION_FAILURE";
+        case MESSAGE_CONSTRUCTION_FAILURE: return "MESSAGE_CONSTRUCTION_FAILURE";
         case PART_ID_NOT_MATCH: return "PART_ID_NOT_MATCH";
 		case ID_NOT_MATCH: return "ID_NOT_MATCH";
     }

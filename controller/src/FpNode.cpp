@@ -3,17 +3,18 @@
 #include <node_lib/Node.h>
 #include <support_lib/Utilities.h>
 
-class RhFpNode : protected Node::FeedbackProcessorNode
+class RhFpNode : public Node::FeedbackProcessorNode
 {
     public:
-        FeedbackProcessorNode()
-            MotionControllerNode( RHLEG, "rhLeg")
+        RhFpNode():
+            FeedbackProcessorNode( RHLEG, "rhLeg")
         {}
 };
 
 int main(int argc, char **argv) {
     ros::init(argc, argv, "RhFpNode");
-    RhFpNode node();
+    RhFpNode node;
+	if ( !node.isValid()) return 1;
     ros::spin();
     return 0;
 }

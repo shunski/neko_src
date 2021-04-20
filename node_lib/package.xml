@@ -12,10 +12,30 @@
   <build_depend>body_lib</build_depend>
   <build_depend>support_lib</build_depend>
   <build_depend>support_msgs</build_depend>
-  <build_depend>support_srvs</build_depend>
+  <build_depend>parts_lib</build_depend>
+  <build_depend>parts_msgs</build_depend>
+  <build_depend>motioncontroll_action</build_depend>
+  <build_depend>teensy_msgs</build_depend>
   <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <build_export_depend>body_msgs</build_export_depend>
+  <build_export_depend>body_lib</build_export_depend>
+  <build_export_depend>support_msgs</build_export_depend>
+  <build_export_depend>support_lib</build_export_depend>
+  <build_export_depend>parts_lib</build_export_depend>
+  <build_export_depend>parts_msgs</build_export_depend>
+  <build_export_depend>motioncontroll_action</build_export_depend>
+  <build_export_depend>teensy_msgs</build_export_depend>
   <exec_depend>roscpp</exec_depend>
-
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>body_msgs</exec_depend>
+  <exec_depend>body_lib</exec_depend>
+  <exec_depend>support_msgs</exec_depend>
+  <exec_depend>support_lib</exec_depend>
+  <exec_depend>parts_lib</exec_depend>
+  <exec_depend>parts_msgs</exec_depend>
+  <exec_depend>motioncontroll_action</exec_depend>
+  <exec_depend>teensy_msgs</exec_depend>
   <export>
   </export>
 </package>

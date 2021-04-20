@@ -94,12 +94,12 @@ CattyError KondoServo::set_msg( ServoMsg & msg ) const {
 		}
 	}
 	if ( state != GENERAL ) {
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILUE: This <%s> object is not suitable for setting the message.", child_name.c_str());
-		return MESSAGE_CONSTRUCTION_FAILUE;
+		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is not suitable for setting the message.", child_name.c_str());
+		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 	if ( !valid || !well_defined ){
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILUE: This <%s> object is ill-defined. Could not set a message.", child_name.c_str());
-		return MESSAGE_CONSTRUCTION_FAILUE;
+		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is ill-defined. Could not set a message.", child_name.c_str());
+		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 
 	msg.degree = degree;
@@ -130,12 +130,12 @@ CattyError KondoServo::set_CommandMsg( ServoCommandMsg & msg ) const {
 		}
 	}
 	if ( !( state == COMMAND || state == GENERAL )) {
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILUE: This <%s> object is not suitable for setting the message.", child_name.c_str());
-		return MESSAGE_CONSTRUCTION_FAILUE;
+		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is not suitable for setting the message.", child_name.c_str());
+		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 	if ( !valid || !well_defined ){
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILUE: This <%s> object is ill-defined. Could not set a message.", child_name.c_str());
-		return MESSAGE_CONSTRUCTION_FAILUE;
+		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is ill-defined. Could not set a message.", child_name.c_str());
+		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 
 	msg.degree = degree;
@@ -163,12 +163,12 @@ CattyError KondoServo::set_FeedbackMsg( ServoFeedbackMsg & msg ) const {
 		}
 	}
 	if ( !( state == FEEDBACK || state == GENERAL )) {
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILUE: This <%s> object is not suitable for setting the message.", child_name.c_str());
-		return MESSAGE_CONSTRUCTION_FAILUE;
+		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is not suitable for setting the message.", child_name.c_str());
+		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 	if ( !valid || !well_defined ){
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILUE: This <%s> object is ill-defined. Could not set a message.", child_name.c_str());
-		return MESSAGE_CONSTRUCTION_FAILUE;
+		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is ill-defined. Could not set a message.", child_name.c_str());
+		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 
 	msg.temp = temp;

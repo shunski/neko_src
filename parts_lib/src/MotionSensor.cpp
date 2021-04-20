@@ -76,8 +76,8 @@ CattyError MotionSensor::set_msg( MotionSensorMsg & msg ) const {
         }
     }
     if ( !valid || !well_defined ){
-        ROS_INFO("MESSAGE_CONSTRUCTION_FAILUE: This <%s> object is ill-defined. Could not set a message.", child_name.c_str());
-        return MESSAGE_CONSTRUCTION_FAILUE;
+        ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is ill-defined. Could not set a message.", child_name.c_str());
+        return MESSAGE_CONSTRUCTION_FAILURE;
     }
 
     msg.accel_x = accel_x;

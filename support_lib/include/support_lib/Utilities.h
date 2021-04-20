@@ -27,7 +27,6 @@ struct PartProperties {
     size_t brushlessMotorNum;
     size_t motionSensorNum;
     PartProperties( PartID ID, size_t KondoServoNum, size_t BrushedMotorNum, size_t BrushlessMotorNum, size_t MotionSensorNum );
-    PartProperties();
 };
 
 PartProperties get_properties_by_id( PartID id );
@@ -37,10 +36,10 @@ enum CattyError
 {
     SUCCESS=0,
 	WARNING,
-    LOCOMOTION_ACTION_FAILUE,
-    MOTION_INIT_FAILUE,
-	OBJECT_CONSTRUCTION_FAILUE,
-	MESSAGE_CONSTRUCTION_FAILUE,
+    LOCOMOTION_ACTION_FAILURE,
+    MOTION_INIT_FAILURE,
+	OBJECT_CONSTRUCTION_FAILURE,
+	MESSAGE_CONSTRUCTION_FAILURE,
 	PART_ID_NOT_MATCH,
 	ID_NOT_MATCH
 };

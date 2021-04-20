@@ -11,7 +11,7 @@
   <buildtool_depend>catkin</buildtool_depend>
   <exec_depend>parts_msgs</exec_depend>
   <exec_depend>calibration_msgs</exec_depend>
-  <exec_depend>bodypart_msgs</exec_depend>
+  <exec_depend>body_msgs</exec_depend>
   <exec_depend>std_msgs</exec_depend>
 
 

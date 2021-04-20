@@ -1,5 +1,3 @@
-#include <parts_lib/GenericParts.h>
-
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
 GenericParts<Msg, CommandMsg, FeedbackMsg>::GenericParts( std::string ChildName, PartID pID, Uint8 ID ) :
 	child_name( ChildName ),
@@ -7,7 +5,7 @@ GenericParts<Msg, CommandMsg, FeedbackMsg>::GenericParts( std::string ChildName,
 	id( ID ),
 	valid( true ),
 	well_defined( false ),
-	state( NONE )
+	state( INVALID )
 {}
 
 
@@ -151,21 +149,21 @@ void GenericParts<Msg, CommandMsg, FeedbackMsg>::print_msg_id_error( const typen
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
 CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::set_msg( Msg & ) const {
     ROS_INFO("ERROR: No set_msg() method is not defined in the derived class <%s>. Please exit the program.", child_name.c_str());
-    return MESSAGE_CONSTRUCTION_FAILUE;
+    return MESSAGE_CONSTRUCTION_FAILURE;
 }
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
 CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::set_CommandMsg( CommandMsg & ) const {
 	ROS_INFO("ERROR: No set_CommandMsg() method is not defined in the derived class <%s>. Please exit the program.", child_name.c_str());
-	return MESSAGE_CONSTRUCTION_FAILUE;
+	return MESSAGE_CONSTRUCTION_FAILURE;
 }
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
 CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::set_FeedbackMsg( FeedbackMsg & ) const {
 	ROS_INFO("ERROR: No set_FeedbackMsg() method is not defined in the derived class <%s>. Please exit the program.", child_name.c_str());
-	return MESSAGE_CONSTRUCTION_FAILUE;
+	return MESSAGE_CONSTRUCTION_FAILURE;
 }
 
 
@@ -174,7 +172,7 @@ CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::set( const CommandMsg & )
 {
 	ROS_INFO("ERROR: No set() method is defined in the derived class <%s> for the mesaage of this type. Please exit the program.", child_name.c_str());
 	valid = false;
-	return OBJECT_CONSTRUCTION_FAILUE;
+	return OBJECT_CONSTRUCTION_FAILURE;
 }
 
 
@@ -183,7 +181,7 @@ CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::set( const typename Comma
 {
 	ROS_INFO("ERROR: No set() method is defined in the derived class <%s> for the mesaage of this type. Please exit the program.", child_name.c_str());
 	valid = false;
-	return OBJECT_CONSTRUCTION_FAILUE;
+	return OBJECT_CONSTRUCTION_FAILURE;
 }
 
 
@@ -192,7 +190,7 @@ CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::set( const FeedbackMsg & 
 {
 	ROS_INFO("ERROR: No set() method is defined in the derived class <%s> for the mesaage of this type. Please exit the program.", child_name.c_str());
 	valid = false;
-	return OBJECT_CONSTRUCTION_FAILUE;
+	return OBJECT_CONSTRUCTION_FAILURE;
 }
 
 
@@ -201,7 +199,7 @@ CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::set( const typename Feedb
 {
 	ROS_INFO("ERROR: No set() method is defined in the derived class <%s> for the mesaage of this type. Please exit the program.", child_name.c_str());
 	valid = false;
-	return OBJECT_CONSTRUCTION_FAILUE;
+	return OBJECT_CONSTRUCTION_FAILURE;
 }
 
 
@@ -215,3 +213,4 @@ Uint8 GenericParts<Msg, CommandMsg, FeedbackMsg>::get_id() const { return id; }
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
 bool GenericParts<Msg, CommandMsg, FeedbackMsg>::isValid() const { return valid; }
+

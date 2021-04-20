@@ -56,11 +56,12 @@ class GenericParts
 		virtual CattyError set( const FeedbackMsg & );
 		virtual CattyError set( const typename FeedbackMsg::ConstPtr & );
 
-		virtual PartID get_part_id() const final ;
-		virtual Uint8 get_id() const final ;
+		PartID get_part_id() const ;
+		Uint8 get_id() const ;
 
-		virtual bool isValid() const final;
+		bool isValid() const ;
 };
 
+#include<parts_lib/GenericPartsImpl.h>
 
 #endif

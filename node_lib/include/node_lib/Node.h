@@ -6,10 +6,9 @@
 #include <ros/ros.h>
 #include <body_msgs/PartMsg.h>
 #include <body_lib/Body.h>
-#include <std_msgs/bool.h>
+#include <std_msgs/Bool.h>
 #include <support_msgs/HeartrateMsg.h>
 #include <support_msgs/CalibrationMsg.h>
-#include <support_srv/LocomotionActionStateSrv.h>
 #include <support_lib/Utilities.h>
 #include <teensy_msgs/CommandMsg.h>
 #include <teensy_msgs/FeedbackMsg.h>
@@ -24,35 +23,37 @@
 #define heartrateTopicName "Heartrate"
 
 namespace Node{
-    class HeartrateSubscriber : virtual protected ros::NodeHandle
+    class HeartrateSubscriberNode : virtual protected ros::NodeHandle
     {
         protected:
             ros::Subscriber heartrateListner;
             ros::Duration heartrate;
         public:
-            HeartrateSubscriber();
-            void HeartrateSubscriberCallback( support_msgs::HeartrateMsg::ConstPtr );
-			virtual void renewAllPublisherTimer();
+            HeartrateSubscriberNode();
+            void HeartrateSubscriberCallback( const support_msgs::HeartrateMsg::ConstPtr & );
+			virtual void renewAllPublisherTimer()=0;
     };
 
 
 
-    class MotionControllerNode : virtual protected ros::NodeHandle, virtual protected HeartrateSubscriber
+    class MotionControllerNode : virtual protected ros::NodeHandle, virtual protected HeartrateSubscriberNode
     {
         protected:
             Body::MotionController mc;
             ros::Publisher commandPublisher;             // to teensy
             ros::Publisher currentStatePublisher;        // to core / other nodes
             ros::Publisher actionStartNotifier;
+			ros::Subscriber actionEndListner;
             ros::Subscriber feedbackProcessorListner;    // listening to FeedbackProcessor Node
             ros::Timer currentStatePublisherTimer;
             actionlib::SimpleActionServer<motioncontroll_action::MotionControllAction> locomotionServer; // execute action from core
 
             std::string nodeName;
             std::string locomotionActionName;
-            std::string fromFeedbackProcessorSubscribeTopicName;
+            std::string fromFeedbackProcessorFeedbackTopicName;
+			std::string fromFeedbackProcessorFinishActionTopicName;
             std::string toTeensyPublishTopicName;
-            std::string toFeedbackProcessorRequestTopicName;
+            std::string toFeedbackProcessorActionStartNotifierName;
             std::string heartrateFeedbackName;
             bool valid;
             ros::Timer mcValidnessSensor;
@@ -60,17 +61,19 @@ namespace Node{
         public:
             MotionControllerNode( PartID pID, std::string PartName );
             void renewAllPublisherTimer () override;
-            void processorListnerCallback ( const body_msgs::PartMsg::ConstPtr );
-            void locomotionActionCallback ( const motioncontroll_action::MotionControllAction::ConstPtr & );
-            inline void publish_cmdMsg() const;
-            inline void publish_feedback() const;
-            inline void publish_currentState() const;
+            void processorListnerCallback ( const body_msgs::PartMsg::ConstPtr & );
+            void locomotionActionCallback ( const motioncontroll_action::MotionControllGoalConstPtr & );
+            void publish_CommandMsg() const;
+            void publish_feedback();
+            void publish_currentState() const ;
+			void end_action( const support_msgs::ActionEndReporterMsg::ConstPtr & );
             void checkMcValidness();
+			bool isValid() const ;
     };
 
 
 
-    class FeedbackProcessorNode : virtual protected ros::NodeHandle, virtual protected HeartrateSubscriber
+    class FeedbackProcessorNode : virtual protected ros::NodeHandle, virtual protected HeartrateSubscriberNode
     {
         protected:
             Body::FeedbackProcessor fp;
@@ -80,13 +83,14 @@ namespace Node{
 			ros::Publisher currentStatePublisher;
             ros::Timer currentStatePublisherTimer;
             ros::Subscriber actionStartListner;
+			ros::Publisher actionEndReporter;
 
             std::string nodeName;
             std::string toMotionControllerFeedbackTopicName;
             std::string toMotionControllerFinishActionTopicName;
             std::string fromMotionControllerTeensyCommandTopicName;
             std::string fromTeensySubscribeTopicName;
-            std::string fromMotionControllerServiceTopicName;
+            std::string fromMotionControllerActionStartNotifierTopicName;
 			std::string heartrateFeedbackName;
 
             bool valid;
@@ -94,11 +98,14 @@ namespace Node{
 
         public:
             FeedbackProcessorNode( PartID pID, std::string PartName );
-            void teensyListnerCallback( teensy_msgs::InfoMsg::ConstPtr );
+			void teensyCommandListnerCallback( const teensy_msgs::CommandMsg::ConstPtr & );
+            void teensyListnerCallback( const teensy_msgs::FeedbackMsg::ConstPtr & );
             inline void publish_processedFeedback( body_msgs::PartMsg ) const ;
-			void publish_CurrentState();
+			void publish_currentState();
             void checkFpValidness();
-            void actionStartListnerCallback();
+            void actionStartListnerCallback( const support_msgs::ActionStartNotifierMsg::ConstPtr & msg );
+			bool isValid() const ;
+			void renewAllPublisherTimer() override ;
     };
 }
 

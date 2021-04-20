@@ -7,11 +7,11 @@ FeedbackProcessor::FeedbackProcessor( PartID ID ):
 {}
 
 
-CattyError FeedbackProcessor::start_action( const support_msgs::ActionStartNotifierMsg::ConstPtr & msg, std::string & NodeName ){
+CattyError FeedbackProcessor::start_action( const support_msgs::ActionStartNotifierMsg::ConstPtr & msg, const std::string & NodeName ){
 	if ( inAction ){
 		ROS_INFO("LOCOMOTION_ACTION_ERROR: %s could not start action since another action is in already happning. ", NodeName.c_str());
 		valid = false;
-		return LOCOMOTION_ACTION_ERROR;
+		return LOCOMOTION_ACTION_FAILURE;
 	}
 	if ( msg->part_id != part_id ){
 		valid = false;
@@ -28,7 +28,7 @@ bool FeedbackProcessor::add_pendingScenes( const teensy_msgs::CommandMsg::ConstP
 {
 	if ( msg->scene_id <= currentSceneIdReceived ){
 
-		reset_processing();
+		reset();
 
 		if ( msg->scene_id != 0) { // if some starting scenes are missed
 			Uint16 numMissedHere = msg->scene_id - 1;
@@ -71,8 +71,8 @@ Part FeedbackProcessor::process_Feedback( const teensy_msgs::FeedbackMsg::ConstP
 	if( pendingScenes.front().get_scene_id() == msg->scene_id )
 	{
 		Part processedPart = pendingScenes.front();
-		CatttyError error = processedPart.set( msg );
-		if ( error!=SUCCESS )
+		CattyError error = processedPart.set( msg );
+		if ( error != SUCCESS )
 		{
 			valid = false;
 		}
@@ -111,10 +111,21 @@ Part FeedbackProcessor::process_Feedback( const teensy_msgs::FeedbackMsg::ConstP
 
 void FeedbackProcessor::reset()
 {
-	pendingScenes = queue<Part>( sequenceSize, INVALID );
+	pendingScenes = std::queue<Part>();
 	numMissingActualScenes = 0;
 	numMissingExpectedScenes = 0;
 	numTotallyMissingScenes = 0;
+}
+
+
+CattyError FeedbackProcessor::set_ActionEndReporterMsg( support_msgs::ActionEndReporterMsg & msg ){
+	msg.part_id = part_id;
+
+	msg.stateOfScenes.clear();
+	msg.stateOfScenes.reserve( sequenceSize );
+	for ( std::vector<ObjectState>::iterator it = stateOfScenes.begin(); it!=stateOfScenes.end(); ++it )
+		msg.stateOfScenes.push_back( *it );
+	return SUCCESS;
 }
 
 

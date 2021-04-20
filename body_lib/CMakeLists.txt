@@ -9,13 +9,20 @@ find_package(catkin REQUIRED COMPONENTS
   parts_lib
   body_msgs
   motioncontroll_action
-  teensy_msgs #add
+  teensy_msgs
 )
 
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES body_lib
-  CATKIN_DEPENDS roscpp
+  CATKIN_DEPENDS
+    roscpp
+    support_lib
+	parts_msgs
+    parts_lib
+    body_msgs
+    motioncontroll_action
+    teensy_msgs
   DEPENDS parts_lib parts_msgs body_msgs motioncontroll_action
 )
 

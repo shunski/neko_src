@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>rh_leg_controller</name>
+  <name>controller</name>
   <version>0.0.0</version>
   <description>The motion_controller package</description>
   <maintainer email="shunski@todo.todo">shunski</maintainer>
@@ -9,13 +9,11 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>
-  <build_depend>jcatty_lib</build_depend>
-  <build_depend>jcatty_msgs</build_depend>
-  <build_depend>jcatty_action</build_depend>
+  <build_depend>node_lib</build_depend>
   <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>body_msgs</build_export_depend>
   <exec_depend>roscpp</exec_depend>
-  <exec_depend>jcatty_msgs</exec_depend>
-  <exec_depend>jcatty_action</exec_depend>
-
+  <exec_depend>parts_lib</exec_depend>
+  <exec_depend>body_lib</exec_depend>
   <export> </export>
 </package>

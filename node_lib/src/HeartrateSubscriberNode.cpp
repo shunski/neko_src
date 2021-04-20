@@ -2,18 +2,18 @@
 #include <node_lib/Node.h>
 using namespace Node;
 
-HeartrateSubscriber::HeartrateSubscriber()
+HeartrateSubscriberNode::HeartrateSubscriberNode()
 {
-    HeartrateSubscriber this->subscribe<support_msgs::HeartrateMsg>(heartrateTopicName,
-                                                                           queue_size,
-                                                                           boost::bind(& Node::HeartrateSubscriber::HeartrateSubscriberCB, this));
-    heartrate = ros::Duration(1000); // super slow until initialized by the subscriber
+    heartrateListner = this->subscribe( heartrateTopicName,
+			default_queue_size,
+			&Node::HeartrateSubscriberNode::HeartrateSubscriberCallback, this);
+    heartrate = ros::Duration( 1000 ); // super slow until initialized by the subscriber
 }
 
-HeartrateSubscriber::HeartrateSubscriberCB(support_msgs::HeartrateMsg::ConstPtr msg)
+void HeartrateSubscriberNode::HeartrateSubscriberCallback( const support_msgs::HeartrateMsg::ConstPtr & msg )
 {
-    if (heartrate != msg.heartrate){
-        heartrate = msg.heartrate;
+    if ( heartrate != msg->period ){
+        heartrate = msg->period;
         renewAllPublisherTimer();
     }
 }

@@ -6,15 +6,28 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   support_lib
   support_msgs
-  support_srvs
   body_msgs
   body_lib
+  parts_lib
+  parts_msgs
+  motioncontroll_action
+  teensy_msgs
 )
 
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES node_lib
-  CATKIN_DEPENDS roscpp
+  CATKIN_DEPENDS 
+    roscpp
+    body_lib
+    body_msgs
+    support_lib
+    support_msgs
+    std_msgs
+    parts_lib
+    parts_msgs
+    motioncontroll_action
+    teensy_msgs
   #  DEPENDS system_lib
 )
 
@@ -28,17 +41,12 @@ add_library(${PROJECT_NAME}
   src/MotionControllerNode.cpp
   src/FeedbackProcessorNode.cpp
 )
-
-add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-target_link_libraries(${PROJECT_NAME}
-  ${catkin_LIBRARIES}
-)
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 install(
   TARGETS ${PROJECT_NAME}
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}$
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}$
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
 )
 

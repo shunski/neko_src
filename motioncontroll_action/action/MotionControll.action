@@ -9,8 +9,8 @@ body_msgs/PartCommandMsg[] partCommandSequence
 
 # result
 int8 part_id
-body_msgs/PartMsg actualFinalState
 duration actualTotalDuration
+uint8[] stateOfScenes
 
 ---
 

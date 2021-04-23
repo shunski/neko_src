@@ -1,2 +1,2 @@
 # HeartrateMsg.msg
-duration period
+duration heartrate

@@ -1,14 +1,16 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include <iostream>
 #include <string>
+#include <vector>
+#include <map>
 #include <ros/ros.h>
 #include <body_msgs/PartMsg.h>
 #include <body_lib/Body.h>
 #include <std_msgs/Bool.h>
 #include <support_msgs/HeartrateMsg.h>
 #include <support_msgs/CalibrationMsg.h>
+#include <support_srvs/InitRegistrationService.h>
 #include <support_lib/Utilities.h>
 #include <teensy_msgs/CommandMsg.h>
 #include <teensy_msgs/FeedbackMsg.h>
@@ -21,8 +23,43 @@
 #include <support_msgs/ActionEndReporterMsg.h>
 
 #define heartrateTopicName "Heartrate"
+#define nodeRegistrationTopicName "NodeRegistration"
 
 namespace Node{
+    class GenericCattyNode : virtual protected ros::NodeHandle
+    {
+        private:
+            bool init_succeeded;
+        protected:
+            std::string nodeName;
+            std::string currentStateTopicName;
+
+            GenericCattyNode( const std::string NodeName );
+            bool didInitSucceed() const;
+    };
+
+
+    class HeartratePublisherNode : virtual protected ros::NodeHandle
+    {
+        protected:
+            ros::Publisher heartratePublisher;
+            ros::ServiceServer nodeRegistrationServer;
+            std::vector<ros::Subscriber> currentStateSubscriberSet;
+            std::map<std::string, bool> currentStateHolder;
+            ros::Duration heartrate;
+
+        public:
+            HeartratePublisherNode( cosnt std::vector<std::string> & partNameSet );
+            void publishHeartrate();
+            CattyError set_heartrate( const ros::duration & );
+            CattyError set_heartrate( const double );
+            void publish_newHeartrate();
+            bool register_node( const support_srvs::InitRegistrationService::Request );
+            bool InitRegistrationCallback( const support_srvs::initSrv )
+            void currentStateSubscriberCallback( const support_msgs::HeartrateMsg::ConstPtr & );
+    };
+
+
     class HeartrateSubscriberNode : virtual protected ros::NodeHandle
     {
         protected:
@@ -30,10 +67,9 @@ namespace Node{
             ros::Duration heartrate;
         public:
             HeartrateSubscriberNode();
-            void HeartrateSubscriberCallback( const support_msgs::HeartrateMsg::ConstPtr & );
+            void heartrateSubscriberCallback( const support_msgs::HeartrateMsg::ConstPtr & );
 			virtual void renewAllPublisherTimer()=0;
     };
-
 
 
     class MotionControllerNode : virtual protected ros::NodeHandle, virtual protected HeartrateSubscriberNode
@@ -47,7 +83,6 @@ namespace Node{
             ros::Subscriber feedbackProcessorListner;    // listening to FeedbackProcessor Node
             ros::Timer currentStatePublisherTimer;
 
-            std::string nodeName;
             std::string locomotionActionName;
             std::string fromFeedbackProcessorFeedbackTopicName;
 			std::string fromFeedbackProcessorFinishActionTopicName;
@@ -87,7 +122,6 @@ namespace Node{
             ros::Subscriber actionStartListner;
 			ros::Publisher actionEndReporter;
 
-            std::string nodeName;
             std::string toMotionControllerFeedbackTopicName;
             std::string toMotionControllerFinishActionTopicName;
             std::string fromMotionControllerTeensyCommandTopicName;

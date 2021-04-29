@@ -1,0 +1,6 @@
+<launch>
+    <node pkg="optim_test" type="core_node" name="core_node" />
+    <node pkg="optim_test" type="mc_node" name="mc_node" />
+    <node pkg="optim_test" type="fp_node" name="fp_node" />
+    <node pkg="optim_test" type="lazy_teensy" name="lazy_teensy" />
+</launch>

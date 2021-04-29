@@ -3,7 +3,7 @@
 using namespace body;
 
 FeedbackProcessor::FeedbackProcessor( PartID ID ):
-	part_id( ID ), inAction( false )
+	part_id( ID ), inAction( false ), valid( true )
 {}
 
 
@@ -87,8 +87,9 @@ void FeedbackProcessor::process_Feedback( const teensy_msgs::FeedbackMsg::ConstP
 		pendingScenes.pop();
 		currentSceneIdProcessed = msg->scene_id;
 	}
-	else if ( pendingScenes.front().get_scene_id() > msg->scene_id ) // Some feedbacks from the teensy were missed
+	else if ( pendingScenes.front().get_scene_id() < msg->scene_id ) // Some feedbacks from the teensy were missed
 	{
+		ROS_ERROR("Some scene is lost at teesy");
 		currentSceneIdProcessed = msg->scene_id;
 		while ( pendingScenes.front().get_scene_id() != msg->scene_id ){
 			pendingScenes.pop();

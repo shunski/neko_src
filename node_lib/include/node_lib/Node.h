@@ -13,6 +13,7 @@
 #include "support_msgs/HeartrateMsg.h"
 #include "support_msgs/CalibrationMsg.h"
 #include "support_srvs/RegistrationSrv.h"
+#include "support_srvs/CheckIfSpecificNodeAliveSrv.h"
 #include "support_lib/Utilities.h"
 #include "teensy_msgs/CommandMsg.h"
 #include "teensy_msgs/FeedbackMsg.h"
@@ -75,15 +76,18 @@ namespace node{
     {
         protected:
             ros::ServiceServer registrationServer;
+            ros::ServiceServer tellLivenessOfNodesServer;
             std::map<std::string, std::tuple<ros::Subscriber, ros::Time> > registeredNodeList;
         public:
             RegistrarNode();
             void disregister_disqualifiedNode();
             std::vector<std::string> get_allLiveNodes();
-            bool isRegistered( const std::string & );
+            bool isRegistered( const std::string & ) const ;
             bool registrationCallback( support_srvs::RegistrationSrv::Request &, support_srvs::RegistrationSrv::Response & );
             void heartrateSoundSubscriberCallback( const std_msgs::String::ConstPtr & msg );
             void heartPumped() override;
+            bool check_liveness( support_srvs::CheckIfSpecificNodeAliveSrv::Request & ,
+                    support_srvs::CheckIfSpecificNodeAliveSrv::Response & );
     };
 
 
@@ -98,6 +102,7 @@ namespace node{
             ros::Subscriber actionEndListner;
             ros::Subscriber feedbackProcessorListner;    // listening to FeedbackProcessor Node
 
+            std::string feedbackProcessorName;
             std::string locomotionActionName;
             std::string fromFeedbackProcessorFeedbackTopicName;
             std::string fromFeedbackProcessorFinishActionTopicName;

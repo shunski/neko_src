@@ -32,7 +32,6 @@ FeedbackProcessorNode::FeedbackProcessorNode( PartID pID, std::string PartName )
 
 
 void FeedbackProcessorNode::teensyCommandListenerCallback( const teensy_msgs::CommandMsg::ConstPtr & msg ){
-	ROS_INFO("Message from mc_node. part_id=[%d]", msg->part_id);
 	bool isActionFinished = fp.add_pendingScenes( msg );
 	if ( isActionFinished ){
 		Uint8 scenesLeft = fp.get_scenesLeft();
@@ -76,6 +75,10 @@ void FeedbackProcessorNode::actionStartListenerCallback( const support_msgs::Act
 
 void FeedbackProcessorNode::checkFpValidness() {
 	valid = fp.isValid();
+	if( !valid ) {
+		ROS_ERROR("This Feedback Processor Node is invalid. Shutting down.");
+		ros::shutdown();
+	}
 }
 
 bool FeedbackProcessorNode::isValid() const { return valid; }

@@ -4,6 +4,7 @@ using namespace node;
 
 RegistrarNode::RegistrarNode(){
     registrationServer = this->advertiseService( nodeRegistrationTopicName, &node::RegistrarNode::registrationCallback, this );
+    tellLivenessOfNodesServer = this->advertiseService( "CheckLivenessOfNode", &node::RegistrarNode::check_liveness, this );
 }
 
 void RegistrarNode::disregister_disqualifiedNode() {
@@ -28,7 +29,7 @@ std::vector<std::string> RegistrarNode::get_allLiveNodes(){
 }
 
 
-bool RegistrarNode::isRegistered( const std::string & NodeName ){
+bool RegistrarNode::isRegistered( const std::string & NodeName )  const {
     for ( auto it = registeredNodeList.begin(); it!=registeredNodeList.end(); ++it ){
         if ( it->first == NodeName){
             return true;
@@ -57,4 +58,10 @@ void RegistrarNode::heartrateSoundSubscriberCallback( const std_msgs::String::Co
 void RegistrarNode::heartPumped(){
     ( heartrate*0.5 ).sleep();
     disregister_disqualifiedNode();
+}
+
+bool RegistrarNode::check_liveness( support_srvs::CheckIfSpecificNodeAliveSrv::Request & req,
+                     support_srvs::CheckIfSpecificNodeAliveSrv::Response & res) {
+    res.isAlive = isRegistered( req.nodeName );
+    return true;
 }

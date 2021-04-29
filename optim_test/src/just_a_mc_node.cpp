@@ -11,8 +11,8 @@ class JustAMcNode : public node::MotionControllerNode
         {}
 };
 
-int main(int argc, char **argv) {
-    ros::init(argc, argv, "mc_node");
+int main( int argc, char **argv ) {
+    ros::init( argc, argv, "mc_node" );
     JustAMcNode node;
     if ( !node.didInitSucceed()) return 1;
     ros::spin();

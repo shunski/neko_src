@@ -5,6 +5,7 @@ using namespace node;
 MotionControllerNode::MotionControllerNode( PartID pID, std::string PartName ):
 	GenericCattyNode( PartName+"MotionController"),
 	mc( pID ),
+	feedbackProcessorName( PartName + "FeedbackProcessor" ),
 	fromFeedbackProcessorFeedbackTopicName( PartName+"ProcessedFeedback" ),
 	fromFeedbackProcessorFinishActionTopicName( PartName+"FinishAction" ),
 	toTeensyPublishTopicName( PartName+"TeensyCommand" ),
@@ -14,6 +15,20 @@ MotionControllerNode::MotionControllerNode( PartID pID, std::string PartName ):
 	locomotionServer( *((ros::NodeHandle*)this), locomotionActionName, boost::bind( &node::MotionControllerNode::locomotionActionCallback, this, _1 ), false )
 {
 	ROS_INFO("Initializing MotionControllerNode...");
+
+	// Checking if the Feedback Processor is alive
+	bool isFeedbackProcessorAlive = false;
+	ros::ServiceClient fpCheckClient = this->serviceClient<support_srvs::CheckIfSpecificNodeAliveSrv>( "CheckLivenessOfNode" );
+	support_srvs::CheckIfSpecificNodeAliveSrv checkSrv;
+	checkSrv.request.nodeName = feedbackProcessorName;
+	do {
+		fpCheckClient.call( checkSrv );
+		isFeedbackProcessorAlive = checkSrv.response.isAlive;
+		ROS_INFO("Waiting for Feedback Processor starting.");
+		ros::Duration( 0.1 ).sleep();
+	} while ( !isFeedbackProcessorAlive );
+
+	// initializing various stuff
     locomotionServer.start();
 	valid = mc.isValid();
     commandPublisher = this->advertise<teensy_msgs::CommandMsg>( toTeensyPublishTopicName, default_queue_size );
@@ -65,7 +80,7 @@ void MotionControllerNode::locomotionActionCallback ( const motioncontroll_actio
     actionStartNotifier.publish( notifierMsg );
 	ros::Duration(1.0/100).sleep();
 
-	// ros::Timer publishFeedbackTimer = this->createTimer( mc.get_expectedSceneDuration()*0.5, boost::bind( &node::MotionControllerNode::publish_feedback, this ));
+	ros::Timer publishFeedbackTimer = this->createTimer( mc.get_expectedSceneDuration()*0.5, boost::bind( &node::MotionControllerNode::publish_feedback, this ));
 
 	mc.startMotioncontrollAction();
 
@@ -113,7 +128,13 @@ void MotionControllerNode::publish_currentState() const
 }
 
 
-void MotionControllerNode::checkMcValidness() { valid = mc.isValid(); }
+void MotionControllerNode::checkMcValidness() {
+	valid = mc.isValid();
+	if( !valid ) {
+		ROS_ERROR("This Motion Controller Node is invalid. Shutting down.");
+		ros::shutdown();
+	}
+}
 
 
 bool MotionControllerNode::isValid() const { return valid; }

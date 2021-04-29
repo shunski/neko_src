@@ -253,4 +253,5 @@ void teensy_callback( const teensy_msgs::CommandMsg::ConstPtr & receivedMsg )
 
     // This teensy looses the messages sometimes...
     if (rand()%10) pub.publish( feedbackMsg );
+    else ROS_ERROR("Oops! I accidentally lost the task... ");
 }

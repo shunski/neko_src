@@ -177,6 +177,7 @@ void Part::operator=( const Part & original )
 {
 	if( part_id != original.part_id )
 		ROS_INFO("Invalid use of assignment operator for two Parts. Operation failed.");
+	scene_id = original.scene_id;
 	kondoServoSet = original.kondoServoSet;
 	brushedMotorSet = original.brushedMotorSet;
 	brushlessMotorSet = original.brushlessMotorSet;

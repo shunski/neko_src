@@ -18,22 +18,21 @@ class ActionTestClientNode
             test_client( "SomePartLocomotionAction", true )
         { test_client.waitForServer(); }
 
-        void startTesting( int test_number );
+        void startTesting();
         void feedbackCallback( const motioncontroll_action::MotionControllFeedbackConstPtr& feedback );
         void resultCallback( const actionlib::SimpleClientGoalState& state,
                              const motioncontroll_action::MotionControllResultConstPtr& goal );
 
-        motioncontroll_action::MotionControllGoal setUpTestAction( int test_number );
+        motioncontroll_action::MotionControllGoal setUpTestAction();
 };
 
 // -------------------------------------------------------------------------------------------------------------------
 
 // --------------------------- Class member function implementation -----------------------------------------------------
 
-void ActionTestClientNode::startTesting( int test_number ){
-    ROS_INFO( "Setting up the action of #%d...", test_number );
+void ActionTestClientNode::startTesting(){
     motioncontroll_action::MotionControllGoal test_action_goal;
-    test_action_goal = setUpTestAction( test_number );
+    test_action_goal = setUpTestAction();
     scene_number = 0;
 
     ROS_INFO( "Sending the action goal to the server..." );
@@ -46,7 +45,7 @@ void ActionTestClientNode::startTesting( int test_number ){
 
 void ActionTestClientNode::feedbackCallback( const motioncontroll_action::MotionControllFeedbackConstPtr& feedback ) {
     while( scene_number < feedback->actualCurrentState.scene_id-1 ){
-        ROS_INFO( "Missed Feedback scene of number \t:[%d]", feedback->actualCurrentState.scene_id );
+        ROS_INFO( "Missed Feedback scene of number \t:[%d]", scene_number );
         scene_number++;
     }
     ROS_INFO( "Received Feedback scene of number \t:[%d]", feedback->actualCurrentState.scene_id );
@@ -62,35 +61,13 @@ void ActionTestClientNode::resultCallback( const actionlib::SimpleClientGoalStat
 }
 
 
-motioncontroll_action::MotionControllGoal ActionTestClientNode::setUpTestAction( int test_number ){
+motioncontroll_action::MotionControllGoal ActionTestClientNode::setUpTestAction() {
     motioncontroll_action::MotionControllGoal goal;
     goal.part_id = RHLEG; // DO NOT CHANGE HERE
 
-    int sequenceSize;
-    double eachSceneDuration;
+    int sequenceSize = rand() % 1000;
+    double eachSceneDuration = ( rand() % 100 ) / 1000.0;
 
-    switch( test_number )
-    {
-        case 0: // custom test
-        {
-            sequenceSize = 100;
-            eachSceneDuration = 0.05; // can be changed. but not too small
-            break;
-        }
-
-        case 1: // random test
-        {
-            sequenceSize = rand() % 1000;
-            eachSceneDuration = ( rand() % 100 ) / 1000.0;
-            break;
-        }
-
-        default:
-        {
-            ROS_INFO("Something went wrong. Could not set up the action");
-            break;
-        }
-    }
     goal.sequenceSize = sequenceSize;
     goal.expectedTotalDuration = ros::Duration( eachSceneDuration * sequenceSize );
     goal.partCommandSequence.reserve( sequenceSize );
@@ -101,7 +78,7 @@ motioncontroll_action::MotionControllGoal ActionTestClientNode::setUpTestAction(
         goal.partCommandSequence.push_back( msg );
     }
 
-    ROS_INFO("The action with the sequence of size %d is set.", sequenceSize);
+    ROS_INFO("The action with the random sequence of size %d is set.", sequenceSize);
 
     return goal;
 }
@@ -114,19 +91,8 @@ int main( int argc, char** argv ){
     ros::init( argc, argv, "test_action");
     ActionTestClientNode node;
 
-
-    // Getting user input for testing number
-    std::string test_number_str;
-    std::cout << "Inuput test number:" << std::endl << "\t0: custom action" << std::endl << "\t1: random action" << std::endl;
-    getline( std::cin, test_number_str );
-    while( test_number_str!="0" && test_number_str!="1" ){
-        std::cout << "Oops! Your input does not seem to be correct... Try Again." << std::endl;
-        getline( std::cin, test_number_str );
-    }
-    int test_number = std::stoi( test_number_str );
-
     // Testing
-    node.startTesting( test_number );
+    node.startTesting();
 
     ros::spin();
     return 0;

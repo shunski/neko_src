@@ -30,7 +30,7 @@ namespace body{
     {
         private:
             const PartID part_id;
-            const Uint16 scene_id;
+            Uint16 scene_id;
 
             std::vector<KondoServo> kondoServoSet;
             std::vector<BrushedMotor> brushedMotorSet;

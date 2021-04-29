@@ -10,7 +10,7 @@ GenericParts<Msg, CommandMsg, FeedbackMsg>::GenericParts( std::string ChildName,
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
-CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::check_msg_id( const Msg & msg ) const 
+CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::check_msg_id( const Msg & msg ) const
 {
 	if ( part_id != msg.part_id ) return PART_ID_NOT_MATCH;
 	if ( id != msg.id ) return ID_NOT_MATCH;
@@ -64,105 +64,105 @@ CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::check_msg_id( const typen
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
-void GenericParts<Msg, CommandMsg, FeedbackMsg>::print_msg_part_id_error( const Msg & msg ) const 
+void GenericParts<Msg, CommandMsg, FeedbackMsg>::print_msg_part_id_error( const Msg & msg ) const
 {
-	ROS_INFO("ID_NOT_MATCH: PartID did not match: %s object=%d and Msg=%d", child_name.c_str(), part_id, msg.part_id );
+	ROS_ERROR("ID_NOT_MATCH: PartID did not match: %s object=%d and Msg=%d", child_name.c_str(), part_id, msg.part_id );
 }
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
 void GenericParts<Msg, CommandMsg, FeedbackMsg>::print_msg_part_id_error( const typename Msg::ConstPtr & msg ) const
 {
-	ROS_INFO("PART_ID_NOT_MATCH: PartID did not match: %s object=%d and Msg=%d", child_name.c_str(), part_id, msg->part_id );
+	ROS_ERROR("PART_ID_NOT_MATCH: PartID did not match: %s object=%d and Msg=%d", child_name.c_str(), part_id, msg->part_id );
 }
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
-void GenericParts<Msg, CommandMsg, FeedbackMsg>::print_msg_part_id_error( const CommandMsg & msg ) const 
+void GenericParts<Msg, CommandMsg, FeedbackMsg>::print_msg_part_id_error( const CommandMsg & msg ) const
 {
-	ROS_INFO("PART_ID_NOT_MATCH: PartID did not match: %s object=%d and CommandMsg=%d", child_name.c_str(), part_id, msg.part_id );
+	ROS_ERROR("PART_ID_NOT_MATCH: PartID did not match: %s object=%d and CommandMsg=%d", child_name.c_str(), part_id, msg.part_id );
 }
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
 void GenericParts<Msg, CommandMsg, FeedbackMsg>::print_msg_part_id_error( const typename CommandMsg::ConstPtr & msg ) const
 {
-	ROS_INFO("PART_ID_NOT_MATCH: PartID did not match: %s object=%d and CommandMsg=%d", child_name.c_str(), part_id, msg->part_id );
+	ROS_ERROR("PART_ID_NOT_MATCH: PartID did not match: %s object=%d and CommandMsg=%d", child_name.c_str(), part_id, msg->part_id );
 }
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
-void GenericParts<Msg, CommandMsg, FeedbackMsg>::print_msg_part_id_error( const FeedbackMsg & msg ) const 
+void GenericParts<Msg, CommandMsg, FeedbackMsg>::print_msg_part_id_error( const FeedbackMsg & msg ) const
 {
-	ROS_INFO("PART_ID_NOT_MATCH: PartID did not match: %s object=%d and FeedbackMsg=%d", child_name.c_str(), part_id, msg.part_id );
+	ROS_ERROR("PART_ID_NOT_MATCH: PartID did not match: %s object=%d and FeedbackMsg=%d", child_name.c_str(), part_id, msg.part_id );
 }
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
-void GenericParts<Msg, CommandMsg, FeedbackMsg>::print_msg_part_id_error( const typename FeedbackMsg::ConstPtr & msg ) const 
+void GenericParts<Msg, CommandMsg, FeedbackMsg>::print_msg_part_id_error( const typename FeedbackMsg::ConstPtr & msg ) const
 {
-	ROS_INFO("PART_ID_NOT_MATCH: PartID did not match: %s object=%d and FeedbackMsg=%d", child_name.c_str(), part_id, msg->part_id );
+	ROS_ERROR("PART_ID_NOT_MATCH: PartID did not match: %s object=%d and FeedbackMsg=%d", child_name.c_str(), part_id, msg->part_id );
 }
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
 void GenericParts<Msg, CommandMsg, FeedbackMsg>::print_msg_id_error( const Msg & msg ) const
 {
-	ROS_INFO("ID_NOT_MATCH: ID did not match: %s object=%d and Msg=%d", child_name.c_str(), part_id, msg.id );
+	ROS_ERROR("ID_NOT_MATCH: ID did not match: %s object=%d and Msg=%d", child_name.c_str(), part_id, msg.id );
 }
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
 void GenericParts<Msg, CommandMsg, FeedbackMsg>::print_msg_id_error( const typename Msg::ConstPtr & msg ) const
 {
-	ROS_INFO("ID_NOT_MATCH: ID did not match: %s object=%d and Msg=%d", child_name.c_str(), part_id, msg->id );
+	ROS_ERROR("ID_NOT_MATCH: ID did not match: %s object=%d and Msg=%d", child_name.c_str(), part_id, msg->id );
 }
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
 void GenericParts<Msg, CommandMsg, FeedbackMsg>::print_msg_id_error( const CommandMsg & msg ) const
 {
-	ROS_INFO("ID_NOT_MATCH: ID did not match: %s object=%d and CommadnMsg=%d", child_name.c_str(), part_id, msg.id );
+	ROS_ERROR("ID_NOT_MATCH: ID did not match: %s object=%d and CommadnMsg=%d", child_name.c_str(), part_id, msg.id );
 }
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
 void GenericParts<Msg, CommandMsg, FeedbackMsg>::print_msg_id_error( const typename CommandMsg::ConstPtr & msg ) const
 {
-	ROS_INFO("ID_NOT_MATCH: ID did not match: %s object=%d and CommandMsg=%d", child_name.c_str(), part_id, msg->id );
+	ROS_ERROR("ID_NOT_MATCH: ID did not match: %s object=%d and CommandMsg=%d", child_name.c_str(), part_id, msg->id );
 }
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
 void GenericParts<Msg, CommandMsg, FeedbackMsg>::print_msg_id_error( const FeedbackMsg & msg ) const
 {
-	ROS_INFO("ID_NOT_MATCH: ID did not match: %s object=%d and Feedback=%d", child_name.c_str(), part_id, msg.id );
+	ROS_ERROR("ID_NOT_MATCH: ID did not match: %s object=%d and Feedback=%d", child_name.c_str(), part_id, msg.id );
 }
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
 void GenericParts<Msg, CommandMsg, FeedbackMsg>::print_msg_id_error( const typename FeedbackMsg::ConstPtr & msg ) const {
-	ROS_INFO("ID_NOT_MATCH: ID did not match: %s object=%d and Feedback=%d", child_name.c_str(), part_id, msg->id );
+	ROS_ERROR("ID_NOT_MATCH: ID did not match: %s object=%d and Feedback=%d", child_name.c_str(), part_id, msg->id );
 }
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
 CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::set_msg( Msg & ) const {
-    ROS_INFO("ERROR: No set_msg() method is not defined in the derived class <%s>. Please exit the program.", child_name.c_str());
+    ROS_ERROR("ERROR: No set_msg() method is not defined in the derived class <%s>. Please exit the program.", child_name.c_str());
     return MESSAGE_CONSTRUCTION_FAILURE;
 }
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
 CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::set_CommandMsg( CommandMsg & ) const {
-	ROS_INFO("ERROR: No set_CommandMsg() method is not defined in the derived class <%s>. Please exit the program.", child_name.c_str());
+	ROS_ERROR("ERROR: No set_CommandMsg() method is not defined in the derived class <%s>. Please exit the program.", child_name.c_str());
 	return MESSAGE_CONSTRUCTION_FAILURE;
 }
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
 CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::set_FeedbackMsg( FeedbackMsg & ) const {
-	ROS_INFO("ERROR: No set_FeedbackMsg() method is not defined in the derived class <%s>. Please exit the program.", child_name.c_str());
+	ROS_ERROR("ERROR: No set_FeedbackMsg() method is not defined in the derived class <%s>. Please exit the program.", child_name.c_str());
 	return MESSAGE_CONSTRUCTION_FAILURE;
 }
 
@@ -170,16 +170,16 @@ CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::set_FeedbackMsg( Feedback
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
 CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::set( const CommandMsg & )
 {
-	ROS_INFO("ERROR: No set() method is defined in the derived class <%s> for the mesaage of this type. Please exit the program.", child_name.c_str());
+	ROS_ERROR("ERROR: No set() method is defined in the derived class <%s> for the mesaage of this type. Please exit the program.", child_name.c_str());
 	valid = false;
 	return OBJECT_CONSTRUCTION_FAILURE;
 }
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
-CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::set( const typename CommandMsg::ConstPtr & ) 
+CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::set( const typename CommandMsg::ConstPtr & )
 {
-	ROS_INFO("ERROR: No set() method is defined in the derived class <%s> for the mesaage of this type. Please exit the program.", child_name.c_str());
+	ROS_ERROR("ERROR: No set() method is defined in the derived class <%s> for the mesaage of this type. Please exit the program.", child_name.c_str());
 	valid = false;
 	return OBJECT_CONSTRUCTION_FAILURE;
 }
@@ -188,7 +188,7 @@ CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::set( const typename Comma
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
 CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::set( const FeedbackMsg & )
 {
-	ROS_INFO("ERROR: No set() method is defined in the derived class <%s> for the mesaage of this type. Please exit the program.", child_name.c_str());
+	ROS_ERROR("ERROR: No set() method is defined in the derived class <%s> for the mesaage of this type. Please exit the program.", child_name.c_str());
 	valid = false;
 	return OBJECT_CONSTRUCTION_FAILURE;
 }
@@ -197,7 +197,7 @@ CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::set( const FeedbackMsg & 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
 CattyError GenericParts<Msg, CommandMsg, FeedbackMsg>::set( const typename FeedbackMsg::ConstPtr & )
 {
-	ROS_INFO("ERROR: No set() method is defined in the derived class <%s> for the mesaage of this type. Please exit the program.", child_name.c_str());
+	ROS_ERROR("ERROR: No set() method is defined in the derived class <%s> for the mesaage of this type. Please exit the program.", child_name.c_str());
 	valid = false;
 	return OBJECT_CONSTRUCTION_FAILURE;
 }
@@ -212,5 +212,8 @@ Uint8 GenericParts<Msg, CommandMsg, FeedbackMsg>::get_id() const { return id; }
 
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
-bool GenericParts<Msg, CommandMsg, FeedbackMsg>::isValid() const { return valid; }
+ObjectState GenericParts<Msg, CommandMsg, FeedbackMsg>::get_state() const { return state; }
 
+
+template < typename Msg, typename CommandMsg, typename FeedbackMsg >
+bool GenericParts<Msg, CommandMsg, FeedbackMsg>::isValid() const { return valid; }

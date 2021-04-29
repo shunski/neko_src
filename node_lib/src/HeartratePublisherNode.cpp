@@ -1,12 +1,11 @@
 // HeartratePublisherNode.cpp: implements HeartratePublisherNode class in Node.h
 #include <node_lib/Node.h>
-using namespace Node;
+using namespace node;
 
 HeartratePublisherNode::HeartratePublisherNode():
     heartrate( ros::Duration( 0.5 )) // heartrate is 0.5 [Hz] by default
 {
-    heartratePublisher  = this->advertise( heartrateTopicName, default_queue_size );
-    nodeRegistrationServer = this->ServiceServer( nodeRegistrationTopicName, Node::HeartratePublisherNode::register_node );
+    heartratePublisher  = this->advertise<support_msgs::HeartrateMsg>( heartrateTopicName, default_queue_size );
 }
 
 
@@ -19,7 +18,7 @@ CattyError HeartratePublisherNode::set_heartrate( const ros::Duration & heartrat
     }
     else if ( heartrateIn > ros::Duration( 2.0 ) )
     {
-        ROS_INFO("Input heartrate too slow. It is instead set to 2");
+        ROS_INFO("Input heartrate too slow. It is instead set to 2.0");
         heartrate = ros::Duration( 2.0 );
         return WARNING;
     }
@@ -31,11 +30,7 @@ CattyError HeartratePublisherNode::set_heartrate( const ros::Duration & heartrat
     }
 
     publish_newHeartrate();
-    return;
-}
-
-void HeartratePublisherNode::publish_newHeartrate(){
-    heartratePublisher.publish();
+    return SUCCESS;
 }
 
 
@@ -43,7 +38,9 @@ CattyError HeartratePublisherNode::set_heartrate( const double heartrateIn ){
     return set_heartrate( ros::Duration( heartrateIn ));
 }
 
-void currentStateSubscriberCallback( const support_msgs::HeartrateMsg::ConstPtr & msg ){
-    if ( msg.node_name )
-    nodeDisable ros::Timer = this->createTimer( ros::Duration, , true );
+
+void HeartratePublisherNode::publish_newHeartrate(){
+    support_msgs::HeartrateMsg msg;
+    msg.heartrate = heartrate;
+    heartratePublisher.publish( msg );
 }

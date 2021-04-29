@@ -1,6 +1,6 @@
 // FeedbackProcessor.cpp implements FeedbackProcessor class in Body.h
 #include <body_lib/Body.h>
-using namespace Body;
+using namespace body;
 
 FeedbackProcessor::FeedbackProcessor( PartID ID ):
 	part_id( ID ), inAction( false )
@@ -8,28 +8,34 @@ FeedbackProcessor::FeedbackProcessor( PartID ID ):
 
 
 CattyError FeedbackProcessor::start_action( const support_msgs::ActionStartNotifierMsg::ConstPtr & msg, const std::string & NodeName ){
-	if ( inAction ){
-		ROS_INFO("LOCOMOTION_ACTION_ERROR: %s could not start action since another action is in already happning. ", NodeName.c_str());
+	if ( inAction ) {
+		ROS_ERROR("LOCOMOTION_ACTION_ERROR: %s could not start action since another action is already happning. ", NodeName.c_str());
 		valid = false;
 		return LOCOMOTION_ACTION_FAILURE;
 	}
-	if ( msg->part_id != part_id ){
+	if ( msg->part_id != part_id ) {
 		valid = false;
-		ROS_INFO("PART_ID_NOT_MATCH: %s could not start action since StartActionNotifierMsg id does not match. ", NodeName.c_str());
+		ROS_ERROR("PART_ID_NOT_MATCH: %s could not start action since StartActionNotifierMsg id does not match. ", NodeName.c_str());
 		return PART_ID_NOT_MATCH;
 	}
 	inAction = true;
 	sequenceSize = msg->sequenceSize;
+	expectedSceneDuration = msg->expectedSceneDuration;
 	reset();
+	return SUCCESS;
 }
 
 
 bool FeedbackProcessor::add_pendingScenes( const teensy_msgs::CommandMsg::ConstPtr & msg )
 {
-	if ( msg->scene_id <= currentSceneIdReceived ){
+	if (msg->scene_id == 0){ // initial scene of an action
 
+		pendingScenes.push( Part( msg ));
+
+	} else if ( msg->scene_id <= currentSceneIdReceived ){
+
+		ROS_ERROR("Some exeption occured while adding command to the list");
 		reset();
-
 		if ( msg->scene_id != 0) { // if some starting scenes are missed
 			Uint16 numMissedHere = msg->scene_id - 1;
 			numTotallyMissingScenes += numMissedHere;
@@ -38,24 +44,21 @@ bool FeedbackProcessor::add_pendingScenes( const teensy_msgs::CommandMsg::ConstP
 
 	} else if ( msg->scene_id > currentSceneIdReceived+1 ) {
 
-		Uint16 numMissedHere = msg->scene_id - (currentSceneIdReceived+1);
+		ROS_ERROR("Some exeption occured while adding command to the list");
+		Uint16 numMissedHere = msg->scene_id - ( currentSceneIdReceived+1 );
 		numTotallyMissingScenes += numMissedHere;
 		pendingScenes.push( Part( msg ));
 
-	} else { // msg->scene_id == currentSceneIdReceived+1 what we expect
+	} else { // msg->scene_id == currentSceneIdReceived+1. This is what we expect
+
 		pendingScenes.push( Part( msg ));
+
 	}
 
+	ROS_INFO("The scene of scene_id [%d] and of part_id[%d] is added to the pending scenes", msg->scene_id ,msg->part_id );
 	currentSceneIdReceived = msg->scene_id;
 
-	if ( currentSceneIdReceived == sequenceSize ) {
-		ros::Duration(0.5).sleep();
-		if ( currentSceneIdProcessed != currentSceneIdReceived )
-			fillTheRest();
-		inAction = false;
-		return true;
-	}
-
+	if ( currentSceneIdReceived == sequenceSize-1 ) return true; // returning true to end action
 	return false;
 }
 
@@ -66,55 +69,65 @@ void FeedbackProcessor::fillTheRest() {
 }
 
 
-Part FeedbackProcessor::process_Feedback( const teensy_msgs::FeedbackMsg::ConstPtr & msg )
+void FeedbackProcessor::process_Feedback( const teensy_msgs::FeedbackMsg::ConstPtr & msg, body_msgs::ProcessedFeedbackMsg& processedFeedback )
 {
+	if( pendingScenes.size() == 0 ){
+		ROS_ERROR("A feedback from teensy is received though there is no pending scene.");
+		return;
+	}
+	Part processedPart( part_id );
 	if( pendingScenes.front().get_scene_id() == msg->scene_id )
 	{
-		Part processedPart = pendingScenes.front();
+		processedPart = pendingScenes.front();
 		CattyError error = processedPart.set( msg );
 		if ( error != SUCCESS )
 		{
 			valid = false;
 		}
 		pendingScenes.pop();
-		currentSceneIdProcessed++;
-		return processedPart;
-	}
-
-	else if ( pendingScenes.front().get_scene_id() > msg->scene_id )
-	{
 		currentSceneIdProcessed = msg->scene_id;
-		numMissingExpectedScenes++;
-		numTotallyMissingScenes--;
-		return Part( msg );
 	}
-
-
-	else // pendingScenes.front().scene_id() < msg->scene_id
+	else if ( pendingScenes.front().get_scene_id() > msg->scene_id ) // Some feedbacks from the teensy were missed
 	{
 		currentSceneIdProcessed = msg->scene_id;
 		while ( pendingScenes.front().get_scene_id() != msg->scene_id ){
 			pendingScenes.pop();
 			numMissingActualScenes++;
 		}
-		Part processedPart = pendingScenes.front();
+		processedPart = pendingScenes.front();
 		CattyError error = processedPart.set(msg);
 		if ( error!=SUCCESS )
 		{
 			valid = false;
 		}
 		pendingScenes.pop();
-		return processedPart;
 	}
+	else // pendingScenes.front().scene_id() < msg->scene_id : some commands from the motion controller were missed
+	{
+		currentSceneIdProcessed = msg->scene_id;
+		numMissingExpectedScenes++;
+		numTotallyMissingScenes--;
+		processedPart = Part( msg );
+	}
+
+	body_msgs::PartMsg processedPartMsg;
+	processedPart.set_PartMsg( processedPartMsg );
+	processedFeedback.processedPart = processedPartMsg;
+	processedFeedback.actualCurrentSceneDuration = msg->actualCurrentSceneDuration;
+
+	return;
 }
 
 
 void FeedbackProcessor::reset()
 {
-	pendingScenes = std::queue<Part>();
+	while( !pendingScenes.empty()) pendingScenes.pop();
 	numMissingActualScenes = 0;
 	numMissingExpectedScenes = 0;
 	numTotallyMissingScenes = 0;
+	currentSceneIdReceived = 0;
+	currentSceneIdProcessed = 0;
+	stateOfScenes.clear();
 }
 
 
@@ -128,7 +141,15 @@ CattyError FeedbackProcessor::set_ActionEndReporterMsg( support_msgs::ActionEndR
 	return SUCCESS;
 }
 
-
 bool FeedbackProcessor::isInAction() const { return inAction; }
 
+Uint8 FeedbackProcessor::get_scenesLeft() const{ return sequenceSize - currentSceneIdProcessed; }
+
+ros::Duration FeedbackProcessor::get_expectedSceneDuration() const { return expectedSceneDuration; }
+
 bool FeedbackProcessor::isValid() const { return valid; }
+
+void FeedbackProcessor::end_action(){
+	inAction = false;
+	reset();
+}

@@ -12,6 +12,7 @@ add_message_files(
   FILES
   PartMsg.msg
   PartCommandMsg.msg
+  ProcessedFeedbackMsg.msg
 )
 
 

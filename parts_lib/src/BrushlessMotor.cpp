@@ -48,6 +48,24 @@ BrushlessMotor::BrushlessMotor( const typename BrushlessFeedbackMsg::ConstPtr & 
 { this->set( msg ); }
 
 
+void BrushlessMotor::operator=( const BrushlessMotor & original ){
+	if( part_id != original.part_id || id != original.id ){
+		ROS_INFO("Invalid use of assignment operator for two BrushlessMotor objects. Operation failed.");
+		return;
+	}
+
+	valid = original.valid;
+	well_defined = original.well_defined;
+	state = original.state;
+
+	voltage = original.voltage;
+
+	position = original.position;
+	speed = original.speed;
+	current = original.current;
+}
+
+
 Int16 BrushlessMotor::get_voltage() const { return voltage; }
 Uint16 BrushlessMotor::get_position() const { return position; }
 Int16 BrushlessMotor::get_speed() const { return speed; }
@@ -56,12 +74,12 @@ Uint16 BrushlessMotor::get_current() const { return current; }
 CattyError BrushlessMotor::set_voltage( const Int16 Voltage ) {
 	if ( Voltage > 30000 ) {
 		voltage =  30000;
-		ROS_INFO("set_voltage(Int16):Could not set the value of argument. Value was too big.");
+		ROS_ERROR("set_voltage(Int16):Could not set the value of argument. Value was too big.");
 		return WARNING;
 	}
 	if ( Voltage < -30000 ) {
 		voltage =  -30000;
-		ROS_INFO("set_voltage(Int16):Could not set the value of argument. Value was too small.");
+		ROS_ERROR("set_voltage(Int16):Could not set the value of argument. Value was too small.");
 		return WARNING;
 	}
 	voltage = Voltage;
@@ -72,12 +90,12 @@ CattyError BrushlessMotor::set_voltage( const Int16 Voltage ) {
 CattyError BrushlessMotor::set_position( const Uint16 Position ) {
 	if ( Position > 8191 ) {
 		position =  8191;
-		ROS_INFO("set_position(Uint16):Could not set the value of argument. Value was too big.");
+		ROS_ERROR("set_position(Uint16):Could not set the value of argument. Value was too big.");
 		return WARNING;
 	}
 	if ( Position < 0 ) {
 		position =  0;
-		ROS_INFO("set_position(Uint16):Could not set the value of argument. Value was too small.");
+		ROS_ERROR("set_position(Uint16):Could not set the value of argument. Value was too small.");
 		return WARNING;
 	}
 	position = Position;
@@ -99,10 +117,10 @@ CattyError BrushlessMotor::set_current( const Uint16 Current ) {
 
 void BrushlessMotor::print() const {
 	if( valid ){
-		ROS_INFO("Printing Information of <%s>: part_id = [%d], id = [%d], \nvoltage \t= [%d], \nposition \t= [%d], \nspeed \t= [%d], \ncurrent \t= [%d] \n", child_name.c_str(), part_id, id, voltage, position, speed, current );
+		ROS_ERROR("Printing information of <%s>: part_id = [%d], id = [%d], \nvoltage \t= [%d], \nposition \t= [%d], \nspeed \t= [%d], \ncurrent \t= [%d] \n", child_name.c_str(), part_id, id, voltage, position, speed, current );
 	}
 	else {
-		ROS_INFO("This <%s> is not valid. Please exit the program.", child_name.c_str());
+		ROS_ERROR("This <%s> is not valid. Please exit the program.", child_name.c_str());
 	}
 }
 
@@ -122,11 +140,11 @@ CattyError BrushlessMotor::set_msg( BrushlessMsg & msg ) const {
 		}
 	}
 	if ( state != GENERAL ) {
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is not suitable for setting the message.", child_name.c_str());
+		ROS_ERROR("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is not suitable for setting the message.", child_name.c_str());
 		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 	if ( !valid || !well_defined ){
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is ill-defined. Could not set a message.", child_name.c_str());
+		ROS_ERROR("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is ill-defined. Could not set a message.", child_name.c_str());
 		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 
@@ -153,12 +171,13 @@ CattyError BrushlessMotor::set_CommandMsg( BrushlessCommandMsg & msg ) const {
 			return error;
 		}
 	}
+	ROS_ERROR("state=%d", state);
 	if ( !( state == COMMAND || state == GENERAL )) {
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is not suitable for setting the command message.", child_name.c_str());
+		ROS_ERROR("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is not suitable for setting the command message.", child_name.c_str());
 		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 	if ( !valid || !well_defined ){
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is ill-defined. Could not set a command message.", child_name.c_str());
+		ROS_ERROR("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is ill-defined. Could not set a command message.", child_name.c_str());
 		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 
@@ -183,11 +202,11 @@ CattyError BrushlessMotor::set_FeedbackMsg( BrushlessFeedbackMsg & msg ) const {
 		}
 	}
 	if ( !( state == FEEDBACK || state == GENERAL )) {
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is not suitable for setting the feedback message.", child_name.c_str());
+		ROS_ERROR("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is not suitable for setting the feedback message.", child_name.c_str());
 		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 	if ( !valid || !well_defined ){
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is ill-defined. Could not set a feedback message.", child_name.c_str());
+		ROS_ERROR("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is ill-defined. Could not set a feedback message.", child_name.c_str());
 		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 
@@ -200,7 +219,7 @@ CattyError BrushlessMotor::set_FeedbackMsg( BrushlessFeedbackMsg & msg ) const {
 
 
 
-CattyError BrushlessMotor::set( const BrushlessMsg & msg ) 
+CattyError BrushlessMotor::set( const BrushlessMsg & msg )
 {
 	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
@@ -264,6 +283,7 @@ CattyError BrushlessMotor::set( const BrushlessCommandMsg & msg )
 		valid = false;
 		return error;
 	}
+
 
 	if ( state == INVALID ) state = COMMAND;
 	else if ( state == FEEDBACK ) state = GENERAL;
@@ -349,4 +369,11 @@ CattyError BrushlessMotor::set( const typename BrushlessFeedbackMsg::ConstPtr & 
 	well_defined = true;
 
 	return SUCCESS;
+}
+
+
+void BrushlessMotor::set_RandomCommandMsg( BrushlessCommandMsg & msg ) const {
+	msg.part_id = part_id;
+	msg.id = id;
+	msg.voltage = rand()%60001 - 30000;
 }

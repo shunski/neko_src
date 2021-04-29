@@ -1,5 +1,13 @@
 #include <support_lib/Utilities.h>
 
+std::string createRandomStringOfSize( int n ){
+    std::string str;
+    for( int i=0; i<n; i++ ){
+        str.push_back( rand()%26 + 65 );
+    }
+    return str;
+}
+
 PartProperties::PartProperties( PartID ID, size_t KondoServoNum, size_t BrushedMotorNum, size_t BrushlessMotorNum, size_t MotionSensorNum ):
     id( ID ),
     kondoServoNum( KondoServoNum ),
@@ -23,9 +31,21 @@ PartProperties get_properties_by_id( PartID id ){
     return PartProperties( NONE, 0, 0, 0, 0);
 }
 
+
+std::string get_description( ObjectState state ){
+    switch( state )
+    {
+        case( GENERAL ): return "GENERAL";
+        case( COMMAND ): return "COMMAND";
+        case( FEEDBACK ): return "FEEDBACK";
+        default: return "INVALID";
+    }
+}
+
+
 bool isSucceeded( CattyError error ) { return !error; }
 
-std::string get_catty_error_description( CattyError error ) {
+std::string get_description( CattyError error ) {
     switch( error )
     {
         case SUCCESS: return "SUCCESS";
@@ -35,7 +55,6 @@ std::string get_catty_error_description( CattyError error ) {
         case OBJECT_CONSTRUCTION_FAILURE: return "OBJECT_CONSTRUCTION_FAILURE";
         case MESSAGE_CONSTRUCTION_FAILURE: return "MESSAGE_CONSTRUCTION_FAILURE";
         case PART_ID_NOT_MATCH: return "PART_ID_NOT_MATCH";
-		case ID_NOT_MATCH: return "ID_NOT_MATCH";
+		default: return "ID_NOT_MATCH";
     }
 }
-

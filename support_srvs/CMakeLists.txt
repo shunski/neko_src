@@ -9,7 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_service_files(
   FILES
-  LocomotionActionStateSrv.srv
+  RegistrationSrv.srv
 )
 
 

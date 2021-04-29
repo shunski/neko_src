@@ -6,7 +6,7 @@
 #include <string>
 
 template < typename Msg, typename CommandMsg, typename FeedbackMsg >
-class GenericParts 
+class GenericParts
 {
 	protected:
 		std::string child_name;             // Name of the child class (Name of parts)
@@ -14,7 +14,7 @@ class GenericParts
 		const Uint8 id;
 		bool valid;                         // will be set to false having had a serious error
 		bool well_defined;                  // will be set to true after enough information filled out (as a particular 'state')
-		ObjectState state;
+		ObjectState state = INVALID;
 
 		virtual void print() const =0;
 		void print_msg_id_error( Uint8 pID, Uint8 ID) const ;
@@ -58,6 +58,7 @@ class GenericParts
 
 		PartID get_part_id() const ;
 		Uint8 get_id() const ;
+		ObjectState get_state() const ;
 
 		bool isValid() const ;
 };

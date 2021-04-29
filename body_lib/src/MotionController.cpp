@@ -1,11 +1,12 @@
 // MotionController.cpp: implements MotionController class in Body.h
-#include <body_lib/Body.h>
-namespace Body{
+#include "body_lib/Body.h"
+using namespace body;
 
 
 MotionController::MotionController( PartID ID ):
 	part_id( ID ),
-	valid( true )
+	valid( true ),
+	inAction( false )
 {
 	ROS_INFO("Initializing MotionController Done.");
 }
@@ -13,91 +14,89 @@ MotionController::MotionController( PartID ID ):
 
 CattyError MotionController::set_action( const motioncontroll_action::MotionControllGoal::ConstPtr & msg ) {
 	if ( part_id != msg->part_id ){
-        ROS_INFO("ERROR: Could not set MotionController object from body_msgs::PartCommandMsg since message id does not match.");
+        ROS_ERROR("Could not set MotionController from motioncontroll_action::MotionControllGoal since message id does not match.");
 		valid = false;
         return LOCOMOTION_ACTION_FAILURE;
     }
 
+	if ( msg->sequenceSize == 0 ){
+		ROS_ERROR("Could not set MotionController from motioncontroll_action::MotionControllGoal since this is an invalid action.");
+        return WARNING;
+	}
+
 	if ( msg->sequenceSize != msg->partCommandSequence.size() ){
-		ROS_INFO("ERROR: Could not set MotionController object from body_msgs::PartCommandMsg since the message is not well defined; sizes do not match.");
+		ROS_ERROR("Could not set MotionController from motioncontroll_action::MotionControllGoal since the message is not well defined; sizes do not match.");
 		valid = false;
         return LOCOMOTION_ACTION_FAILURE;
 	}
 
-	if ( inAction == true ) {
-		ROS_INFO("ERROR: Could not set MotionController object to start since another action is in progress.");
+	if ( inAction ) {
+		ROS_ERROR("Could not set MotionController from motioncontroll_action::MotionControllGoal since another action is in progress.");
 		valid = false;
         return LOCOMOTION_ACTION_FAILURE;
 	}
 	inAction = true;
 
-	initialize_feedbackMsg();
-	initialize_resultMsg();
-	expectedStates = std::vector<Part>( msg->sequenceSize );
+	sequenceSize = msg->sequenceSize;
+	expectedSceneDuration = msg->expectedTotalDuration * ( 1.0 / msg->sequenceSize );
 
+	reset();
+	expectedStates.reserve( sequenceSize );
+
+	int sceneId = 0;
     for ( std::vector<body_msgs::PartCommandMsg>::const_iterator it = msg->partCommandSequence.begin();
 			it != msg->partCommandSequence.end();
 			++it ) {
         expectedStates.push_back(
 			Part(
+				sceneId,
 				part_id,
 				it->kondoServoCommandSet,
 				it->brushedMotorCommandSet,
 				it->brushlessMotorCommandSet
 			)
 		);
+		sceneId++;
 		if ( !expectedStates.back().isValid() )
 			break;
     }
-	if( expectedStates.size() != msg->sequenceSize ) return LOCOMOTION_ACTION_FAILURE;
+	if( expectedStates.size() != sequenceSize ) {
+		ROS_ERROR("The size of expectedStates does not match to the sequence size of the message. (expectedStates.size()=%ld while msg->sequenceSize=%d)", expectedStates.size(), msg->sequenceSize );
+		return LOCOMOTION_ACTION_FAILURE;
+	}
+
+	expectedCurrentState = expectedStates.begin();
+
 	return SUCCESS;
 }
 
-
-// CattyError MotionController::init_part( init_service::PartInit::Request &,
-// 										init_service::PartInit::Response & ){
-//
-// };
-
-// CattyError MotionController::startMotioncontrollAction( motioncontroll_action::MotionControllGoal::ConstPtr & ) {
-// 	if ( expectedStates.front() == actualCurrentState ) {
-// 		ROS_INFO("The expected position too far from the current position and thus could not start action.");
-// 		return LOCOMOTION_ACTION_FAILURE;
-// 	}
-// 	timeOfActionStart = ros::Time::now();
-// }
-
-
-CattyError MotionController::initialize_feedbackMsg(){
-	motionControllFeedback = motioncontroll_action::MotionControllFeedback();
-	motionControllFeedback.part_id = part_id;
+void MotionController::startMotioncontrollAction() {
+	timeOfActionStart = ros::Time::now();
 }
 
 
-CattyError MotionController::initialize_resultMsg(){
+void MotionController::initialize_feedbackMsg(){
+	while( !motionControllFeedbacks.empty() )
+		motionControllFeedbacks.pop();
+}
+
+
+void MotionController::initialize_resultMsg(){
 	motionControllResult = motioncontroll_action::MotionControllResult();
 	motionControllResult.part_id = part_id;
 }
 
 
 void MotionController::proceed() {
-    if (expectedCurrentState == expectedStates.begin()){ //first case
-        ros::Time currentTime = ros::Time::now();
-        actualCurrentSceneDuration.push( currentTime - timeOfActionStart );
-        timeOfLastAction = currentTime;
-    }
-    else{
-        ros::Time currentTime = ros::Time::now();
-        actualCurrentSceneDuration.push( currentTime - timeOfLastAction );
-        timeOfLastAction = currentTime;
-    }
+	expectedSceneDuration.sleep();
+	ros::Time currentTime = ros::Time::now();
     ++expectedCurrentState;
 }
 
 
 CattyError MotionController::set_CommandMsg( teensy_msgs::CommandMsg & msg ) const {
 	if ( part_id != msg.part_id && msg.part_id != 0 ){
-		ROS_INFO("ERROR: Could not set [teensy_msgs::CommandMsg] message because id does not match.");
+		ROS_ERROR("PART_ID_NOT_MATCH: Could not set [teensy_msgs::CommandMsg] message because part_id does not match.");
 		return PART_ID_NOT_MATCH;
 	}
     expectedCurrentState->set_CommandMsg( msg );
@@ -110,22 +109,22 @@ bool MotionController::isEnd() const {
 }
 
 
-CattyError MotionController::update_locomotionActionFeedbackMsg( const body_msgs::PartMsg::ConstPtr & msg, const std::string & nodeName ){
-	if ( part_id != msg->part_id ){
-		ROS_INFO("PART_ID_NOT_MATCH(%s): Could not set the feedbackMsg of Action by body_msgs::PartMsg since PartID not match", nodeName.c_str());
+CattyError MotionController::update_locomotionActionFeedbackMsg( const body_msgs::ProcessedFeedbackMsg::ConstPtr & msg, const std::string & nodeName ){
+	if ( part_id != msg->processedPart.part_id ){
+		ROS_ERROR("PART_ID_NOT_MATCH(%s): Could not set the feedbackMsg of Action by body_msgs::PartMsg since PartID not match", nodeName.c_str());
 		return PART_ID_NOT_MATCH;
 	}
 
-	while ( currentSceneIdProcessed < msg->scene_id ){
-		actualCurrentSceneDuration.pop();
+	while ( currentSceneIdProcessed < msg->processedPart.scene_id ){
 		currentSceneIdProcessed++;
 	}
 
-	motionControllFeedback.part_id = part_id;
-	motionControllFeedback.actualCurrentState = *msg;
-	motionControllFeedback.currentSceneDuration = actualCurrentSceneDuration.front();
+	motioncontroll_action::MotionControllFeedback feedback;
+	feedback.part_id = part_id;
+	feedback.actualCurrentState = msg->processedPart;
+	feedback.currentSceneDuration = msg->actualCurrentSceneDuration;
+	motionControllFeedbacks.push( feedback );
 
-	actualCurrentSceneDuration.pop();
 	currentSceneIdProcessed++;
 
 	return SUCCESS;
@@ -134,12 +133,11 @@ CattyError MotionController::update_locomotionActionFeedbackMsg( const body_msgs
 
 CattyError MotionController::update_locomotionActionResultMsg( const support_msgs::ActionEndReporterMsg::ConstPtr & msg, const std::string & nodeName  ){
 	if ( part_id != msg->part_id ){
-		ROS_INFO("PART_ID_NOT_MATCH(%s): Could not set the resultMsg of Action by support_msgs::ActionEndReporterMsg since PartID not match", nodeName.c_str());
+		ROS_ERROR("PART_ID_NOT_MATCH(%s): Could not set the resultMsg of Action by support_msgs::ActionEndReporterMsg since PartID not match", nodeName.c_str());
 		return PART_ID_NOT_MATCH;
 	}
 
 	while ( currentSceneIdProcessed < sequenceSize ){
-		actualCurrentSceneDuration.pop();
 		currentSceneIdProcessed++;
 	}
 
@@ -151,18 +149,18 @@ CattyError MotionController::update_locomotionActionResultMsg( const support_msg
 }
 
 
-motioncontroll_action::MotionControllFeedback MotionController::get_locomotionActionFeedbackMsg()const {
-	return motionControllFeedback;
+bool MotionController::set_locomotionActionFeedbackMsg( motioncontroll_action::MotionControllFeedback & feedback ) {
+	if ( !motionControllFeedbacks.empty() ){
+		feedback = motionControllFeedbacks.front();
+		motionControllFeedbacks.pop();
+		return true;
+	}
+	return false;
 }
 
 
 motioncontroll_action::MotionControllResult MotionController::get_locomotionActionResultMsg() const {
 	return motionControllResult;
-}
-
-
-ros::Duration MotionController::get_actualCurrentSceneDuration() const {
-	return actualCurrentSceneDuration.front();
 }
 
 
@@ -175,19 +173,21 @@ CattyError MotionController::set_actionStartNotifier( support_msgs::ActionStartN
 	if( msg.part_id == 0 ){
 		msg.part_id = part_id;
 		msg.sequenceSize = sequenceSize;
+		msg.expectedSceneDuration = expectedSceneDuration;
 		return SUCCESS;
 	} else if ( part_id == msg.part_id ) {
 		msg.sequenceSize = sequenceSize;
+		msg.expectedSceneDuration = expectedSceneDuration;
 		return SUCCESS;
 	} else {
 		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 }
 
-
-void MotionController::add_processedFeedbackPending( const body_msgs::PartMsg::ConstPtr & msg ){
-	body_msgs::PartMsg msgCopy = *msg;
-	processedFeedbackPending.push( msgCopy );
+void MotionController::reset(){
+	initialize_feedbackMsg();
+	initialize_resultMsg();
+	expectedStates.clear();
 }
 
 
@@ -198,6 +198,3 @@ void MotionController::end_action(){
 bool MotionController::isInAction() const { return inAction; }
 
 bool MotionController::isValid() const { return valid; }
-
-
-} // closing namespace

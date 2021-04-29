@@ -16,6 +16,10 @@ typedef std::vector<Uint8> Uint8Sequence;
 typedef std::vector<Uint16> Uint16Sequence;
 
 
+// Useful functions
+std::string createRandomStringOfSize( int );
+
+
 // Part Definitions
 enum PartID { NONE=0, HEAD, CHEST, WAIST, RFLEG, LFLEG, RHLEG, LHLEG };
 enum ObjectState { INVALID=0, GENERAL, COMMAND, FEEDBACK };
@@ -29,7 +33,8 @@ struct PartProperties {
     PartProperties( PartID ID, size_t KondoServoNum, size_t BrushedMotorNum, size_t BrushlessMotorNum, size_t MotionSensorNum );
 };
 
-PartProperties get_properties_by_id( PartID id );
+PartProperties get_properties_by_id( PartID );
+std::string get_description( ObjectState );
 
 // Error Handling
 enum CattyError
@@ -45,7 +50,7 @@ enum CattyError
 };
 
 bool isSucceeded( CattyError error );
-std::string get_catty_error_description( CattyError error );
+std::string get_description( CattyError error );
 
 struct Point
 {

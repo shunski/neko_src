@@ -32,6 +32,8 @@ class MotionSensor : public GenericParts<MotionSensorMsg, MotionSensorCommandMsg
         MotionSensor( const MotionSensorMsg & );
         MotionSensor( const typename MotionSensorMsg::ConstPtr & );
 
+        void operator=( const MotionSensor & );
+
         Uint16 get_accel_x() const ;
         Uint16 get_accel_y() const ;
         Uint16 get_accel_z() const ;

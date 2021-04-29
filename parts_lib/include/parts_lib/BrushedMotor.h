@@ -23,7 +23,7 @@ class BrushedMotor : public GenericParts<BrushedMsg, BrushedCommandMsg, BrushedF
         Uint8 current_limit;           // [0 ~ 255], 255 = max_current[A]
         Uint8 pwm;                     // [0 ~ 255]
 
-        Uint16 rpm;                    // [0 ~ 255], n = n[rpm] for the sake of storing information. NOT A COMMAND
+        Uint16 rpm;                    // [0 ~ 255], n = n[rpm]
         Uint8 current;                 // [0 ~ 255], 255 = max_current[A]
 
         Uint8 current_double_to_uint8( double current_double );
@@ -40,6 +40,8 @@ class BrushedMotor : public GenericParts<BrushedMsg, BrushedCommandMsg, BrushedF
         BrushedMotor( const typename BrushedCommandMsg::ConstPtr & );
         BrushedMotor( const BrushedFeedbackMsg & );
         BrushedMotor( const typename BrushedFeedbackMsg::ConstPtr & );
+
+        void operator=( const BrushedMotor & );
 
         Uint8 get_rpm() const ;
         Uint8 get_current() const ;
@@ -67,6 +69,8 @@ class BrushedMotor : public GenericParts<BrushedMsg, BrushedCommandMsg, BrushedF
         CattyError set( const typename BrushedCommandMsg::ConstPtr & );
         CattyError set( const BrushedFeedbackMsg & );
         CattyError set( const typename BrushedFeedbackMsg::ConstPtr & );
+
+        void set_RandomCommandMsg( BrushedCommandMsg & ) const ;
 };
 
 

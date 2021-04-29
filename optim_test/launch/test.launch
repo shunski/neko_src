@@ -1,0 +1,6 @@
+<launch>
+    <node pkg="optim_test" type="just_a_core_node" name="core_node" />
+    <node pkg="optim_test" type="just_a_mc_node" name="mc_node" />
+    <node pkg="optim_test" type="just_a_fp_node" name="fp_node" />
+    <node pkg="optim_test" type="perfect_virtual_teensy" name="perfect_teensy" />
+</launch>

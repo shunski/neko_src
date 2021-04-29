@@ -10,7 +10,11 @@ BrushedMotor::BrushedMotor( const BrushedMotor & original ) :
     pwm( original.pwm ),
     rpm( original.rpm ),
     current( original.current )
-{}
+{
+    state = original.state;
+    valid = original.valid;
+    well_defined = original.well_defined;
+}
 
 
 BrushedMotor::BrushedMotor( const BrushedMsg & msg ):
@@ -43,6 +47,24 @@ BrushedMotor::BrushedMotor( const typename BrushedFeedbackMsg::ConstPtr & msg ):
 { this->set( msg ); }
 
 
+void BrushedMotor::operator=( const BrushedMotor & original ){
+    if( part_id != original.part_id || id != original.id ){
+        ROS_INFO("Invalid use of assignment operator for two BrushedMotor objects. Operation failed.");
+        return;
+    }
+
+    valid = original.valid;
+    well_defined = original.well_defined;
+    state = original.state;
+
+    current_limit = original.current_limit;
+    pwm = original.pwm;
+
+    rpm = original.rpm;
+    current = original.current;
+}
+
+
 Uint8 BrushedMotor::get_rpm() const { return rpm; }
 Uint8 BrushedMotor::get_current() const { return current; }
 Uint8 BrushedMotor::get_current_limit() const { return current_limit; }
@@ -58,12 +80,12 @@ bool BrushedMotor::set_current_limit_ampair(double Current_limit_ampair) {
     int current_limit_uint8 = current_double_to_uint8( Current_limit_ampair );
 
     if( current_limit_uint8 > 128 ){
-        ROS_INFO("ERROR: in 'set_current_limit_ampair( double )': Too large number received as an argument. Note: max_current=[%d]", max_current);
+        ROS_ERROR("Error in 'set_current_limit_ampair( double )': Too large number received as an argument. Note: max_current=[%d]", max_current);
         return false;
     }
 
     if( current_limit_uint8 < 0 ) {
-        ROS_INFO("ERROR: in 'set_current_limit_ampair( double )': Negative number received as an argument.");
+        ROS_ERROR("Error in 'set_current_limit_ampair( double )': Negative number received as an argument.");
         return false;
     }
 
@@ -86,19 +108,13 @@ double BrushedMotor::current_uint8_to_double( Uint8 current_char ){
 }
 
 
-Uint8 current_limit;
-Uint8 pwm;
-Uint16 rpm;
-Uint8 current;
-
-
 void BrushedMotor::print() const
 {
     if( valid ){
-        ROS_INFO("Printing Information of <%s>: part_id = [%d], id = [%d], \ncurrent_limit\t= [%d], \npwm \t= [%d], \nrpm \t= [%d], \ncurrent \t= [%d], \n", child_name.c_str(), part_id, id, current_limit, pwm, rpm, current );
+        ROS_ERROR("Printing information of <%s>: part_id = [%d], id = [%d], \ncurrent_limit\t= [%d], \npwm \t= [%d], \nrpm \t= [%d], \ncurrent \t= [%d], \n", child_name.c_str(), part_id, id, current_limit, pwm, rpm, current );
     }
     else {
-        ROS_INFO("This <%s> is not valid. Please exit the program.", child_name.c_str());
+        ROS_ERROR("This <%s> is not valid. Please exit the program.", child_name.c_str());
     }
 }
 
@@ -119,11 +135,11 @@ CattyError BrushedMotor::set_msg( BrushedMsg & msg ) const
 		}
 	}
 	if ( state != GENERAL ) {
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is not suitable for setting the message.", child_name.c_str());
+		ROS_ERROR("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is not suitable for setting the message.", child_name.c_str());
 		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 	if ( !valid || !well_defined ){
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is ill-defined. Could not set a message.", child_name.c_str());
+		ROS_ERROR("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is ill-defined. Could not set a message.", child_name.c_str());
 		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 
@@ -151,12 +167,13 @@ CattyError BrushedMotor::set_CommandMsg( BrushedCommandMsg & msg ) const {
 			return error;
 		}
 	}
+
 	if ( !( state == COMMAND || state == GENERAL )) {
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is not suitable for setting the message.", child_name.c_str());
+		ROS_ERROR("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is not suitable for setting the command message.", child_name.c_str());
 		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 	if ( !valid || !well_defined ){
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is ill-defined. Could not set a message.", child_name.c_str());
+		ROS_ERROR("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is ill-defined. Could not set a message.", child_name.c_str());
 		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 
@@ -182,11 +199,11 @@ CattyError BrushedMotor::set_FeedbackMsg( BrushedFeedbackMsg & msg ) const {
 		}
 	}
 	if ( !( state == FEEDBACK || state == GENERAL )) {
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is not suitable for setting the message.", child_name.c_str());
+		ROS_ERROR("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is not suitable for setting the feedback message.", child_name.c_str());
 		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 	if ( !valid || !well_defined ){
-		ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is ill-defined. Could not set a message.", child_name.c_str());
+		ROS_ERROR("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is ill-defined. Could not set a message.", child_name.c_str());
 		return MESSAGE_CONSTRUCTION_FAILURE;
 	}
 
@@ -348,4 +365,12 @@ CattyError BrushedMotor::set( const typename BrushedFeedbackMsg::ConstPtr & msg 
 	well_defined = true;
 
     return SUCCESS;
+}
+
+
+void BrushedMotor::set_RandomCommandMsg( BrushedCommandMsg & msg ) const {
+    msg.part_id = part_id;
+    msg.id = id;
+    msg.current_limit = 255;
+    msg.pwm = rand()%255;
 }

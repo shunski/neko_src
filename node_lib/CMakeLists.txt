@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES node_lib
-  CATKIN_DEPENDS 
+  CATKIN_DEPENDS
     roscpp
     body_lib
     body_msgs
@@ -40,6 +40,9 @@ add_library(${PROJECT_NAME}
   src/HeartrateSubscriberNode.cpp
   src/MotionControllerNode.cpp
   src/FeedbackProcessorNode.cpp
+  src/RegistrarNode.cpp
+  src/HeartratePublisherNode.cpp
+  src/GenericCattyNode.cpp
 )
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 

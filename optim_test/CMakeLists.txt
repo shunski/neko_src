@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(controller)
+project(optim_test)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -15,10 +15,26 @@ catkin_package(
 
 include_directories(${catkin_INCLUDE_DIRS})
 
-add_executable( just_a_motion_controller src/McNode.cpp )
-target_link_libraries( just_a_motion_controller ${catkin_LIBRARIES} )
-add_dependencies( just_a_motion_controller ${catkin_EXPORTED_TARGETS} )
+add_executable( mc_node src/just_a_mc_node.cpp )
+target_link_libraries( mc_node ${catkin_LIBRARIES} )
+add_dependencies( mc_node ${catkin_EXPORTED_TARGETS} )
 
-add_executable( just_a_feedback_processor src/FpNode.cpp )
-target_link_libraries( just_a_feedback_processor ${catkin_LIBRARIES} )
-add_dependencies( just_a_feedback_processor ${catkin_EXPORTED_TARGETS} )
+add_executable( fp_node src/just_a_fp_node.cpp )
+target_link_libraries( fp_node ${catkin_LIBRARIES} )
+add_dependencies( fp_node ${catkin_EXPORTED_TARGETS} )
+
+add_executable( lazy_teensy src/lazy_virtual_teensy.cpp )
+target_link_libraries( lazy_teensy ${catkin_LIBRARIES} )
+add_dependencies( lazy_teensy ${catkin_EXPORTED_TARGETS} )
+
+add_executable( perfect_teensy src/perfect_virtual_teensy.cpp )
+target_link_libraries( perfect_teensy ${catkin_LIBRARIES} )
+add_dependencies( perfect_teensy ${catkin_EXPORTED_TARGETS} )
+
+add_executable( action_test_client_node src/action_test_client_node.cpp )
+target_link_libraries( action_test_client_node ${catkin_LIBRARIES} )
+add_dependencies( action_test_client_node ${catkin_EXPORTED_TARGETS} )
+
+add_executable( core_node src/just_a_core_node.cpp )
+target_link_libraries( core_node ${catkin_LIBRARIES} )
+add_dependencies( core_node ${catkin_EXPORTED_TARGETS} )

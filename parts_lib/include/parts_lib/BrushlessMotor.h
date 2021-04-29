@@ -34,6 +34,8 @@ class BrushlessMotor : public GenericParts<BrushlessMsg, BrushlessCommandMsg, Br
 		BrushlessMotor( const BrushlessFeedbackMsg & );
 		BrushlessMotor( const typename BrushlessFeedbackMsg::ConstPtr & );
 
+		void operator=( const BrushlessMotor & );
+
 		Int16 get_voltage() const ;
 		Uint16 get_position() const ;
 		Int16 get_speed() const ;
@@ -56,6 +58,8 @@ class BrushlessMotor : public GenericParts<BrushlessMsg, BrushlessCommandMsg, Br
 		CattyError set_msg( BrushlessMsg & ) const override ;
 		CattyError set_CommandMsg( BrushlessCommandMsg & ) const override ;
 		CattyError set_FeedbackMsg( BrushlessFeedbackMsg & ) const override ;
+
+		void set_RandomCommandMsg( BrushlessCommandMsg & ) const ;
 };
 
 #endif

@@ -16,7 +16,11 @@ MotionSensor::MotionSensor( const MotionSensor & original ):
     magnet_x( original.magnet_x ),
     magnet_y( original.magnet_y ),
     magnet_z( original.magnet_z )
-{}
+{
+    state = original.state;
+    valid = original.valid;
+    well_defined = original.well_defined;
+}
 
 
 MotionSensor::MotionSensor( const MotionSensorMsg & msg ):
@@ -51,12 +55,35 @@ void MotionSensor::set_magnet_y( const Uint16 MagnetY ) { magnet_y =MagnetY; }
 void MotionSensor::set_magnet_z( const Uint16 MagnetZ ) { magnet_z =MagnetZ; }
 
 
+void MotionSensor::operator=( const MotionSensor & original ){
+    if( part_id != original.part_id || id != original.id ){
+        ROS_INFO("Invalid use of assignment operator for two MotionSensor objects. Operation failed.");
+        return;
+    }
+
+    valid = original.valid;
+    well_defined = original.well_defined;
+    state = original.state;
+
+    accel_x = original.accel_x;
+    accel_y = original.accel_y;
+    accel_z = original.accel_z;
+    gyro_x = original.gyro_x;
+    gyro_y = original.gyro_y;
+    gyro_z = original.gyro_z;
+    magnet_x = original.magnet_x;
+    magnet_y = original.magnet_y;
+    magnet_z = original.magnet_z;
+
+}
+
+
 void MotionSensor::print() const {
     if( valid ){
-        ROS_INFO("Printing Information of <%s>: part_id = [%d], id = [%d], \naccel_x = [%d], \t accel_y = [%d], \t accel_z = [%d]\ngyro_x = [%d], \t gyro_y = [%d], \t gyro_z = [%d]\nmagnet_x = [%d], \t magnet_y = [%d], \t magnet_z = [%d]", child_name.c_str(), part_id, id, accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z, magnet_x, magnet_y, magnet_z );
+        ROS_ERROR("Printing Information of <%s>: part_id = [%d], id = [%d], \naccel_x = [%d], \t accel_y = [%d], \t accel_z = [%d]\ngyro_x = [%d], \t gyro_y = [%d], \t gyro_z = [%d]\nmagnet_x = [%d], \t magnet_y = [%d], \t magnet_z = [%d]", child_name.c_str(), part_id, id, accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z, magnet_x, magnet_y, magnet_z );
     }
     else {
-        ROS_INFO("This <%s> is not valid. Please exit the program.", child_name.c_str());
+        ROS_ERROR("This <%s> is not valid. Please exit the program.", child_name.c_str());
     }
 }
 
@@ -76,7 +103,7 @@ CattyError MotionSensor::set_msg( MotionSensorMsg & msg ) const {
         }
     }
     if ( !valid || !well_defined ){
-        ROS_INFO("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is ill-defined. Could not set a message.", child_name.c_str());
+        ROS_ERROR("MESSAGE_CONSTRUCTION_FAILURE: This <%s> object is ill-defined. Could not set a message.", child_name.c_str());
         return MESSAGE_CONSTRUCTION_FAILURE;
     }
 

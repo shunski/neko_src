@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>optim_test</name>
+  <name>jcatty_test</name>
   <version>0.0.0</version>
   <description>The motion_controller package</description>
   <maintainer email="shunski@todo.todo">shunski</maintainer>

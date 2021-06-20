@@ -1,0 +1,17 @@
+# MotionControll.action
+# goal
+duration expectedTotalDuration
+int16 sequenceSize
+body_lib/BodyCommandMsg[] bodyCommandSequence
+
+---
+
+# result
+duration actualTotalDuration
+uint8[] stateOfScenes
+
+---
+
+# feedback
+body_lib/BodyMsg actualCurrentState
+duration currentSceneDuration

@@ -5,12 +5,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   support_lib
-  support_msgs
-  body_msgs
   body_lib
-  parts_lib
-  parts_msgs
-  motioncontroll_action
+  actuator_lib
   teensy_msgs
 )
 
@@ -20,13 +16,9 @@ catkin_package(
   CATKIN_DEPENDS
     roscpp
     body_lib
-    body_msgs
     support_lib
-    support_msgs
     std_msgs
-    parts_lib
-    parts_msgs
-    motioncontroll_action
+    actuator_lib
     teensy_msgs
   #  DEPENDS system_lib
 )

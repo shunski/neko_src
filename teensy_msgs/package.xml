@@ -3,17 +3,17 @@
   <name>teensy_msgs</name>
   <version>0.0.0</version>
   <description>Contains messages sent to and received from teensy.</description>
-  <maintainer email="shunski@todo.todo">shunski</maintainer>
-  <license>TODO</license>
+  <maintainer email="y.thyks@gmail.com">shunski</maintainer>
+  <license>MIT</license>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>std_msgs</build_depend>
-  <build_depend>parts_msgs</build_depend>
+  <build_depend>actuator_lib</build_depend>
   <build_depend>message_generation</build_depend>
   <build_export_depend>std_msgs</build_export_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>message_runtime</exec_depend>
-  <exec_depend>parts_msgs</exec_depend>
+  <exec_depend>actuator_lib</exec_depend>
 
   <export></export>
 </package>

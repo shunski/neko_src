@@ -1,0 +1,6 @@
+# CheckIfSpecificNodeAliveSrv
+string nodeName # want to know if this node on the list
+
+---
+
+bool isAlive

@@ -1,3 +1,0 @@
-# ProcessedFeedbackMsg
-body_msgs/PartMsg processedPart
-duration actualCurrentSceneDuration

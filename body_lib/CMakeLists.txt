@@ -5,11 +5,29 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   actionlib
   support_lib
-  parts_msgs
-  parts_lib
-  body_msgs
-  motioncontroll_action
+  actuator_lib
   teensy_msgs
+  message_generation
+  actionlib_msgs
+)
+
+add_message_files(
+  FILES
+  BodyMsg.msg
+  BodyCommandMsg.msg
+  ProcessedFeedbackMsg.msg
+)
+
+add_action_files(
+  FILES
+  MotionControll.action
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  actuator_lib
+  actionlib_msgs
 )
 
 catkin_package(
@@ -18,12 +36,10 @@ catkin_package(
   CATKIN_DEPENDS
     roscpp
     support_lib
-	parts_msgs
-    parts_lib
-    body_msgs
-    motioncontroll_action
+    actuator_lib
     teensy_msgs
-  DEPENDS parts_lib parts_msgs body_msgs motioncontroll_action
+  DEPENDS
+    actuator_lib
 )
 
 include_directories(
@@ -32,7 +48,6 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME}
-  src/Part.cpp
   src/Body.cpp
   src/MotionController.cpp
   src/FeedbackProcessor.cpp

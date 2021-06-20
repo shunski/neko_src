@@ -6,35 +6,11 @@
 #include <vector>
 #include <string>
 
+typedef std::vector<uint8_t> Uint8Sequence;
+typedef std::vector<uint16_t> Uint16Sequence;
 
-// Useful type definitions
-typedef unsigned char Uint8;
-typedef unsigned short Uint16;
-typedef signed short Int16;
-
-typedef std::vector<Uint8> Uint8Sequence;
-typedef std::vector<Uint16> Uint16Sequence;
-
-
-// Useful functions
-std::string createRandomStringOfSize( int );
-
-
-// Part Definitions
-enum PartID { NONE=0, HEAD, CHEST, WAIST, RFLEG, LFLEG, RHLEG, LHLEG };
-enum ObjectState { INVALID=0, GENERAL, COMMAND, FEEDBACK };
-
-struct PartProperties {
-    PartID id;
-    size_t kondoServoNum;
-    size_t brushedMotorNum;
-    size_t brushlessMotorNum;
-    size_t motionSensorNum;
-    PartProperties( PartID ID, size_t KondoServoNum, size_t BrushedMotorNum, size_t BrushlessMotorNum, size_t MotionSensorNum );
-};
-
-PartProperties get_properties_by_id( PartID );
-std::string get_description( ObjectState );
+// Components definitions
+enum Components{ KondoServo, Motor, MotionSensor };
 
 // Error Handling
 enum CattyError
@@ -49,8 +25,29 @@ enum CattyError
 	ID_NOT_MATCH
 };
 
-bool isSucceeded( CattyError error );
+bool is_succeeded( CattyError error );
 std::string get_description( CattyError error );
+
+
+// Useful functions
+std::string create_random_string_of_size( int );
+
+// Part Definitions
+enum PartID { NONE=0, HEAD, CHEST, WAIST, RFLEG, LFLEG, RHLEG, LHLEG };
+enum TransferableObjectState { INVALID=0, GENERAL, COMMAND, FEEDBACK };
+
+struct PartProperties {
+    PartID part_id;
+    size_t kondo_servo_num;
+    size_t motor_num;
+    size_t motion_sensor_num;
+    PartProperties( PartID ID, size_t kondo_servo_num, size_t brushed_motor_num, size_t brushless_motor_num, size_t motion_sensor_num );
+};
+
+PartProperties get_properties_by_id( PartID );
+std::string get_description( TransferableObjectState );
+
+
 
 struct Point
 {

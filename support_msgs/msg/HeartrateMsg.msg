@@ -1,2 +1,0 @@
-# HeartrateMsg.msg
-duration heartrate

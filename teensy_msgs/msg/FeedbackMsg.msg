@@ -1,8 +1,6 @@
 # FeedbackMsg.msg
-uint8 part_id
 uint16 scene_id
 duration actualCurrentSceneDuration
-parts_msgs/KondoServoFeedbackMsg[] kondoServoFeedbackSet
-parts_msgs/BrushedMotorFeedbackMsg[] brushedMotorFeedbackSet
-parts_msgs/BrushlessMotorFeedbackMsg[] brushlessMotorFeedbackSet
-parts_msgs/MotionSensorMsg[] motionSensorSet
+actuator_lib/KondoServoFeedbackMsg[] kondoServoFeedbackSet
+actuator_lib/BrushedMotorFeedbackMsg[] brushedMotorFeedbackSet
+actuator_lib/BrushlessMotorFeedbackMsg[] brushlessMotorFeedbackSet

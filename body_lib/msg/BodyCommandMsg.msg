@@ -1,0 +1,4 @@
+# PartCommandMsg.msg
+actuator_lib/KondoServoCommandMsg[] kondoServoCommandSet
+actuator_lib/BrushedMotorCommandMsg[] brushedMotorCommandSet
+actuator_lib/BrushlessMotorCommandMsg[] brushlessMotorCommandSet

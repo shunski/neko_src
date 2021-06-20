@@ -1,2 +1,0 @@
-# CalibrationMsg.msg
-time now

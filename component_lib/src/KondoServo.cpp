@@ -2,12 +2,12 @@
 #include <actuator_lib/KondoServo.h>
 
 KondoServo::KondoServo ( PartID pID, Uint8 ID ) :
-    GenericParts( "KondoServo", pID, ID )
+    GenericActuator( "KondoServo", pID, ID )
 {}
 
 
 KondoServo::KondoServo( const KondoServo & original ):
-	GenericParts( "KondoServo", PartID(original.part_id), original.id ),
+	GenericActuator( "KondoServo", PartID(original.part_id), original.id ),
 	command_degree( original.command_degree ),
 	temp_limit( original.temp_limit ),
 	current_limit( original.current_limit ),
@@ -25,34 +25,18 @@ KondoServo::KondoServo( const KondoServo & original ):
 	well_defined = original.well_defined;
 }
 
-
-KondoServo::KondoServo ( const ServoMsg &  msg ):
-    GenericParts( "KondoServo", PartID(msg.part_id), msg.id )
-{ this->set( msg ); }
-
-
 KondoServo::KondoServo ( const typename ServoMsg::ConstPtr &  msg ):
-    GenericParts( "KondoServo", PartID(msg->part_id), msg->id )
-{ this->set( msg ); }
-
-
-KondoServo::KondoServo ( const ServoCommandMsg &  msg ):
-    GenericParts( "KondoServo", PartID(msg.part_id), msg.id )
+    GenericActuator( "KondoServo", PartID(msg->part_id), msg->id )
 { this->set( msg ); }
 
 
 KondoServo::KondoServo ( const typename ServoCommandMsg::ConstPtr &  msg ):
-    GenericParts( "KondoServo", PartID(msg->part_id), msg->id )
-{ this->set( msg ); }
-
-
-KondoServo::KondoServo ( const ServoFeedbackMsg &  msg ):
-    GenericParts( "KondoServo", PartID(msg.part_id), msg.id )
+    GenericActuator( "KondoServo", PartID(msg->part_id), msg->id )
 { this->set( msg ); }
 
 
 KondoServo::KondoServo ( const typename ServoFeedbackMsg::ConstPtr &  msg ):
-    GenericParts( "KondoServo", PartID(msg->part_id), msg->id )
+    GenericActuator( "KondoServo", PartID(msg->part_id), msg->id )
 { this->set( msg ); }
 
 

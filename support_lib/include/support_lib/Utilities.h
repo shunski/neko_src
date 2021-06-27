@@ -10,7 +10,12 @@ typedef std::vector<uint8_t> Uint8Sequence;
 typedef std::vector<uint16_t> Uint16Sequence;
 
 // Components definitions
-enum Components{ KondoServo, Motor, MotionSensor };
+// ComponentKind indicates the groups of comoponent, made for traits
+enum ComponentKind { COMPUTER, BATTERY, MICRO_CONTROLLER, ACTUATOR, SENSOR };
+// ComponentId indicates each of specific components
+enum ComponentId { KONDO_SERVO, MOTOR, MOTION_SENSOR, CURRENT_SENSOR, VOLTAGE_SENSOR,
+                    11_1_LIPO, 7.6_LIFE, RASPI4B, JETSON_NANO, };
+std::string get_description( ComponentId );
 
 // Error Handling
 enum CattyError
@@ -22,7 +27,7 @@ enum CattyError
 	OBJECT_CONSTRUCTION_FAILURE,
 	MESSAGE_CONSTRUCTION_FAILURE,
 	PART_ID_NOT_MATCH,
-	ID_NOT_MATCH
+	COMPONENT_ID_NOT_MATCH
 };
 
 bool is_succeeded( CattyError error );
@@ -33,18 +38,18 @@ std::string get_description( CattyError error );
 std::string create_random_string_of_size( int );
 
 // Part Definitions
-enum PartID { NONE=0, HEAD, CHEST, WAIST, RFLEG, LFLEG, RHLEG, LHLEG };
-enum TransferableObjectState { INVALID=0, GENERAL, COMMAND, FEEDBACK };
+enum PartId { INVALID=0, HEAD, CHEST, WAIST, RFLEG, LFLEG, RHLEG, LHLEG };
+enum TransferableObjectState { NONE=0, GENERAL, COMMAND, FEEDBACK };
 
 struct PartProperties {
     PartID part_id;
     size_t kondo_servo_num;
     size_t motor_num;
     size_t motion_sensor_num;
-    PartProperties( PartID ID, size_t kondo_servo_num, size_t brushed_motor_num, size_t brushless_motor_num, size_t motion_sensor_num );
+    PartProperties( PartId, size_t kondo_servo_num, size_t brushless_motor_num, size_t motion_sensor_num );
 };
 
-PartProperties get_properties_by_id( PartID );
+PartProperties get_properties_by_id( PartId );
 std::string get_description( TransferableObjectState );
 
 

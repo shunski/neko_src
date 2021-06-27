@@ -30,29 +30,29 @@ namespace body{
             const PartID part_id;
             Uint16 scene_id;
 
-            std::vector<shared_ptr<Actuator>> actuators;
-            std::vector<shared_ptr<Sensor>> sensors;
+            AbstructBody abstract_body;
+            std::vector<Component> concrete_body;
 
 			bool valid;
 			bool well_defined;
 			ObjectState state;
 
         public:
-            Part();
-		    Part( PartID );
-            Part( PartID, Uint16 SceneID );
-            Part( const teensy_msgs::CommandMsg::ConstPtr & );
-            Part( const teensy_msgs::FeedbackMsg::ConstPtr & );
-			Part( const body_msgs::PartMsg::ConstPtr & );
-            Part( PartID, Uint8 servoNum, Uint8 brushedMotorNum, Uint8 brushlessMotorNum, Uint8 motionSensorNum );
-            Part( PartID, const std::vector<KondoServo>&,
+            Body();
+		    Body( PartID );
+            Body( PartID, Uint16 SceneID );
+            Body( const teensy_msgs::CommandMsg::ConstPtr & );
+            Body( const teensy_msgs::FeedbackMsg::ConstPtr & );
+			Body( const body_msgs::PartMsg::ConstPtr & );
+            Body( PartID, Uint8 servoNum, Uint8 brushedMotorNum, Uint8 brushlessMotorNum, Uint8 motionSensorNum );
+            Body( PartID, const std::vector<KondoServo>&,
                           const std::vector<BrushedMotor>&,
                           const std::vector<BrushlessMotor>& );
-			Part( Uint16 sceneId, PartID,
+			Body( Uint16 sceneId, PartID,
                     const std::vector<parts_msgs::KondoServoCommandMsg> &,
                     const std::vector<parts_msgs::BrushedMotorCommandMsg> &,
                     const std::vector<parts_msgs::BrushlessMotorCommandMsg> & );
-            Part( const Part & );
+            Body( const Part & );
 
             void operator=( const Part & );
 

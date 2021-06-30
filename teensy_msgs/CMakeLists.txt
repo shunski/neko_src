@@ -3,7 +3,7 @@ project(teensy_msgs)
 
 find_package(catkin REQUIRED COMPONENTS
   std_msgs
-  actuator_lib
+  component_lib
   message_generation
 )
 
@@ -18,13 +18,13 @@ add_message_files(
 generate_messages(
   DEPENDENCIES
   std_msgs
-  actuator_lib
+  component_lib
 )
 
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES
-  CATKIN_DEPENDS std_msgs actuator_lib message_runtime
+  CATKIN_DEPENDS std_msgs component_lib message_runtime
 #  DEPENDS system_lib
 )
 

@@ -1,11 +1,11 @@
-#include <actuator_lib/BrushedMotor.h>
+#include <actuator_lib/Motor.h>
 
-BrushedMotor::BrushedMotor( PartID pID, Uint8 ID):
-    GenericParts( "BrushedMotor", pID, ID )
+Motor::Motor( PartID pID, Uint8 ID):
+    GenericParts( "Motor", pID, ID )
 {}
 
-BrushedMotor::BrushedMotor( const BrushedMotor & original ) :
-    GenericParts( "BrushedMotor", PartID(original.part_id), original.id ),
+Motor::Motor( const Motor & original ) :
+    GenericParts( "Motor", PartID(original.part_id), original.id ),
     current_limit( original.current_limit ),
     pwm( original.pwm ),
     rpm( original.rpm ),
@@ -16,40 +16,40 @@ BrushedMotor::BrushedMotor( const BrushedMotor & original ) :
     well_defined = original.well_defined;
 }
 
-
-BrushedMotor::BrushedMotor( const BrushedMsg & msg ):
-    GenericParts( "BrushedMotor", PartID(msg.part_id), msg.id )
+ 
+Motor::Motor( const BrushedMsg & msg ):
+    GenericParts( "Motor", PartID(msg.part_id), msg.id )
 { this->set( msg ); }
 
 
-BrushedMotor::BrushedMotor( const typename BrushedMsg::ConstPtr & msg ):
-    GenericParts( "BrushedMotor", PartID(msg->part_id), msg->id )
+Motor::Motor( const typename BrushedMsg::ConstPtr & msg ):
+    GenericParts( "Motor", PartID(msg->part_id), msg->id )
 { this->set( msg ); }
 
 
-BrushedMotor::BrushedMotor( const BrushedCommandMsg & msg ):
-    GenericParts( "BrushedMotor", PartID(msg.part_id), msg.id )
+Motor::Motor( const BrushedCommandMsg & msg ):
+    GenericParts( "Motor", PartID(msg.part_id), msg.id )
 { this->set( msg ); }
 
 
-BrushedMotor::BrushedMotor( const typename BrushedCommandMsg::ConstPtr & msg ):
-    GenericParts( "BrushedMotor", PartID(msg->part_id), msg->id )
+Motor::Motor( const typename BrushedCommandMsg::ConstPtr & msg ):
+    GenericParts( "Motor", PartID(msg->part_id), msg->id )
 { this->set( msg ); }
 
 
-BrushedMotor::BrushedMotor( const BrushedFeedbackMsg & msg ):
-    GenericParts( "BrushedMotor", PartID(msg.part_id), msg.id )
+Motor::Motor( const BrushedFeedbackMsg & msg ):
+    GenericParts( "Motor", PartID(msg.part_id), msg.id )
 { this->set( msg ); }
 
 
-BrushedMotor::BrushedMotor( const typename BrushedFeedbackMsg::ConstPtr & msg ):
-    GenericParts( "BrushedMotor", PartID(msg->part_id), msg->id )
+Motor::Motor( const typename BrushedFeedbackMsg::ConstPtr & msg ):
+    GenericParts( "Motor", PartID(msg->part_id), msg->id )
 { this->set( msg ); }
 
 
-void BrushedMotor::operator=( const BrushedMotor & original ){
+void Motor::operator=( const Motor & original ){
     if( part_id != original.part_id || id != original.id ){
-        ROS_INFO("Invalid use of assignment operator for two BrushedMotor objects. Operation failed.");
+        ROS_INFO("Invalid use of assignment operator for two Motor objects. Operation failed.");
         return;
     }
 
@@ -75,7 +75,7 @@ const map<ros::Time, int16_t>& get_actual_positions() const ;
 const map<ros::Time, int16_t>& get_current_drawed() const ;
 
 
-void BrushedMotor::print() const
+void Motor::print() const
 {
     if( valid ){
         ROS_ERROR("Printing information of <%s>: part_id = [%d], id = [%d], \ncurrent_limit\t= [%d], \ncurrent \t= [%d]\n", child_name.c_str(), part_id, id, current_limit );
@@ -86,7 +86,7 @@ void BrushedMotor::print() const
 }
 
 
-CattyError BrushedMotor::set_msg( BrushedMsg & msg ) const
+CattyError Motor::set_msg( BrushedMsg & msg ) const
 {
 	if ( msg.part_id == 0 && msg.id == 0 ) {
 		msg.part_id = part_id;
@@ -120,7 +120,7 @@ CattyError BrushedMotor::set_msg( BrushedMsg & msg ) const
 }
 
 
-CattyError BrushedMotor::set_CommandMsg( BrushedCommandMsg & msg ) const {
+CattyError Motor::set_CommandMsg( BrushedCommandMsg & msg ) const {
 	if ( msg.part_id == 0 && msg.id == 0 ) {
 		msg.part_id = part_id;
 		msg.id = id;
@@ -151,7 +151,7 @@ CattyError BrushedMotor::set_CommandMsg( BrushedCommandMsg & msg ) const {
 }
 
 
-CattyError BrushedMotor::set_FeedbackMsg( BrushedFeedbackMsg & msg ) const {
+CattyError Motor::set_FeedbackMsg( BrushedFeedbackMsg & msg ) const {
 	if ( msg.part_id == 0 && msg.id == 0 ) {
 		msg.part_id = part_id;
 		msg.id = id;
@@ -181,7 +181,7 @@ CattyError BrushedMotor::set_FeedbackMsg( BrushedFeedbackMsg & msg ) const {
 }
 
 
-CattyError BrushedMotor::set( const BrushedMsg & msg )
+CattyError Motor::set( const BrushedMsg & msg )
 {
 	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
@@ -208,7 +208,7 @@ CattyError BrushedMotor::set( const BrushedMsg & msg )
 }
 
 
-CattyError BrushedMotor::set( const typename BrushedMsg::ConstPtr & msg )
+CattyError Motor::set( const typename BrushedMsg::ConstPtr & msg )
 {
 	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
@@ -235,7 +235,7 @@ CattyError BrushedMotor::set( const typename BrushedMsg::ConstPtr & msg )
 }
 
 
-CattyError BrushedMotor::set( const BrushedCommandMsg & msg )
+CattyError Motor::set( const BrushedCommandMsg & msg )
 {
 	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
@@ -260,7 +260,7 @@ CattyError BrushedMotor::set( const BrushedCommandMsg & msg )
 }
 
 
-CattyError BrushedMotor::set( const BrushedCommandMsg::ConstPtr & msg )
+CattyError Motor::set( const BrushedCommandMsg::ConstPtr & msg )
 {
 	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
@@ -285,7 +285,7 @@ CattyError BrushedMotor::set( const BrushedCommandMsg::ConstPtr & msg )
 }
 
 
-CattyError BrushedMotor::set( const BrushedFeedbackMsg & msg )
+CattyError Motor::set( const BrushedFeedbackMsg & msg )
 {
 	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
@@ -310,7 +310,7 @@ CattyError BrushedMotor::set( const BrushedFeedbackMsg & msg )
 }
 
 
-CattyError BrushedMotor::set( const typename BrushedFeedbackMsg::ConstPtr & msg )
+CattyError Motor::set( const typename BrushedFeedbackMsg::ConstPtr & msg )
 {
 	CattyError error = check_msg_id( msg );
 	if ( error == PART_ID_NOT_MATCH ) {
@@ -335,7 +335,7 @@ CattyError BrushedMotor::set( const typename BrushedFeedbackMsg::ConstPtr & msg 
 }
 
 
-void BrushedMotor::set_RandomCommandMsg( BrushedCommandMsg & msg ) const {
+void Motor::set_RandomCommandMsg( BrushedCommandMsg & msg ) const {
     msg.part_id = part_id;
     msg.id = id;
     msg.current_limit = 255;

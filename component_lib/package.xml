@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>actuator_lib</name>
+  <name>component_lib</name>
   <version>0.0.0</version>
   <description>The package that contains an integrated object definitions of Neko</description>
 

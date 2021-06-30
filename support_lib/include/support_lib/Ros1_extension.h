@@ -10,31 +10,23 @@
 class TransferableObject {
     private:
         ObjectState state = NONE;		     // will be set to either COMMAND, FEEDBACK or GENERAL as needed
-        bool well_defined;                   // will be set to true after enough information (as a particular 'state') filled out
 
     protected:
-
-        template <Typename MessageType>
-        void update_state( const typename MessageType::ConstPtr& message ){
-
-            if ( state == NONE ){
-                if constexpr( message_state<MessageType>::value == COMMAND )
-                    state = COMMAND;
-                else if constexpr( message_state<MessageType>::value == FEEDBACK )
-                    state = FEEDBACK;
-                else if constexpr( message_state<MessageType>::value == GENERAL )
-                    state = GENERAL;
+		TransferableObjectState get_state() const { return state; }
+        template <typename MessageType>
+        CattyError check_state( const typename MessageType::ConstPtr& message ){
+            if constexpr( message_state<MessageType>::value == COMMAND ){
+                if ( state != COMMAND ){
+                    ROS_ERROR( "OBJECT_STATE_NOT_MATCH: State of Object is %s, but that of message is COMMAND", get_description( this->state ).c_str() );
+                    return OBJECT_STATE_NOT_MATCH;
+                }
+            } else  if constexpr( message_state<MessageType>::value == FEEDBACK ){
+                if ( state != FEEDBACK ){
+                    ROS_ERROR( "OBJECT_STATE_NOT_MATCH: State of Object is %s, but that of message is FEEDBACK", get_description( this->state ).c_str() );
+                    return OBJECT_STATE_NOT_MATCH;
+                }
             }
-
-            else if( state == COMMAND ){
-                if constexpr( message_state<MessageType>::value == FEEDBACK || message_state<MessageType>::value == GENERAL )
-                    state = GENERAL;
-            }
-
-            else if( state == FEEDBACK ){
-                if constexpr( message_state<MessageType>::value == COMMAND || message_state<MessageType>::value == GENERAL )
-                    state = GENERAL;
-            }
+            return SUCCESS;
         }
 };
 
@@ -44,7 +36,7 @@ struct message_state {
     static const TransferableObjectState value = NONE;
 };
 
-// trait that detects transferble objects
+// trait that detects transferable objects
 // ALL of the following members must be specialized in each specialized class:
 // - (public) CattyError fill_general_msg();
 // - (public) CattyError fill_command_msg();
@@ -63,11 +55,12 @@ struct is_transferable_object<TransferableObject> {
 // trait that detects component objects (motor, sensor, ...)
 // this trait is implemented in component_lib
 template< typename ObjectType >
-struct is_component {
-    static const bool value = false;
+struct get_component_kind {
+    static const ComponentKind value = INVALID_COMPONENT_KIND;
 };
 
 
+// the neko_msg struct tells the information about the formula
 template < typename ObjectType, typename MessageType >
 struct neko_msg {
     static void set_msg( const ObjectType& object, MessageType& message ){
@@ -106,8 +99,7 @@ struct neko_msg {
     static CattyError check_msg_id( const typename MessageType::ConstPtr message_ptr ) {
         if constexpr( is_transferable_object<ObjectType>::value && message_state<MessageType>::value!=NONE ) {
             if ( object.get_part_id() != message_ptr->part_id ) return PART_ID_NOT_MATCH;
-            if constexpr ( is_component<ObjectType> ){
-                if ( object.get_part_id() != message_ptr->part_id ) return COMPONENT_ID_NOT_MATCH;
+            if constexpr ( get_component_kind<ObjectType> ){  // the expression returns false if the type is INVALID_COMPONENT_KIND
                 if ( object.get_component_id() != message_ptr->component_id ) return COMPONENT_ID_NOT_MATCH;
             }
             return SUCCESS;
@@ -121,5 +113,4 @@ struct neko_msg {
         }
     }
 };
-
 #endif

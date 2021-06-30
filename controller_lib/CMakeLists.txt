@@ -1,33 +1,45 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(component_lib)
+project(controller_lib)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  actionlib
   support_lib
+  actuator_lib
+  teensy_msgs
   message_generation
+  actionlib_msgs
 )
 
 add_message_files(
   FILES
-  GenericComponentMsg.msg
-  KondoServoCommandMsg.msg
-  KondoServoFeedbackMsg.msg
-  KondoServoGeneralMsg.msg
-  MotorCommandMsg.msg
-  MotorFeedbackMsg.msg
-  MotorGeneralMsg.msg
+  BodyMsg.msg
+  BodyCommandMsg.msg
+  ProcessedFeedbackMsg.msg
+)
+
+add_action_files(
+  FILES
+  MotionControll.action
 )
 
 generate_messages(
   DEPENDENCIES
   std_msgs
+  actuator_lib
+  actionlib_msgs
 )
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES actuator_lib
-  CATKIN_DEPENDS roscpp support_lib
-  #  DEPENDS system_lib
+  LIBRARIES body_lib
+  CATKIN_DEPENDS
+    roscpp
+    support_lib
+    actuator_lib
+    teensy_msgs
+  DEPENDS
+    actuator_lib
 )
 
 include_directories(
@@ -36,11 +48,10 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME}
-  src/Motor.cpp
-  src/KondoServo.cpp
+  src/Body.cpp
+  src/MotionController.cpp
+  src/FeedbackProcessor.cpp
 )
-
-
 target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )

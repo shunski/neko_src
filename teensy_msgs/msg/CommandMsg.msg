@@ -1,6 +1,5 @@
 # CommandMsg.msg
 uint16 scene_id
 duration expectedSceneDuration
-actuator_lib/KondoServoCommandMsg[] kondoServoCommandSet
-actuator_lib/BrushedMotorCommandMsg[] brushedMotorCommandSet
-actuator_lib/BrushlessMotorCommandMsg[] brushlessMotorCommandSet
+component_lib/KondoServoCommandMsg[] kondoServoCommandSet
+component_lib/motorCommandMsg[] motorCommandSet

@@ -1,6 +1,6 @@
-# KondoServoMsg.msg
-uint8 part_id
-uint8 id
+# KondoServoGeneralMsg.msg
+
+component_lib/GenericComponentMsg component_property
 
 # command information
 uint8 current_limit
@@ -17,4 +17,4 @@ bool feedback_degree
 bool is_freed
 
 
-# see the definitions in KondoServo.h
+# see the definitions in component.h

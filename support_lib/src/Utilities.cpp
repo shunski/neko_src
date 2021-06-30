@@ -1,16 +1,36 @@
 #include <support_lib/Utilities.h>
 
-std::string get_description( ComponentId component_id ){
-    if ( component_id == KondoServo ){
-        return "KondoServo";
-    } else if ( component_id == Motor ){
-        return "Motor";
-    } else {
-        return "MotionSensor";
+const std::string get_description( ComponentKind component_kind ){
+    switch ( component_kind ) {
+        case COMPUTER: return "Computer";
+        case BATTERY: return "Battery";
+        case MICRO_CONTROLLER: return "MicroController";
+        case ACTUATOR: return "Actuator";
+        case SENSOR: return "Sensor";
+        default:
+            ROS_ERROR("Not a valid component_id. Could not return the description.");
+            return "";
+    }
+}
+
+const std::string get_description( ComponentId component_id ){
+    switch ( component_id ) {
+        case KONDO_SERVO: return "KondoServo";
+        case MOTOR: return "Motor";
+        case MOTION_SENSOR: return "MotionSensor";
+        case CURRENT_SENSOR: return "CurrntSensor";
+        case VOLTAGE_SENSOR: return "VoltageSensor";
+        case BATTERY: return "Battery";
+        case DC_POWER: return "DcPower";
+        case COMPUTER: return "Computer";
+        case MICRO_CONTROLLER: return "MicroController";
+        default:
+            ROS_ERROR("Not a valid component_id. Could not return the description.");
+            return "";
     };
 }
 
-std::string createRandomStringOfSize( int n ){
+const std::string createRandomStringOfSize( int n ){
     std::string str;
     for( int i=0; i<n; i++ ){
         str.push_back( rand()%26 + 65 );
@@ -18,35 +38,49 @@ std::string createRandomStringOfSize( int n ){
     return str;
 }
 
-PartProperties::PartProperties( PartID ID, size_t KondoServoNum, size_t MotorNum, size_t MotionSensorNum ):
-    id( ID ),
-    kondoServoNum( KondoServoNum ),
-    brushedMotorNum( MotorNum ),
-    motionSensorNum( MotionSensorNum )
+PartProperties::PartProperties(
+        PartId partId,
+        size_t kondoServoNum,
+        size_t motorNum,
+        size_t motionSensorNum,
+        size_t currentSensorNum,
+        size_t batteryNum,
+        size_t dcPowerNum,
+        size_t computerNum,
+        size_t microControllerNum
+    ):
+        part_id( partId ),
+        kondo_servo_num( kondoServoNum ),
+        motor_num( motorNum ),
+        motion_sensor_num( motionSensorNum ),
+        current_sensor_num( currentSensorNum ),
+        battery_num( batteryNum ),
+        dc_power_num( dcPowerNum ),
+        computer_num( computerNum ),
+        micro_controller_num( microControllerNum )
 {}
 
-
-PartProperties get_properties_by_id( PartID id ){
-    switch ( id )
-    {
-        case( HEAD ):    return PartProperties( HEAD,  1, 0 , 0 );
-        case( CHEST ):   return PartProperties( CHEST, 2, 0 , 0 );
-        case( WAIST ):   return PartProperties( WAIST, 3, 1 , 0 );
-        case( RFLEG ):   return PartProperties( RFLEG, 1, 1 , 2 );
-        case( LFLEG ):   return PartProperties( LFLEG, 1, 1 , 2 );
-        case( RHLEG ):   return PartProperties( RHLEG, 3, 1 , 2 );
-        case( LHLEG ):   return PartProperties( LHLEG, 3, 1 , 2 );
+const std::string get_description( PartId partId ){
+    switch( partId ){
+        case( HEAD ): return "HEAD";
+        case( CHEST ): return "CHEST";
+        case( BELLY ): return "BELLY";
+        case( WAIST ): return "WAIST";
+        case( RFLEG ): return "RFLEG";
+        case( LFLEG ): return "LFLEG";
+        case( RHLEG ): return "RHLEG";
+        case( LHLEG ): return "LHLEG";
+        default: return "INVALID";
     }
-    return PartProperties( NONE, 0, 0, 0, 0);
 }
 
-
-std::string get_description( ObjectState state ){
+const std::string get_description( TransferableObjectState state ){
     switch( state )
     {
         case( GENERAL ): return "GENERAL";
         case( COMMAND ): return "COMMAND";
         case( FEEDBACK ): return "FEEDBACK";
+        case( EXPECTED ): return "EXPECTED";
         default: return "NONE";
     }
 }
@@ -54,7 +88,7 @@ std::string get_description( ObjectState state ){
 
 bool isSucceeded( CattyError error ) { return !error; }
 
-std::string get_description( CattyError error ) {
+const std::string get_description( CattyError error ) {
     switch( error )
     {
         case SUCCESS: return "SUCCESS";

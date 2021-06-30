@@ -3,7 +3,6 @@ project(support_lib)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  support_msgs
   message_generation
 )
 

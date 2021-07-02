@@ -9,9 +9,10 @@
 // All transferable objects (by messages) must inherit this class.
 class TransferableObject {
     private:
-        ObjectState state = NONE;		     // will be set to either COMMAND, FEEDBACK or GENERAL as needed
+        TransferableObjectState state = NONE;		     // will be set to either COMMAND, FEEDBACK or GENERAL as needed
 
     protected:
+        TransferableObject( TransferableObjectState );
 		TransferableObjectState get_state() const { return state; }
         template <typename MessageType>
         CattyError check_state( const typename MessageType::ConstPtr& message ){
@@ -65,11 +66,15 @@ template < typename ObjectType, typename MessageType >
 struct neko_msg {
     static void set_msg( const ObjectType& object, MessageType& message ){
         if constexpr( is_transferable_object<ObjectType>::value && ros::message_traits::IsMessage::value ) {
+            // Error handling
+            CattyError = error = check_msg_id( object, message_msg );
+            if( error ){
+                ROS_ERROR( "%s: During set message for the following object: \n%s\n\nshutting down...", get_description( error ).c_str(), object.get_description().c_str());
+                ros::shutdown();
+            }
             if constexpr ( message_state<MessageType>::value == COMMAND ){
                 object.fill_command_msg( message );
             } else if constexpr( message_state<MessageType>::value == FEEDBACK ){
-                object.fill_feedback_msg( message );
-            } else if constexpr( message_state<MessageType>::value == GENERAL ){
                 object.fill_feedback_msg( message );
             } else {
                 static_assert("The message does not support the message_state<T> trait.");
@@ -101,6 +106,7 @@ struct neko_msg {
             if ( object.get_part_id() != message_ptr->part_id ) return PART_ID_NOT_MATCH;
             if constexpr ( get_component_kind<ObjectType> ){  // the expression returns false if the type is INVALID_COMPONENT_KIND
                 if ( object.get_component_id() != message_ptr->component_id ) return COMPONENT_ID_NOT_MATCH;
+                if ( object.get_id_number() != message_ptr->id_number ) return ID_NUMBER_NOT_MATCH;
             }
             return SUCCESS;
 

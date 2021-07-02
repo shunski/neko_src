@@ -1,11 +1,11 @@
-#include <actuator_lib/Motor.h>
+#include <component_lib/component.h>
 
 Motor::Motor( PartID pID, Uint8 ID):
-    GenericParts( "Motor", pID, ID )
+    Actuator( "Motor", pID, ID )
 {}
 
 Motor::Motor( const Motor & original ) :
-    GenericParts( "Motor", PartID(original.part_id), original.id ),
+    Actuator( "Motor", PartID(original.part_id), original.id ),
     current_limit( original.current_limit ),
     pwm( original.pwm ),
     rpm( original.rpm ),
@@ -16,34 +16,34 @@ Motor::Motor( const Motor & original ) :
     well_defined = original.well_defined;
 }
 
- 
+
 Motor::Motor( const BrushedMsg & msg ):
-    GenericParts( "Motor", PartID(msg.part_id), msg.id )
+    Actuator( "Motor", PartID(msg.part_id), msg.id )
 { this->set( msg ); }
 
 
 Motor::Motor( const typename BrushedMsg::ConstPtr & msg ):
-    GenericParts( "Motor", PartID(msg->part_id), msg->id )
+    Actuator( "Motor", PartID(msg->part_id), msg->id )
 { this->set( msg ); }
 
 
 Motor::Motor( const BrushedCommandMsg & msg ):
-    GenericParts( "Motor", PartID(msg.part_id), msg.id )
+    Actuator( "Motor", PartID(msg.part_id), msg.id )
 { this->set( msg ); }
 
 
 Motor::Motor( const typename BrushedCommandMsg::ConstPtr & msg ):
-    GenericParts( "Motor", PartID(msg->part_id), msg->id )
+    Actuator( "Motor", PartID(msg->part_id), msg->id )
 { this->set( msg ); }
 
 
 Motor::Motor( const BrushedFeedbackMsg & msg ):
-    GenericParts( "Motor", PartID(msg.part_id), msg.id )
+    Actuator( "Motor", PartID(msg.part_id), msg.id )
 { this->set( msg ); }
 
 
 Motor::Motor( const typename BrushedFeedbackMsg::ConstPtr & msg ):
-    GenericParts( "Motor", PartID(msg->part_id), msg->id )
+    Actuator( "Motor", PartID(msg->part_id), msg->id )
 { this->set( msg ); }
 
 

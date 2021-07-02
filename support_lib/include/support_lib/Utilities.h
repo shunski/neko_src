@@ -71,7 +71,7 @@ struct PartProperties{
 const std::string get_description( PartId );
 const std::string get_description( TransferableObjectState );
 
-// ID definition: Each component is identified by PartId, ComponentId and IdNumber
+// Additional ID definitions: Each component is identified by PartId, ComponentId and IdNumber
 typedef uint8_t IdNumber;
 
 struct Point
